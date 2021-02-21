@@ -16,12 +16,13 @@ use App\Http\Controllers\API\ProductController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::post('register', [RegisterController::class, 'register']);
 Route::post('login', [RegisterController::class, 'login']);
    
 Route::middleware('auth:api')->group( function () {
+
     Route::resource('products', ProductController::class);
+    Route::post('register', [RegisterController::class, 'register']);
+    
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

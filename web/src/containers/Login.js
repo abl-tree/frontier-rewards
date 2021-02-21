@@ -11,7 +11,7 @@ const Login = (props) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
-    const onLogin = (e) => {
+    const onLogin = async (e) => {
 
         e.preventDefault();
 
@@ -20,7 +20,7 @@ const Login = (props) => {
             password: password
         }
 
-        dispatch(Auth(data));
+        dispatch(Auth(props, data));
         
     }
 

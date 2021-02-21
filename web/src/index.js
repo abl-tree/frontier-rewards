@@ -8,10 +8,12 @@ import Store from "./Store";
 import {BrowserRouter} from "react-router-dom";
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:8000/";
-axios.defaults.headers['Accept'] = "application/json";
-axios.defaults.headers['Content-Type'] = "application/json";
-// axios.defaults.headers.common['Authorization'] = "Bearer " + localStorage.getItem('token');
+axios.defaults.baseURL = "http://localhost:8000/v1/";
+axios.defaults.headers = {
+    "Access-Control-Allow-Origin": "*",
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+}
 
 ReactDOM.render(
     <React.StrictMode>
