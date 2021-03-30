@@ -36,3 +36,12 @@
     transform: rotate(360deg);
   }
 }
+
+.navbar .navbar-toggler {
+  top: .25rem;
+  right: 1rem;
+}
+
+.react-datepicker-wrapper {
+  width: 100%;
+}

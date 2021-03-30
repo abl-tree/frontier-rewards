@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {useDispatch, useSelector} from "react-redux";
 import { Button, Form, Col } from 'react-bootstrap';
 import { Auth } from "../actions/userAction";
+import '../css/signin.css'
 
 const Login = (props) => {
     
@@ -10,10 +11,22 @@ const Login = (props) => {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const [validated, setValidated] = useState(false);
 
-    const onLogin = async (e) => {
+    const onLogin = async (event) => {
 
-        e.preventDefault();
+        event.preventDefault();
+        event.stopPropagation();
+
+        const form = event.currentTarget;
+    
+        setValidated(true);
+
+        if (form.checkValidity() === false) {
+
+            return;
+
+        }
 
         const data = {
             email: username,
@@ -25,46 +38,42 @@ const Login = (props) => {
     }
 
     return (
-        <Col md="6">
-            <Form>
-                <Form.Group controlId="formBasicEmail">
-                    <Form.Label>Email address</Form.Label>
-                    <Form.Control 
-                        type="email" 
-                        placeholder="Enter email" 
-                        onChange={ e => setUsername(e.target.value) }
-                    />
-                    <Form.Text className="text-muted">
-                        We'll never share your email with anyone else.
-                    </Form.Text>
-                </Form.Group>
-            
-                <Form.Group controlId="formBasicPassword">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control 
-                        type="password" 
-                        placeholder="Password" 
-                        onChange={ e => setPassword(e.target.value) }
-                    />
-                </Form.Group>
+        <div className="login-container text-center">
+            <Form className="form-signin" noValidate validated={validated} onSubmit={onLogin}>
 
-                <Form.Group controlId="formBasicCheckbox">
-                    <Form.Check type="checkbox" label="Check me out" />
-                </Form.Group>
+                <h1 className="h3 mb-3 font-weight-normal">Login</h1>
+
+                <Form.Control 
+                    type="email" 
+                    placeholder="Email address" 
+                    onChange={ e => setUsername(e.target.value) }
+                    isInvalid={auth.errorMsg}
+                    required
+                />
+        
+                <Form.Control 
+                    type="password" 
+                    placeholder="Password" 
+                    onChange={ e => setPassword(e.target.value) }
+                    isInvalid={auth.errorMsg}
+                    required
+                />
+
+                <Form.Control.Feedback type="invalid">
+                    {auth.errorMsg && (
+                        <div>{auth.errorMsg}</div>
+                    )}
+                </Form.Control.Feedback>
 
                 <Button 
+                    className="btn-block"
                     variant="primary" 
                     type="submit"
-                    onClick={ e => onLogin(e) }
                 >
                     Login
                 </Button>
-
-                {auth.errorMsg && (
-                    <div>{auth.errorMsg}</div>
-                )}
             </Form>
-        </Col>
+        </div>
     )
 }
 

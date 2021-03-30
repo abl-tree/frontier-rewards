@@ -2,13 +2,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import './App.css';
 import reportWebVitals from './reportWebVitals';
 import {Provider} from "react-redux";
 import Store from "./Store";
 import {BrowserRouter} from "react-router-dom";
+import { config } from '../src/utils/Constants';
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:8000/v1/";
+axios.defaults.baseURL = config.url.API_URL
 axios.defaults.headers = {
     "Access-Control-Allow-Origin": "*",
     "Accept": "application/json",
