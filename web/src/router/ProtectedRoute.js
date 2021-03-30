@@ -37,7 +37,7 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
                                     height="30"
                                     className="d-inline-block align-top"
                                 />
-                                React Bootstrap
+                                Frontier Rewards
                                 </Navbar.Brand>
 
                                 <button className="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">

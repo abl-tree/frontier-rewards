@@ -1,7 +1,7 @@
 const prod = {
     url: {
-        API_URL: 'https://myapp.herokuapp.com',
-        API_URL_USERS: 'https://myapp.herokuapp.com/users'
+        API_URL: 'http://fr-api.thedreamteamdigitalmarketing.com/v1',
+        API_URL_USERS: 'http://fr-api.thedreamteamdigitalmarketing.com'
     }
 };
 
