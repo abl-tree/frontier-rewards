@@ -1,7 +1,7 @@
 const prod = {
     url: {
-        API_URL: 'http://fr-api.thedreamteamdigitalmarketing.com/v1',
-        API_URL_USERS: 'http://fr-api.thedreamteamdigitalmarketing.com'
+        API_URL: 'https://fr-api.thedreamteamdigitalmarketing.com/v1',
+        API_URL_USERS: 'https://fr-api.thedreamteamdigitalmarketing.com'
     }
 };
 
