@@ -7,7 +7,7 @@ export const Auth = (props, data) => async dispatch => {
             type: "LOGIN_REQUEST"
         })
 
-        const res = await axios.post('http://localhost:8000/v1/login', data)
+        const res = await axios.post('/login', data)
 
         dispatch({
             type: "LOGIN_SUCCESS",
@@ -35,7 +35,7 @@ export const Register = (props, data) => async dispatch => {
             type: "REGISTER_REQUEST"
         })
 
-        const res = await axios.post('http://localhost:8000/v1/register', data)
+        const res = await axios.post('/register', data)
 
         dispatch({
             type: "REGISTER_SUCCESS",
