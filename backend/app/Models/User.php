@@ -48,4 +48,8 @@ class User extends Authenticatable
     {
         $this->attributes['name'] = preg_replace('/\s+/', ' ', $value);
     }
+
+    public function info() {
+        return $this->hasOne(UserInfo::class);
+    }
 }

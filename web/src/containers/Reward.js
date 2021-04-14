@@ -20,22 +20,6 @@ const Reward = (props) => {
             'hidden': true
         },
         {
-            'key': 'name',
-            'title': 'Name',
-            'type': 'text',
-            'placeholder': 'Enter action name',
-            'control_id': 'formActionName',
-            'required': true
-        },
-        {
-            'key': 'description',
-            'title': 'Description',
-            'type': 'text',
-            'placeholder': 'Enter action description',
-            'control_id': 'formActionDescription',
-            'required': true
-        },
-        {
             'key': 'type',
             'title': 'Type',
             'type': 'select',
@@ -55,6 +39,31 @@ const Reward = (props) => {
                 }
             ],
             'control_id': 'formActionType',
+            'required': true
+        },
+        {
+            'key': 'value',
+            'title': 'Value',
+            'type': 'number',
+            'min': 0,
+            'placeholder': 'Enter action name',
+            'control_id': 'formValue',
+            'required': true
+        },
+        {
+            'key': 'name',
+            'title': 'Name',
+            'type': 'text',
+            'placeholder': 'Enter action name',
+            'control_id': 'formActionName',
+            'required': true
+        },
+        {
+            'key': 'description',
+            'title': 'Description',
+            'type': 'text',
+            'placeholder': 'Enter action description',
+            'control_id': 'formActionDescription',
             'required': true
         }
     ];
@@ -182,6 +191,20 @@ const Reward = (props) => {
                                                 type={field.type} 
                                                 placeholder={field.placeholder}
                                                 value={data[field.key]}
+                                                onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                } else if(field.type === 'number' && data.type != 'item') {
+                                    return <Form.Group hidden={field.hidden} key={i} as={Row} controlId={field.control_id}>
+                                        <Form.Label column sm={3}>{field.title}</Form.Label>
+                                        <Col sm={9}>
+                                            <Form.Control 
+                                                required={field.required}
+                                                type={field.type} 
+                                                placeholder={field.placeholder}
+                                                value={data[field.key]}
+                                                min={field.min}
                                                 onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                             />
                                         </Col>

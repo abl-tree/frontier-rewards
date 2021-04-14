@@ -229,7 +229,7 @@ const User = (props) => {
 
     React.useEffect(() => {
 
-        initEcho()
+        // initEcho()
 
         fetchUsers()
 
@@ -259,6 +259,8 @@ const User = (props) => {
                                                 required={field.required}
                                                 type={field.type} 
                                                 placeholder={field.placeholder}
+                                                value={data[field.key]}
+                                                defaultValue={data[field.key]}
                                                 onChange={ e => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                             />
                                         </Col>

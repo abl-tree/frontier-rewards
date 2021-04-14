@@ -2,7 +2,9 @@ import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import { Button, ButtonGroup, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
 import _ from "lodash";
+import axios from "axios";
 import {AddPackage, DeletePackage, EditPackage, GetPackages} from "../actions/packageAction";
+import AsyncSelect from 'react-select/async';
 
 const Product = (props) => {
     
@@ -10,6 +12,7 @@ const Product = (props) => {
     const packageList = useSelector(state => state.Package);
     const [validated, setValidated] = useState(false);
     const [data, setData] = useState({});
+    const [reward, setReward] = useState({});
     const fields = [
         {
             'key': 'id',
@@ -97,6 +100,31 @@ const Product = (props) => {
 
     }
 
+    const fetchRewards = async () => {
+
+        const res = await axios.get('/rewards')
+
+        var results = res.data.data
+
+        var options = [];
+
+        for (let a = 0; a < results.data.length; a++) {
+            const result = results.data[a]
+            
+            options = [...options, {value: result.id, label: result.name}]
+        }
+        
+        return options
+    }
+
+    const promiseRewardOptions = inputValue => new Promise(resolve => {
+
+        setTimeout(() => {
+            resolve(fetchRewards(inputValue));
+        }, 1000);
+
+    });
+
     const handleDelete = id => {
     
         dispatch(DeletePackage(props, id))
@@ -176,6 +204,7 @@ const Product = (props) => {
                                     </Col>
                                 </Form.Group>
                             })}
+                            <AsyncSelect cacheOptions defaultOptions loadOptions={promiseRewardOptions} onChange={value => setReward(prev => ({...prev, 'reward_id' : value.value}))} placeholder="None" />
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" onClick={handleClose}>

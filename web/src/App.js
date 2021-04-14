@@ -4,6 +4,7 @@ import Login from './containers/Login';
 import ProductList from './containers/ProductList';
 import Product from './containers/Product';
 import User from './containers/User';
+import UserProfile from './containers/UserProfile';
 import Package from './containers/Package';
 import Action from './containers/Action';
 import Campaign from './containers/Campaign';
@@ -22,6 +23,7 @@ function App() {
             {/* <ProtectedRoute path={"/products"} exact component={ProductList}/> */}
             {/* <ProtectedRoute path={"/product/:product"} exact component={Product}/> */}
             <ProtectedRoute path={"/users"} exact component={User}/>
+            <ProtectedRoute path={"/user/:user"} exact component={UserProfile}/>
             <ProtectedRoute path={"/packages"} exact component={Package}/>
             <ProtectedRoute path={"/actions"} exact component={Action}/>
             <ProtectedRoute path={"/rewards"} exact component={Reward}/>

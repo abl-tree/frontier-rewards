@@ -15,30 +15,30 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
     if(!_.isEmpty(auth.user)){
         axios.defaults.headers['Authorization'] = "Bearer " + auth.user.token;
 
-        window.Echo = new Echo({
-            broadcaster: 'pusher',
-            key: 'FRPUSHERKEY',
-            wsHost: config.url.BROADCAST_URL,
-            wsPort: 6001,
-            disableStats: true,
-            forceTLS: false,
-            authorizer: (channel, options) => {
-                return {
-                    authorize: (socketId, callback) => {
-                        axios.post('/broadcasting/auth', {
-                            socket_id: socketId,
-                            channel_name: channel.name
-                        })
-                        .then(response => {
-                            callback(false, response.data);
-                        })
-                        .catch(error => {
-                            callback(true, error);
-                        });
-                    }
-                };
-            },
-        });
+        // window.Echo = new Echo({
+        //     broadcaster: 'pusher',
+        //     key: 'FRPUSHERKEY',
+        //     wsHost: config.url.BROADCAST_URL,
+        //     wsPort: 6001,
+        //     disableStats: true,
+        //     forceTLS: false,
+        //     authorizer: (channel, options) => {
+        //         return {
+        //             authorize: (socketId, callback) => {
+        //                 axios.post('/broadcasting/auth', {
+        //                     socket_id: socketId,
+        //                     channel_name: channel.name
+        //                 })
+        //                 .then(response => {
+        //                     callback(false, response.data);
+        //                 })
+        //                 .catch(error => {
+        //                     callback(true, error);
+        //                 });
+        //             }
+        //         };
+        //     },
+        // });
     }
 
     return (

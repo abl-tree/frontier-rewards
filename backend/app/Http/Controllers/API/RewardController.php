@@ -109,6 +109,7 @@ class RewardController extends BaseController
         $reward->name = $input['name'];
         $reward->description = $input['description'];
         $reward->type = $input['type'];
+        $reward->value = @$input['value'];
         $reward->save();
    
         return $this->sendResponse(new RewardResource($reward), 'Reward updated successfully.');
