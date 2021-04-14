@@ -26,6 +26,30 @@ export const GetData = (props, url = apiRoute) => async dispatch => {
     }
 }
 
+export const GetDataById = (props, id) => async dispatch => {
+    try {
+
+        dispatch({
+            type: "REQUEST"
+        })
+
+        const res = await axios.get(apiRoute + '/' + id)
+
+        // dispatch({
+        //     type: "FETCH_SUCCESS",
+        //     payload: res.data.data
+        // })
+        
+    } catch (error) {
+
+        dispatch({
+            type: "FAIL",
+            payload: error.response.data.data
+        })
+        
+    }
+}
+
 export const AddData = (props, data) => async dispatch => {
     try {
 

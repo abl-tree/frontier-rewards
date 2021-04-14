@@ -24,7 +24,7 @@ const CampaignReducer = (state = DefaultState, action) => {
             
         case "ADD_SUCCESS":
 
-            var newData = [...state.data.data]
+            var newData = [...state.data.data, action.payload]
 
             var stateData = state.data
 

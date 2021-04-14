@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use App\Http\Resources\Action;
 
 class CampaignActionReward extends JsonResource
 {
@@ -19,6 +20,8 @@ class CampaignActionReward extends JsonResource
             'campaign_id' => $this->campaign_id,
             'action_id' => $this->action_id,
             'reward_id' => $this->reward_id,
+            'action' => $this->action,
+            'reward' => $this->reward
         ];
     }
 }

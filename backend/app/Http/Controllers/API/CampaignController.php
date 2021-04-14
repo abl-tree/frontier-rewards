@@ -67,6 +67,7 @@ class CampaignController extends BaseController
     public function show($id)
     {
         $campaign = Campaign::find($id);
+        $campaign->setRelation('campaigns', $campaign->campaigns()->with('reward', 'action')->paginate(10));
   
         if (is_null($campaign)) {
             return $this->sendError('Campaign not found.');
@@ -127,6 +128,6 @@ class CampaignController extends BaseController
     {
         $campaign->delete();
    
-        return $this->sendResponse([], 'Campaign deleted successfully.');
+        return $this->sendResponse($campaign, 'Campaign deleted successfully.');
     }
 }

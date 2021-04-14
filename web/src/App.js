@@ -7,6 +7,7 @@ import User from './containers/User';
 import Package from './containers/Package';
 import Action from './containers/Action';
 import Campaign from './containers/Campaign';
+import CampaignDetail from './containers/CampaignDetail';
 import Reward from './containers/Reward';
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import $ from 'jquery';
@@ -25,6 +26,7 @@ function App() {
             <ProtectedRoute path={"/actions"} exact component={Action}/>
             <ProtectedRoute path={"/rewards"} exact component={Reward}/>
             <ProtectedRoute path={"/campaigns"} exact component={Campaign}/>
+            <ProtectedRoute path={"/campaign/:campaign"} exact component={CampaignDetail}/>
             <ProtectedRoute
                 exact
                 path={"/"}

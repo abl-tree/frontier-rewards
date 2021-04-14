@@ -15,9 +15,12 @@ class ActionController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $actions = Action::paginate(10);
+        $input = $request->all();
+
+        if(@$input['search']) $actions = Action::whereRaw("MATCH(`name`) AGAINST(? IN BOOLEAN MODE)", array($input['search']))->paginate(10)->withQueryString();
+        else $actions = Action::paginate(10)->withQueryString();
     
         return $this->sendResponse($actions, 'Actions retrieved successfully.');
     }

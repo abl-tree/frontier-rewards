@@ -15,11 +15,11 @@ class CampaignActionRewardController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $campaign_infos = CampaignActionReward::all();
+        $campaign_infos = CampaignActionReward::with('reward', 'action')->paginate(10);
     
-        return $this->sendResponse(CampaignARResource::collection($campaign_infos), 'Campaigns retrieved successfully.');
+        return $this->sendResponse($campaign_infos, 'Campaigns retrieved successfully.');
     }
 
     /**
@@ -52,8 +52,8 @@ class CampaignActionRewardController extends BaseController
             return $this->sendError('Validation Error.', $validator->errors());       
         }
    
-        $campaign_info = CampaignActionReward::create($input);
-   
+        $campaign_info = CampaignActionReward::with('action', 'reward')->create($input);
+
         return $this->sendResponse(new CampaignARResource($campaign_info), 'Campaign created successfully.');
     }
 
@@ -126,6 +126,6 @@ class CampaignActionRewardController extends BaseController
         $campaign_info = CampaignActionReward::find($id);
         $campaign_info->delete();
    
-        return $this->sendResponse([], 'Campaign deleted successfully.');
+        return $this->sendResponse($campaign_info, 'Campaign deleted successfully.');
     }
 }

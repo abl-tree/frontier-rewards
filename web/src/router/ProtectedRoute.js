@@ -4,12 +4,42 @@ import { useSelector } from "react-redux";
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import _ from "lodash";
 import axios from "axios";
+import { config } from '../utils/Constants';
+import Pusher from "pusher-js"
+import Echo from 'laravel-echo';
 
 export const ProtectedRoute = ({ component: Component, ...rest }) => {
     
     const auth = useSelector(state => state.Auth);
 
-    if(!_.isEmpty(auth.user)) axios.defaults.headers['Authorization'] = "Bearer " + auth.user.token;
+    if(!_.isEmpty(auth.user)){
+        axios.defaults.headers['Authorization'] = "Bearer " + auth.user.token;
+
+        window.Echo = new Echo({
+            broadcaster: 'pusher',
+            key: 'FRPUSHERKEY',
+            wsHost: config.url.BROADCAST_URL,
+            wsPort: 6001,
+            disableStats: true,
+            forceTLS: false,
+            authorizer: (channel, options) => {
+                return {
+                    authorize: (socketId, callback) => {
+                        axios.post('/broadcasting/auth', {
+                            socket_id: socketId,
+                            channel_name: channel.name
+                        })
+                        .then(response => {
+                            callback(false, response.data);
+                        })
+                        .catch(error => {
+                            callback(true, error);
+                        });
+                    }
+                };
+            },
+        });
+    }
 
     return (
         <Route
@@ -86,9 +116,9 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
                                                     </Link>
                                                 </li>
                                                 <li className="nav-item">
-                                                    <a className="nav-link" href="#">
+                                                    <a className="nav-link" href="/users">
                                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="feather feather-users"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                                                    Customers
+                                                    Users
                                                     </a>
                                                 </li>
                                                 <li className="nav-item">

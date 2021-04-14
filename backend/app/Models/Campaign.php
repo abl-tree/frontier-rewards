@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Campaign extends Model
 {
@@ -22,4 +23,9 @@ class Campaign extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
+
+    public function campaigns()
+    {
+        return $this->hasMany(CampaignActionReward::class);
+    }
 }

@@ -11,6 +11,7 @@ use App\Http\Controllers\API\CampaignActionRewardController;
 use App\Http\Controllers\API\PackageController;
 use App\Http\Controllers\API\PackageRewardController;
 use App\Http\Controllers\API\RewardController;
+use App\Http\Controllers\API\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +34,7 @@ Route::middleware('auth:api')->group( function () {
     Route::resource('packages', PackageController::class);
     Route::resource('package_rewards', PackageRewardController::class);
     Route::resource('rewards', RewardController::class);
+    Route::resource('users', UserController::class);
     Route::post('register', [RegisterController::class, 'register']);
     
 });

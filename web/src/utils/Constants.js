@@ -7,7 +7,10 @@ const prod = {
 
 const dev = {
     url: {
-        API_URL: 'http://localhost:8000/v1'
+        API_URL: 'http://localhost:8000/v1',
+        BASE_URL: 'http://localhost:8000',
+        BROADCAST_URL: 'localhost',
+        BROADCAST_KEY: 'FRPUSHERKEY'
     }
 };
 

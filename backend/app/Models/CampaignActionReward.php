@@ -15,4 +15,14 @@ class CampaignActionReward extends Model
     ];
 
     protected $dates = ['deleted_at'];
+
+    public function reward()
+    {
+        return $this->hasOne(Reward::class, 'id', 'reward_id');
+    }
+
+    public function action()
+    {
+        return $this->hasOne(Action::class, 'id', 'action_id');
+    }
 }
