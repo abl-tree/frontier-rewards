@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 use Illuminate\Auth\Events\Registered;
+use App\Events\UserRegistered;
+use App\Listeners\SendUserNotification;
+use App\Events\TransactionStatusUpdated;
+use App\Listeners\SendTransactionUpdatesNotification;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
@@ -18,6 +22,12 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        UserRegistered::class => [
+            SendUserNotification::class,
+        ],
+        TransactionStatusUpdated::class => [
+            SendTransactionUpdatesNotification::class,
+        ],
     ];
 
     /**
@@ -27,6 +37,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        parent::boot();
         //
     }
 }

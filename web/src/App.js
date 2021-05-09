@@ -5,16 +5,18 @@ import ProductList from './containers/ProductList';
 import Product from './containers/Product';
 import User from './containers/User';
 import UserProfile from './containers/UserProfile';
+import MyProfile from './containers/MyProfile';
 import Package from './containers/Package';
 import Action from './containers/Action';
 import Campaign from './containers/Campaign';
 import CampaignDetail from './containers/CampaignDetail';
 import Reward from './containers/Reward';
+import Transaction from './containers/Transaction';
 import 'bootstrap/dist/css/bootstrap.min.css'; 
 import $ from 'jquery';
-import 'bootstrap/dist/js/bootstrap.bundle';
 import { ProtectedRoute } from "./router/ProtectedRoute";
 import { ProtectedLogin } from "./router/ProtectedLogin";
+// import 'bootstrap/dist/js/bootstrap.bundle';
  
 function App() {
     return (
@@ -22,18 +24,16 @@ function App() {
             <ProtectedLogin path={"/login"} exact component={Login}/>
             {/* <ProtectedRoute path={"/products"} exact component={ProductList}/> */}
             {/* <ProtectedRoute path={"/product/:product"} exact component={Product}/> */}
-            <ProtectedRoute path={"/users"} exact component={User}/>
-            <ProtectedRoute path={"/user/:user"} exact component={UserProfile}/>
-            <ProtectedRoute path={"/packages"} exact component={Package}/>
-            <ProtectedRoute path={"/actions"} exact component={Action}/>
-            <ProtectedRoute path={"/rewards"} exact component={Reward}/>
-            <ProtectedRoute path={"/campaigns"} exact component={Campaign}/>
+            <ProtectedRoute path={"/users"} exact component={User} allowed={[1,2]}/>
+            <ProtectedRoute path={"/user/:user"} exact component={UserProfile} allowed={[1,2]}/>
+            <ProtectedRoute path={"/profile"} exact component={MyProfile} allowed={[2,3]}/>
+            <ProtectedRoute path={"/packages"} exact component={Package} allowed={[1,2]}/>
+            <ProtectedRoute path={"/actions"} exact component={Action} allowed={[1,2]}/>
+            <ProtectedRoute path={"/rewards"} exact component={Reward} allowed={[1,2,3]}/>
+            <ProtectedRoute path={"/transactions"} exact component={Transaction} allowed={[1,2,3]}/>
+            <ProtectedRoute path={"/campaigns"} exact component={Campaign} allowed={[1,2,3]}/>
             <ProtectedRoute path={"/campaign/:campaign"} exact component={CampaignDetail}/>
-            <ProtectedRoute
-                exact
-                path={"/"}
-                component={Dashboard}
-            />
+            <ProtectedRoute path={"/"} exact component={Dashboard} allowed={[1,2,3]}/>
 
             {/* <Redirect to={"/"}/> */}
             <Route path="*" component={ () => "404 NOT FOUND" }/>

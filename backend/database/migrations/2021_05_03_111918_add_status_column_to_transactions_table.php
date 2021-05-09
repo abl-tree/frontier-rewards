@@ -1,0 +1,36 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class AddStatusColumnToTransactionsTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->enum('status', ['pending', 'cancelled', 'completed', 'confirmed'])->after('salesperson_id')->default('pending');
+            $table->unsignedBigInteger('status_updated_by')->after('status')->nullable();
+            $table->foreign('status_updated_by')->references('id')->on('users');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::table('transactions', function (Blueprint $table) {
+            $table->dropColumn('status');
+            $table->dropForeign(['status_updated_by']);
+            $table->dropColumn('status_updated_by');
+        });
+    }
+}

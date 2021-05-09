@@ -4,23 +4,21 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class UserInfo extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     
     protected $fillable = [
-        'userid', 
-        'first_name',
-        'middle_name',
-        'last_name',
-        'address',
-        'vehicle_year',
-        'vehicle_make',
-        'vehicle_model',
-        'vehicle_trim',
-        'vehicle_color',
-        'vehicle_vin_no',
+        'user_id', 
+        'package_id',
+        'customer_id',
+        'customer_infos',
         'salesperson_id'
     ];
+
+    public function package() {
+        return $this->hasOne(Package::class, 'id', 'package_id');
+    }
 }

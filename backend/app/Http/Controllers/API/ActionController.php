@@ -67,7 +67,7 @@ class ActionController extends BaseController
      */
     public function show($id)
     {
-        $action = Action::find($id);
+        $action = Action::with('rewards')->find($id);
   
         if (is_null($action)) {
             return $this->sendError('Action not found.');

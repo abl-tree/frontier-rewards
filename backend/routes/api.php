@@ -12,6 +12,8 @@ use App\Http\Controllers\API\PackageController;
 use App\Http\Controllers\API\PackageRewardController;
 use App\Http\Controllers\API\RewardController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\TransactionController;
+use App\Http\Controllers\API\UserNotificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,12 +32,22 @@ Route::middleware('auth:api')->group( function () {
     Route::resource('products', ProductController::class);
     Route::resource('actions', ActionController::class);
     Route::resource('campaigns', CampaignController::class);
+    Route::get('campaigns/{campaign_id}/actions', [CampaignController::class, 'actions']);
+    Route::get('campaigns/{campaign_id}/actions/{action_id}', [CampaignController::class, 'rewards']);
     Route::resource('campaign_rewards', CampaignActionRewardController::class);
     Route::resource('packages', PackageController::class);
     Route::resource('package_rewards', PackageRewardController::class);
     Route::resource('rewards', RewardController::class);
     Route::resource('users', UserController::class);
+    Route::get('users/{userid}/rewards', [UserController::class, 'rewards']);
+    Route::get('profile', [UserController::class, 'profile']);
+    Route::resource('notifications', UserNotificationController::class);
+    Route::resource('transactions', TransactionController::class);
+    Route::post('redeem', [TransactionController::class, 'redeem']);
+    Route::post('claim', [TransactionController::class, 'claim']);
     Route::post('register', [RegisterController::class, 'register']);
+    Route::post('logout', [RegisterController::class, 'logout']);
+    Route::get('summary/transactions', [TransactionController::class, 'summary']);
     
 });
 

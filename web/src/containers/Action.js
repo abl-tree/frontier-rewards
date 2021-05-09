@@ -1,13 +1,13 @@
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Button, ButtonGroup, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
 import _ from "lodash";
 import {AddData, DeleteData, EditData, GetData} from "../actions/actionAction";
 
-const Action = (props) => {
+const AdminAction = (props) => {
     
     const dispatch = useDispatch();
-    const dataList = useSelector(state => state.Action);
+    const actionList = useSelector(state => state.Action);
     const [validated, setValidated] = useState(false);
     const [data, setData] = useState({});
     const fields = [
@@ -55,10 +55,6 @@ const Action = (props) => {
 
     }
 
-    React.useEffect(() => {
-        fetchData()
-    }, [])
-
     const fetchData = (url = '/actions') => {
 
         dispatch(GetData(props, url));
@@ -77,7 +73,13 @@ const Action = (props) => {
         if(form.checkValidity() !== false) {
 
             if(data.id) dispatch(EditData(props, data))
-            else dispatch(AddData(props, data))
+            else {
+                dispatch(AddData(props, data)).then(() => {
+                    setShow(false)
+                }).catch(() => {
+                    alert('error')
+                })
+            }
 
         }
 
@@ -88,9 +90,10 @@ const Action = (props) => {
         dispatch(DeleteData(props, id))
 
     }
+
     const showPagination = () => {
-        if(!_.isEmpty(dataList.data.links))
-        return dataList.data.links.map((page, i) => {
+        if(!_.isEmpty(actionList.data.links))
+        return actionList.data.links.map((page, i) => {
             return <Pagination.Item key={i} active={page.active} onClick={() => fetchData(page.url)} disabled={!page.url}><span dangerouslySetInnerHTML={{
                 __html: page.label
             }}></span></Pagination.Item>
@@ -99,9 +102,9 @@ const Action = (props) => {
 
     const showData = () => {
 
-        if(!_.isEmpty(dataList.data.data)) {
+        if(!_.isEmpty(actionList.data.data)) {
 
-            return dataList.data.data.map((el, key) => {
+            return actionList.data.data.map((el, key) => {
                 return <tr key={key}>
                     <td>{el.name}</td>
                     <td>{el.description}</td>
@@ -118,21 +121,25 @@ const Action = (props) => {
 
         }
 
-        if(dataList.loading) {
+        if(actionList.loading) {
 
             return <tr><td colSpan="6" className="text-center">Loading...</td></tr>
 
         }
 
-        if(dataList.errorMsg !== "") {
+        if(actionList.errorMsg !== "") {
 
-            return <tr><td colSpan="6" className="text-center">{dataList.errorMsg}</td></tr>
+            return <tr><td colSpan="6" className="text-center">{actionList.errorMsg}</td></tr>
 
         }
 
         return <tr><td colSpan="6" className="text-center">Unable to get data</td></tr>
 
     }
+
+    React.useEffect(() => {
+        fetchData()
+    }, [])
 
     return (
         <>
@@ -155,7 +162,7 @@ const Action = (props) => {
                                             required={field.required}
                                             type={field.type} 
                                             placeholder={field.placeholder}
-                                            value={data[field.key]}
+                                            value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
                                             onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                         />
                                     </Col>
@@ -199,4 +206,81 @@ const Action = (props) => {
 
 }
 
-export default Action;
+const UserAction = (props) => {
+    
+    const dispatch = useDispatch();
+    const actionList = useSelector(state => state.Action);
+
+    const showData = () => {
+
+        if(!_.isEmpty(actionList.data.data)) {
+
+            return actionList.data.data.map((el, key) => {
+
+                return <Col md={4} className="mb-3">
+                    <Card key={key}>
+                        <Card.Body>
+                            <Card.Title>{el.name}</Card.Title>
+                            <Card.Text>{el.description}</Card.Text>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            })
+
+        }
+
+        if(actionList.loading) {
+
+            return <tr><td colSpan="6" className="text-center">Loading...</td></tr>
+
+        }
+
+        if(actionList.errorMsg !== "") {
+
+            return <tr><td colSpan="6" className="text-center">{actionList.errorMsg}</td></tr>
+
+        }
+
+        return <tr><td colSpan="6" className="text-center">Unable to get data</td></tr>
+
+    }
+
+    React.useEffect(() => {
+
+        fetchData()
+
+    }, [])
+
+    const fetchData = (url = '/actions') => {
+
+        dispatch(GetData(props, url));
+
+    }
+
+    return (
+        <>
+            <Row className="pt-3">
+                {showData()}
+            </Row>
+        </>
+    )
+
+}
+
+const Init  = (props) => {
+
+    const auth = useSelector(state => state.Auth);
+
+    if(auth.user.type === 1 || auth.user.type === 2) {
+
+        return AdminAction(props)
+
+    } else {
+
+        return UserAction(props)
+
+    }
+
+}
+
+export default AdminAction

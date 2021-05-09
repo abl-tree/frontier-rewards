@@ -18,6 +18,7 @@ class Action extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
+            'rewards' => $this->rewards,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];

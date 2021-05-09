@@ -9,13 +9,13 @@ const UserReducer = (state = DefaultState, action) => {
     var stateData = state.data, newData
 
     switch (action.type) {
-        case "REQUEST":
+        case "USER_REQUEST":
             return {
                 ...state,
                 loading: true
             }
             
-        case "FETCH_SUCCESS":
+        case "USER_FETCH":
 
             return {
                 ...state,
@@ -24,9 +24,9 @@ const UserReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "ADD_SUCCESS":
+        case "USER_ADD":
 
-            newData = [...state.data.data]
+            newData = [action.payload, ...state.data.data]
 
             stateData.data = newData;
 
@@ -37,7 +37,7 @@ const UserReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "UPDATE_SUCCESS":
+        case "USER_UPDATE":
 
             var index = state.data.data.findIndex((item) => item.id === action.payload.id)
             newData = {
@@ -54,7 +54,7 @@ const UserReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "DELETE_SUCCESS":
+        case "USER_DELETE":
 
             newData = state.data.data.filter((item) => item.id !== action.payload.id)
 
@@ -67,7 +67,7 @@ const UserReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "FAIL":
+        case "USER_FAIL":
             return {
                 ...state,
                 loading: false,

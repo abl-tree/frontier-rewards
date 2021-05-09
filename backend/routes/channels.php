@@ -20,3 +20,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 Broadcast::channel('reward', function ($user) {
     return true;
 });
+
+Broadcast::channel('notification', function ($user) {
+    return true;
+});

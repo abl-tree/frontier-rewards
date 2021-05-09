@@ -7,13 +7,13 @@ const DefaultState = {
 const RewardReducer = (state = DefaultState, action) => {
 
     switch (action.type) {
-        case "REQUEST":
+        case "REWARD_REQUEST":
             return {
                 ...state,
                 loading: true
             }
             
-        case "FETCH_SUCCESS":
+        case "REWARD_FETCH":
 
             return {
                 ...state,
@@ -22,11 +22,10 @@ const RewardReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "ADD_SUCCESS":
-
-            var newData = [...state.data.data]
+        case "REWARD_ADD":
 
             var stateData = state.data
+            var newData = [...state.data.data, action.payload]
 
             stateData.data = newData;
 
@@ -37,7 +36,7 @@ const RewardReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "UPDATE_SUCCESS":
+        case "REWARD_UPDATE":
 
             var stateData = state.data
             var index = state.data.data.findIndex((item) => item.id === action.payload.id)
@@ -55,7 +54,7 @@ const RewardReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "DELETE_SUCCESS":
+        case "REWARD_DELETE":
 
             var stateData = state.data
             var newData = state.data.data.filter((item) => item.id !== action.payload.id)
@@ -69,7 +68,7 @@ const RewardReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "FAIL":
+        case "REWARD_FAIL":
             return {
                 ...state,
                 loading: false,

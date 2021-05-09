@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -19,6 +20,9 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'firstname',
+        'middlename',
+        'lastname',
         'email',
         'password',
         'phone_number',
@@ -44,12 +48,36 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $appends = [
+        'type_name'
+    ];
+
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = preg_replace('/\s+/', ' ', $value);
     }
 
+    public function getNameAttribute($value) {
+        return ucwords($value);
+    }
+
+    public function getTypeNameAttribute() {
+        return $this->type['name'];
+    }
+
     public function info() {
         return $this->hasOne(UserInfo::class);
+    }
+
+    public function type() {
+        return $this->hasOne(UserType::class, 'id', 'user_type_id');
+    }
+
+    public function rewards() {
+        return $this->hasMany(UserReward::class, 'user_id');
+    }
+
+    public function transactions() {
+        return $this->hasMany(Transaction::class, 'user_id', 'id');
     }
 }

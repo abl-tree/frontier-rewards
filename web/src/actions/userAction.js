@@ -18,8 +18,6 @@ export const Auth = (props, data) => async dispatch => {
         
     } catch (error) {
 
-        console.log('error');
-
         dispatch({
             type: "LOGIN_FAIL",
             payload: error.response.data.data
@@ -29,23 +27,51 @@ export const Auth = (props, data) => async dispatch => {
 }
 
 export const Register = (props, data) => async dispatch => {
+    dispatch({
+        type: "USER_REQUEST"
+    })
+
+    await axios.post('/register', data)
+    .then((res) => {
+
+        dispatch({
+            type: "USER_ADD",
+            payload: res.data.data
+        })
+
+        return Promise.resolve();
+
+    })
+    .catch((error) => {
+        if(error.response) {
+            dispatch({
+                type: "USER_FAIL",
+                payload: error.response.data
+            })
+        }
+
+        return Promise.reject();
+    })
+}
+
+export const Logout = (props) => async dispatch => {
     try {
 
         dispatch({
-            type: "REQUEST"
+            type: "USER_REQUEST"
         })
 
-        const res = await axios.post('/register', data)
+        const res = await axios.post('/logout')
 
         dispatch({
-            type: "ADD_SUCCESS",
+            type: "LOGOUT_SUCCESS",
             payload: res.data.data
         })
         
     } catch (error) {
 
         dispatch({
-            type: "FAIL",
+            type: "USER_FAIL",
             payload: error.response.data.data
         })
         
@@ -54,24 +80,24 @@ export const Register = (props, data) => async dispatch => {
 
 const apiRoute = '/users'
 
-export const GetData = (props, url = apiRoute) => async dispatch => {
+export const GetData = (props, url = apiRoute, params = {}) => async dispatch => {
     try {
 
         dispatch({
-            type: "REQUEST"
+            type: "USER_REQUEST"
         })
 
-        const res = await axios.get(url)
+        const res = await axios.get(url, {params: params})
 
         dispatch({
-            type: "FETCH_SUCCESS",
+            type: "USER_FETCH",
             payload: res.data.data
         })
         
     } catch (error) {
 
         dispatch({
-            type: "FAIL",
+            type: "USER_FAIL",
             payload: error.response.data.data
         })
         
@@ -82,22 +108,26 @@ export const EditData = (props, data) => async dispatch => {
     try {
 
         dispatch({
-            type: "PACKAGE"
+            type: "USER_REQUEST"
         })
 
         const res = await axios.put(apiRoute + '/' + data.id, data)
 
         dispatch({
-            type: "UPDATE_SUCCESS",
+            type: "USER_UPDATE",
             payload: res.data.data
         })
+
+        return Promise.resolve()
         
     } catch (error) {
 
         dispatch({
-            type: "FAIL",
+            type: "USER_FAIL",
             payload: error.response.data.data
         })
+
+        return Promise.reject()
         
     }
 }
@@ -106,20 +136,20 @@ export const DeleteData = (props, id) => async dispatch => {
     try {
 
         dispatch({
-            type: "REQUEST"
+            type: "USER_REQUEST"
         })
 
         const res = await axios.delete(apiRoute + '/' + id)
 
         dispatch({
-            type: "DELETE_SUCCESS",
+            type: "USER_DELETE",
             payload: res.data.data
         })
         
     } catch (error) {
 
         dispatch({
-            type: "FAIL",
+            type: "USER_FAIL",
             payload: error.response.data.data
         })
         

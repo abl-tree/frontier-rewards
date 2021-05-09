@@ -1,99 +1,111 @@
 import axios from "axios";
 
-const apiRoute = '/actions'
+const apiRoute = '/actions/'
 
 export const GetData = (props, url = apiRoute) => async dispatch => {
-    try {
+
+    dispatch({
+        type: "ACTION_REQUEST"
+    })
+
+    await axios.get(url)
+    .then((res) => {
 
         dispatch({
-            type: "REQUEST"
-        })
-
-        const res = await axios.get(url)
-
-        dispatch({
-            type: "FETCH_SUCCESS",
+            type: "ACTION_FETCH",
             payload: res.data.data
         })
-        
-    } catch (error) {
 
-        dispatch({
-            type: "FAIL",
-            payload: error.response.data.data
-        })
-        
-    }
+    })
+    .catch((error) => {
+        if(error.response) {
+            dispatch({
+                type: "ACTION_FAIL",
+                payload: error.response.data.message
+            })
+        }
+    })
+
 }
 
 export const AddData = (props, data) => async dispatch => {
-    try {
+
+    dispatch({
+        type: "ACTION_REQUEST"
+    })
+
+    await axios.post(apiRoute, data)
+    .then((res) => {
 
         dispatch({
-            type: "PACKAGE"
-        })
-
-        const res = await axios.post(apiRoute, data)
-
-        dispatch({
-            type: "ADD_SUCCESS",
+            type: "ACTION_ADD",
             payload: res.data.data
         })
-        
-    } catch (error) {
 
-        dispatch({
-            type: "FAIL",
-            payload: error.response.data.data
-        })
-        
-    }
+        return Promise.resolve();
+
+    })
+    .catch((error) => {
+        if(error.response) {
+            dispatch({
+                type: "ACTION_FAIL",
+                payload: error.response.data.message
+            })
+        }
+
+        return Promise.reject();
+    })
+
 }
 
 export const EditData = (props, data) => async dispatch => {
-    try {
+
+    dispatch({
+        type: "ACTION_REQUEST"
+    })
+
+    await axios.put(apiRoute + data.id, data)
+    .then((res) => {
 
         dispatch({
-            type: "PACKAGE"
-        })
-
-        const res = await axios.put(apiRoute + '/' + data.id, data)
-
-        dispatch({
-            type: "UPDATE_SUCCESS",
+            type: "ACTION_UPDATE",
             payload: res.data.data
         })
-        
-    } catch (error) {
 
-        dispatch({
-            type: "FAIL",
-            payload: error.response.data.data
-        })
-        
-    }
+    })
+    .catch((error) => {
+        if(error.response) {
+            dispatch({
+                type: "ACTION_FAIL",
+                payload: error.response.data.message
+            })
+        }
+    })
+
 }
 
 export const DeleteData = (props, id) => async dispatch => {
-    try {
+
+    dispatch({
+        type: "ACTION_REQUEST"
+    })
+
+    await axios.delete(apiRoute + id)
+    .then((res) => {
 
         dispatch({
-            type: "REQUEST"
-        })
-
-        const res = await axios.delete(apiRoute + '/' + id)
-
-        dispatch({
-            type: "DELETE_SUCCESS",
+            type: "ACTION_DELETE",
             payload: res.data.data
         })
-        
-    } catch (error) {
 
-        dispatch({
-            type: "FAIL",
-            payload: error.response.data.data
-        })
+    })
+    .catch((error) => {
+        if(error.response) {
+            dispatch({
+                type: "ACTION_FAIL",
+                payload: error.response.data.message
+            })
+        }
+    })
         
-    }
 }

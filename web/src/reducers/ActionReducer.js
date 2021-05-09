@@ -6,16 +6,14 @@ const DefaultState = {
 
 const ActionReducer = (state = DefaultState, action) => {
 
-    var stateData = state.data, newData
-
     switch (action.type) {
-        case "REQUEST":
+        case "ACTION_REQUEST":
             return {
                 ...state,
                 loading: true
             }
             
-        case "FETCH_SUCCESS":
+        case "ACTION_FETCH":
 
             return {
                 ...state,
@@ -24,9 +22,10 @@ const ActionReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "ADD_SUCCESS":
+        case "ACTION_ADD":
 
-            newData = [...state.data.data]
+            var stateData = state.data
+            var newData = [...state.data.data, action.payload]
 
             stateData.data = newData;
 
@@ -37,10 +36,11 @@ const ActionReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "UPDATE_SUCCESS":
+        case "ACTION_UPDATE":
 
+            var stateData = state.data
             var index = state.data.data.findIndex((item) => item.id === action.payload.id)
-            newData = {
+            var newData = {
                 ...state.data.data[index], 
                 ...action.payload
             }
@@ -54,20 +54,21 @@ const ActionReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "DELETE_SUCCESS":
+        case "ACTION_DELETE":
 
-            newData = state.data.data.filter((item) => item.id !== action.payload.id)
+            var newData = state.data;
+            var newPackages = state.data.data.filter((item) => item.id !== action.payload.id)
 
-            stateData.data = newData;
+            newData.data = newPackages;
 
             return {
                 ...state,
                 loading: false,
-                data: stateData,
+                data: newData,
                 errorMsg: ""
             }
             
-        case "FAIL":
+        case "ACTION_FAIL":
             return {
                 ...state,
                 loading: false,

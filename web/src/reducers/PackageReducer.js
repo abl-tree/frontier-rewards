@@ -45,9 +45,6 @@ const PackageReducer = (state = DefaultState, action) => {
                 ...action.payload
             }
 
-            console.log('index', index);
-            console.log('newPackages', newPackages);
-
             newData.data[index] = newPackages;
 
             return {

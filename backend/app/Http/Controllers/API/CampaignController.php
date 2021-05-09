@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\Campaign;
+use App\Models\CampaignActionReward;
 use Validator;
 use App\Http\Resources\Campaign as CampaignResource;
+use Carbon\Carbon;
 
 class CampaignController extends BaseController
 {
@@ -15,9 +17,11 @@ class CampaignController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $campaigns = Campaign::paginate(10);
+        $campaigns = Campaign::when($request->user()->type->code == 3, function($query) {
+            $query->whereDate('end_date', '>=', Carbon::now());
+        })->paginate(10);
     
         return $this->sendResponse($campaigns, 'Campaigns retrieved successfully.');
     }
@@ -126,8 +130,21 @@ class CampaignController extends BaseController
      */
     public function destroy(Campaign $campaign)
     {
+        $campaign->campaigns()->delete();
         $campaign->delete();
    
         return $this->sendResponse($campaign, 'Campaign deleted successfully.');
+    }
+
+    public function actions($id) {
+        $campaigns = Campaign::find($id)->campaigns()->with('action')->groupBy('action_id')->paginate(10);
+   
+        return $this->sendResponse($campaigns, 'Actions retrieved successfully.');
+    }
+
+    public function rewards($campaign_id, $action_id) {
+        $rewards = CampaignActionReward::with('reward')->where(['campaign_id' => $campaign_id, 'action_id' => $action_id])->paginate(10);
+   
+        return $this->sendResponse($rewards, 'Rewards retrieved successfully.');
     }
 }

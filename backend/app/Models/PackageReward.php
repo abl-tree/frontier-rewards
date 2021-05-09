@@ -12,4 +12,8 @@ class PackageReward extends Model
     protected $fillable = [
         'package_id', 'reward_id'
     ];
+
+    public function reward() {
+        return $this->hasOne(Reward::class, 'id', 'reward_id');
+    }
 }

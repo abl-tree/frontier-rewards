@@ -12,4 +12,8 @@ class Package extends Model
     protected $fillable = [
         'name', 'description', 'multiplier'
     ];
+
+    public function rewards() {
+        return $this->hasMany(PackageReward::class, 'package_id');
+    }
 }

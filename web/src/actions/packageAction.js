@@ -31,7 +31,7 @@ export const AddPackage = (props, data) => async dispatch => {
             type: "PACKAGE_REQUEST"
         })
 
-        const res = await axios.post('http://localhost:8000/v1/packages', data)
+        const res = await axios.post('/packages', data)
 
         dispatch({
             type: "PACKAGE_ADDED",
@@ -55,7 +55,7 @@ export const EditPackage = (props, data) => async dispatch => {
             type: "PACKAGE_REQUEST"
         })
 
-        const res = await axios.put('http://localhost:8000/v1/packages/' + data.id, data)
+        const res = await axios.put('/packages/' + data.id, data)
 
         dispatch({
             type: "PACKAGE_UPDATED",
@@ -79,7 +79,7 @@ export const DeletePackage = (props, id) => async dispatch => {
             type: "PACKAGE_REQUEST"
         })
 
-        const res = await axios.delete('http://localhost:8000/v1/packages/' + id)
+        const res = await axios.delete('/packages/' + id)
 
         dispatch({
             type: "PACKAGE_DELETED",

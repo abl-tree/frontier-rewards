@@ -62,7 +62,11 @@ const Product = (props) => {
     }
     const handleEditShow = (packageData) => {
 
-        console.log(packageData);
+        packageData.rewards.map((reward, i) => {
+            reward['value'] = reward.reward_id
+            reward['label'] = reward.reward.name
+            return reward
+        })
 
         setData(packageData)
 
@@ -177,8 +181,13 @@ const Product = (props) => {
 
     }
 
+    const showTmp = () => {
+        console.log(data);
+    }
+
     return (
         <>
+            {showTmp()}
             <Row>
                 <Button variant="primary" onClick={handleShow}>
                     Add Package
@@ -204,7 +213,7 @@ const Product = (props) => {
                                     </Col>
                                 </Form.Group>
                             })}
-                            <AsyncSelect cacheOptions defaultOptions loadOptions={promiseRewardOptions} onChange={value => setReward(prev => ({...prev, 'reward_id' : value.value}))} placeholder="None" />
+                            <AsyncSelect key={0} isMulti cacheOptions defaultOptions defaultValue={data.rewards} loadOptions={promiseRewardOptions} onChange={value => setData(prev => ({...prev, 'rewards' : value}))} placeholder="None" />
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" onClick={handleClose}>

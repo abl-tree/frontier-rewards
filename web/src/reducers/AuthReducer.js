@@ -1,6 +1,6 @@
 const DefaultState = {
     loading: false,
-    user: JSON.parse(localStorage.getItem('user')),
+    user: localStorage.getItem('user') != 'undefined' ? JSON.parse(localStorage.getItem('user')) : {},
     errorMsg: ""
 }
 
@@ -39,12 +39,12 @@ const LoginReducer = (state = DefaultState, action) => {
             
         case "LOGOUT_SUCCESS":
 
-            localStorage.setItem('user', JSON.stringify(action.payload));
+            localStorage.removeItem('user');
 
             return {
                 ...state,
                 loading: false,
-                user: action.payload,
+                user: {},
                 errorMsg: ""
             }
             

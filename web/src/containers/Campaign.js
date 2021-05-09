@@ -1,19 +1,18 @@
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Button, ButtonGroup, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
 import _ from "lodash";
 import axios from "axios";
 import {AddData, DeleteData, EditData, GetData} from "../actions/campaignAction";
-import {GetData as ActionGetData} from "../actions/actionAction";
 import Moment from 'react-moment';
 import AsyncSelect from 'react-select/async';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
-const Reward = (props) => {
+const AdminCampaign = (props) => {
     
     const dispatch = useDispatch();
-    const dataList = useSelector(state => state.Reward);
+    const dataList = useSelector(state => state.Campaign);
     const [campaignList, setCampaignList] = useState({
         loading: false,
         data: [],
@@ -185,8 +184,24 @@ const Reward = (props) => {
 
         if(form.checkValidity() !== false) {
 
-            if(data.id) dispatch(EditData(props, data))
-            else dispatch(AddData(props, data))
+            if(data.id) {
+                dispatch(EditData(props, data))
+                .then(() => {
+                    setShowAddCampaign(false)
+                })
+                .catch(() => {
+                    alert('error')
+                })
+            }
+            else {
+                dispatch(AddData(props, data))
+                .then(() => {
+                    setShowAddCampaign(false)
+                })
+                .catch(() => {
+                    alert('error')
+                })
+            }
 
         }
 
@@ -303,7 +318,7 @@ const Reward = (props) => {
 
         }
 
-        return <tr><td colSpan="6" className="text-center">Unable to get data</td></tr>
+        return <tr><td colSpan="6" className="text-center">No data available</td></tr>
 
     }
 
@@ -337,7 +352,7 @@ const Reward = (props) => {
 
         }
 
-        return <tr><td colSpan="6" className="text-center">Unable to get data</td></tr>
+        return <tr><td colSpan="6" className="text-center">No data available</td></tr>
 
     }
 
@@ -377,7 +392,7 @@ const Reward = (props) => {
             <Modal show={showAddCampaign} onHide={handleCloseAddCampaign}>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Add Campaign</Modal.Title>
+                        <Modal.Title>{!_.isUndefined(data.id) ? 'Edit Campaign' : 'Add Campaign'}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         {fields.map((field, i) => {
@@ -389,7 +404,7 @@ const Reward = (props) => {
                                             required={field.required}
                                             type={field.type} 
                                             placeholder={field.placeholder}
-                                            value={data[field.key]}
+                                            value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
                                             onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                         />
                                     </Col>
@@ -403,7 +418,7 @@ const Reward = (props) => {
                                             required={field.required}
                                             as={field.type} 
                                             placeholder={field.placeholder}
-                                            value={data[field.key]}
+                                            value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
                                             onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }>
 
                                             {field.options.map((option, i) => {
@@ -422,9 +437,6 @@ const Reward = (props) => {
                             </Form.Group>
                             }
                         })}
-
-                        <AsyncSelect cacheOptions defaultOptions loadOptions={promiseActionOptions} onChange={value => setData(prev => ({...prev, 'action_id' : value.value}))} />
-                        <AsyncSelect cacheOptions defaultOptions loadOptions={promiseRewardOptions} onChange={value => setData(prev => ({...prev, 'reward_id' : value.value}))} />
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleCloseAddCampaign}>
@@ -487,4 +499,81 @@ const Reward = (props) => {
 
 }
 
-export default Reward;
+const UserCampaign = (props) => {
+    
+    const dispatch = useDispatch();
+    const dataList = useSelector(state => state.Campaign);
+
+    const showData = () => {
+
+        if(!_.isEmpty(dataList.data.data)) {
+
+            return dataList.data.data.map((el, key) => {
+
+                return <Col md={4}>
+                    <Card key={key}>
+                        <Card.Body>
+                            <Card.Title>{el.name}</Card.Title>
+                            <Card.Text>
+                                <Row><Col>{el.description}</Col></Row>
+                                <Row><Col>Expiration: {el.end_date}</Col></Row>
+                            </Card.Text>
+                        </Card.Body>
+                    </Card>
+                </Col>
+            })
+
+        }
+
+        if(dataList.loading) {
+
+            return <tr><td colSpan="6" className="text-center">Loading...</td></tr>
+
+        }
+
+        if(dataList.errorMsg !== "") {
+
+            return <tr><td colSpan="6" className="text-center">{dataList.errorMsg}</td></tr>
+
+        }
+
+        return <tr><td colSpan="6" className="text-center">No data available</td></tr>
+
+    }
+
+    React.useEffect(() => {
+
+        fetchData()
+
+    }, [])
+
+    const fetchData = (url = '/campaigns') => {
+
+        dispatch(GetData(props, url));
+
+    }
+
+    return (
+        <>
+            <Row className="pt-3">
+                {showData()}
+            </Row>
+        </>
+    )
+
+}
+
+export default (props) => {
+
+    const auth = useSelector(state => state.Auth);
+
+    if(auth.user.type === 1 || auth.user.type === 2) {
+
+        return AdminCampaign(props)
+
+    } else {
+
+        return UserCampaign(props)
+
+    }
+}

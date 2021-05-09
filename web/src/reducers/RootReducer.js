@@ -5,6 +5,7 @@ import AuthReducer from "./AuthReducer";
 import CampaignReducer from "./CampaignReducer";
 import PackageReducer from "./PackageReducer";
 import RewardReducer from "./RewardReducer";
+import TransactionReducer from "./TransactionReducer";
 import UserReducer from "./UserReducer";
 
 const RootReducer = combineReducers({
@@ -14,6 +15,7 @@ const RootReducer = combineReducers({
     Package: PackageReducer,
     ProductList: ProductListReducer,
     Reward: RewardReducer,
+    Transaction: TransactionReducer,
     User: UserReducer
 });
 

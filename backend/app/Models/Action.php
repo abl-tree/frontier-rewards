@@ -12,4 +12,8 @@ class Action extends Model
     protected $fillable = [
         'name', 'description'
     ];
+
+    public function rewards() {
+        return $this->hasMany(CampaignActionReward::class);
+    }
 }

@@ -7,13 +7,13 @@ const DefaultState = {
 const CampaignReducer = (state = DefaultState, action) => {
 
     switch (action.type) {
-        case "REQUEST":
+        case "CAMPAIGN_REQUEST":
             return {
                 ...state,
                 loading: true
             }
             
-        case "FETCH_SUCCESS":
+        case "CAMPAIGN_FETCH":
 
             return {
                 ...state,
@@ -22,7 +22,7 @@ const CampaignReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "ADD_SUCCESS":
+        case "CAMPAIGN_ADD":
 
             var newData = [...state.data.data, action.payload]
 
@@ -37,7 +37,7 @@ const CampaignReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "UPDATE_SUCCESS":
+        case "CAMPAIGN_UPDATE":
 
             var stateData = state.data
             var index = state.data.data.findIndex((item) => item.id === action.payload.id)
@@ -55,7 +55,7 @@ const CampaignReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "DELETE_SUCCESS":
+        case "CAMPAIGN_DELETE":
 
             var stateData = state.data
             var newData = state.data.data.filter((item) => item.id !== action.payload.id)
@@ -69,7 +69,7 @@ const CampaignReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "FAIL":
+        case "CAMPAIGN_FAIL":
             return {
                 ...state,
                 loading: false,

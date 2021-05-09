@@ -1,10 +1,11 @@
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Button, ButtonGroup, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
 import _ from "lodash";
 import {AddData, DeleteData, EditData, GetData} from "../actions/rewardAction";
+import axios from "axios";
 
-const Reward = (props) => {
+const AdminReward = (props) => {
     
     const dispatch = useDispatch();
     const dataList = useSelector(state => state.Reward);
@@ -109,8 +110,24 @@ const Reward = (props) => {
 
         if(form.checkValidity() !== false) {
 
-            if(data.id) dispatch(EditData(props, data))
-            else dispatch(AddData(props, data))
+            if(data.id) {
+                dispatch(EditData(props, data))
+                .then(() => {
+                    setShow(false)
+                })
+                .catch(() => {
+                    alert('error')
+                })
+            }
+            else {
+                dispatch(AddData(props, data))
+                .then(() => {
+                    setShow(false)
+                })
+                .catch(() => {
+                    alert('error')
+                })
+            }
 
         }
 
@@ -190,7 +207,7 @@ const Reward = (props) => {
                                                 required={field.required}
                                                 type={field.type} 
                                                 placeholder={field.placeholder}
-                                                value={data[field.key]}
+                                                value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
                                                 onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                             />
                                         </Col>
@@ -203,7 +220,7 @@ const Reward = (props) => {
                                                 required={field.required}
                                                 type={field.type} 
                                                 placeholder={field.placeholder}
-                                                value={data[field.key]}
+                                                value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
                                                 min={field.min}
                                                 onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                             />
@@ -218,7 +235,7 @@ const Reward = (props) => {
                                                 required={field.required}
                                                 as={field.type} 
                                                 placeholder={field.placeholder}
-                                                value={data[field.key]}
+                                                value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
                                                 onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }>
 
                                                 {field.options.map((option, i) => {
@@ -269,4 +286,86 @@ const Reward = (props) => {
 
 }
 
-export default Reward;
+const UserReward = (props) => {
+    
+    const dispatch = useDispatch();
+    const dataList = useSelector(state => state.Reward);
+
+    const handleRedeem = async (reward_id) => {
+        
+        const res = await axios.post('redeem', {'reward_id' : reward_id})
+
+        var result = res.data.data
+    }
+
+    const showData = () => {
+
+        if(!_.isEmpty(dataList.data.data)) {
+
+            return dataList.data.data.map((el, key) => {
+
+                return <Col md={4} className="mb-3">
+                    <Card key={key} style={{ height: '100%' }}>
+                        <Card.Body>
+                            <Card.Title>{el.name}</Card.Title>
+                            <Card.Text>{el.description}</Card.Text>
+                        </Card.Body>
+                        {el.type != 'points' ? <Button variant="success" onClick={() => handleRedeem(el.id)}>Redeem</Button> : ''}
+                    </Card>
+                </Col>
+            })
+
+        }
+
+        if(dataList.loading) {
+
+            return <tr><td colSpan="6" className="text-center">Loading...</td></tr>
+
+        }
+
+        if(dataList.errorMsg !== "") {
+
+            return <tr><td colSpan="6" className="text-center">{dataList.errorMsg}</td></tr>
+
+        }
+
+        return <tr><td colSpan="6" className="text-center">Unable to get data</td></tr>
+
+    }
+
+    const fetchData = (url = '/rewards') => {
+
+        dispatch(GetData(props, url));
+
+    }
+
+    React.useEffect(() => {
+
+        fetchData()
+
+    }, [])
+
+    return (
+        <>
+            <Row className="pt-3">
+                {showData()}
+            </Row>
+        </>
+    )
+
+}
+
+export default (props) => {
+
+    const auth = useSelector(state => state.Auth);
+
+    if(auth.user.type === 1 || auth.user.type === 2) {
+
+        return AdminReward(props)
+
+    } else {
+
+        return UserReward(props)
+
+    }
+}

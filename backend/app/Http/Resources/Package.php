@@ -19,6 +19,7 @@ class Package extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'multiplier' => $this->multiplier,
+            'rewards' => $this->rewards,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
