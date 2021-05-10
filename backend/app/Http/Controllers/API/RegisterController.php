@@ -48,7 +48,8 @@ class RegisterController extends BaseController
 
         $name = $input['firstname'] . ' ' . (@$input['middlename'] ? $input['middlename'] : '') . ' ' . $input['lastname'];
         $input['name'] = $name;
-        $input['password'] = bcrypt($this->generateRandomString());
+        $tmpPass = $this->generateRandomString();
+        $input['password'] = bcrypt($tmpPass);
 
         $user = User::create($input);
         $success['token'] =  $user->createToken('MyApp')->accessToken;
@@ -103,7 +104,7 @@ class RegisterController extends BaseController
         }
 
         $user = User::with('info.package')->find($user->id);
-        $user->tmpPass = $input['password'];
+        $user->tmpPass = $tmpPass;
 
         event(new UserRegistered($user));
    
