@@ -37,7 +37,7 @@ class RegisterController extends BaseController
         ]);
 
         // broadcast(new RewardCreated(auth()->user()))->toOthers();
-        // event(broadcast(new RewardCreated(auth()->user()))->toOthers());
+        event(broadcast(new RewardCreated(auth()->user()))->toOthers());
         // broadcast(new UserRegistered(auth()->user()))->toOthers();
    
         if($validator->fails()){

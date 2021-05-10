@@ -34,6 +34,6 @@ class RewardCreated implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('reward');
+        // return new PrivateChannel('reward');
     }
 }

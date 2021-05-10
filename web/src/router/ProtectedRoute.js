@@ -58,7 +58,7 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
             });
         }
 
-        // initEcho();
+        initEcho();
     }
 
     return (

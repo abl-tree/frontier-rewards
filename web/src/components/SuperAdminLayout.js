@@ -1,9 +1,11 @@
 import React, {useState} from 'react';
+import {useSelector} from "react-redux";
 import { Link, Route, Redirect } from "react-router-dom";
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import axios from 'axios';
 import _ from 'lodash';
-import '../css/notifications.css'
+import NotifyMe from 'react-notification-timeline';
+import moment from 'moment';
 
 export const SuperAdminHeader = (props) => {
 
@@ -11,50 +13,49 @@ export const SuperAdminHeader = (props) => {
         loading: false,
         data: []
     })
-    // const [showNotifications, setShowNotifications] = useState({})
+    const auth = useSelector(state => state.Auth);
 
     React.useEffect(() => {
         fetchNotification()
+        initEcho()
     }, [])
+
+    // Start Laravel Echo
+
+    const initEcho = () => {
+        window.Echo.private('App.Models.User.' + auth.user.id)
+        .notification((notification) => {
+            let newNotification = {
+                'data' : {
+                    'data': notification.data,
+                    'title': notification.title
+                },
+                'created_at': moment()
+            }
+
+            setNotifications(prev => ({...prev, data: [...prev.data, newNotification]}))
+        });
+    }
+
+    // End Laravel Echo
 
     const fetchNotification = async () => {
         const res = await axios.get('notifications');
 
         let data = res.data.data;
-        data = [{
-            message: 'Kameshwaran S had shared a feedback with you.',
-            detailPage: '/'
-        }, {
-            message: 'Kameshwaran S had shared a feedback with you.',
-            detailPage: '/'
-        }]
 
         setNotifications(prev => ({...prev, data: data, loading: false}));
     }
 
     const showNotifications = () => {
-        if(notifications.loading == false) {
 
-            if(!_.isEmpty(notifications.data)) {
-
-                return notifications.data.map((el, key) => {
-                    return <li key={key}>
-                        <div className="col-md-3 col-sm-3 col-xs-3">
-                            <div className="notify-img">
-                                <img src="http://placehold.it/45x45" alt=""/>
-                            </div>
-                        </div>
-                        <div className="col-md-9 col-sm-9 col-xs-9 pd-l0">
-                            <p>{el.message}</p>
-                            <hr/>
-                            <p className="time">10 hours ago</p>
-                        </div>
-                    </li>
-                })
-
+        return notifications.data.map((el, key) => {
+            return {
+                message: el.data.title,
+                timestamp: parseInt(moment.parseZone(el.created_at).format('x'))
             }
+        })
 
-        }
     }
 
     return (
@@ -72,26 +73,19 @@ export const SuperAdminHeader = (props) => {
 
             <button className="navbar-toggler position-absolute d-md-none collapsed" type="button" data-toggle="collapse" data-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
-            </button>
+            </button>            
 
-            <ul className="nav navbar-nav navbar-right">
-                <li className="dropdown">
-                    <a href="#" className="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Notification (<b>2</b>)</a>
-                    <ul className="dropdown-menu notify-drop">
-                        <div className="notify-drop-title">
-                            <div className="row">
-                                <div className="col-md-6 col-sm-6 col-xs-6">Notification (<b>2</b>)</div>
-                            </div>
-                        </div>
-                        <div className="drop-content">
-                            {showNotifications()}
-                        </div>
-                        <div className="notify-drop-footer text-center">
-                            <a href=""><i className="fa fa-eye"></i> View All</a>
-                        </div>
-                    </ul>
-                </li>
-            </ul>
+            <NotifyMe
+                data={showNotifications()}
+                storageKey='notific_key'
+                notific_key='timestamp'
+                notific_value='update'
+                heading='Notification Alerts'
+                sortedByKey={false}
+                showDate={true}
+                size={30}
+                color="yellow"
+            />
 
             <ul className="navbar-nav px-3">
                 <li className="nav-item text-nowrap">

@@ -33,6 +33,6 @@ class TransactionStatusUpdated
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('notification');
+        // return new PrivateChannel('notification');
     }
 }

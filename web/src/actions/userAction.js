@@ -63,6 +63,8 @@ export const Logout = (props) => async dispatch => {
 
         const res = await axios.post('/logout')
 
+        window.Echo.disconnect();
+
         dispatch({
             type: "LOGOUT_SUCCESS",
             payload: res.data.data
