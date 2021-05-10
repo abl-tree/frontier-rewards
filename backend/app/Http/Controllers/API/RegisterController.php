@@ -45,7 +45,7 @@ class RegisterController extends BaseController
         }
    
         $input = $request->all();
-        $input['package_id'] = $input['package_id']['value'];
+        $input['package_id'] = @$input['package_id'] ? $input['package_id']['value'] : null;
 
         $name = $input['firstname'] . ' ' . (@$input['middlename'] ? $input['middlename'] : '') . ' ' . $input['lastname'];
         $input['name'] = $name;
