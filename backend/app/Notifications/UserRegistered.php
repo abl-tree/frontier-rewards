@@ -31,7 +31,7 @@ class UserRegistered extends Notification
      */
     public function via($notifiable)
     {
-        return ['database', 'mail'];
+        return ['broadcast', 'database', 'mail'];
     }
 
     /**
@@ -43,8 +43,8 @@ class UserRegistered extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
+                    ->subject('Frontier Rewards Registration')
+                    ->line('Your password is '.$this->user->tmpPass.'.')
                     ->line('Thank you for using our application!');
     }
 
@@ -57,10 +57,8 @@ class UserRegistered extends Notification
     public function toArray($notifiable)
     {
         return [
-            'title' => 'New user registered.',
-            'message' => 'Customer ' . $this->user->name . ' is registered.',
-            'name' => $this->user->name,
-            'email' => $this->user->email
+            'title' => 'Frontier Rewards Registration.',
+            'data' => $this->user
         ];
     }
 }

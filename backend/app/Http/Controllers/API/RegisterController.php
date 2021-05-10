@@ -37,8 +37,7 @@ class RegisterController extends BaseController
         ]);
 
         // broadcast(new RewardCreated(auth()->user()))->toOthers();
-        event(broadcast(new RewardCreated(auth()->user()))->toOthers());
-        // broadcast(new UserRegistered(auth()->user()))->toOthers();
+        // event(broadcast(new RewardCreated(auth()->user()))->toOthers());
    
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());       
@@ -104,6 +103,9 @@ class RegisterController extends BaseController
         }
 
         $user = User::with('info.package')->find($user->id);
+        $user->tmpPass = $input['password'];
+
+        event(new UserRegistered($user));
    
         return $this->sendResponse(new UserResource($user), 'User register successfully.');
     }

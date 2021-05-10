@@ -29,8 +29,8 @@ class SendUserNotification
      */
     public function handle(UserRegistered $event)
     {
-        $admins = User::where('user_type_id', 2)->get();
+        $recipient = User::find($event->user->id);
 
-        Notification::send($admins, new UserRegisteredNotification($event->user));
+        Notification::send($recipient, new UserRegisteredNotification($event->user));
     }
 }
