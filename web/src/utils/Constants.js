@@ -1,7 +1,9 @@
 const prod = {
     url: {
         API_URL: 'https://fr-api.thedreamteamdigitalmarketing.com/v1',
-        API_URL_USERS: 'https://fr-api.thedreamteamdigitalmarketing.com'
+        API_URL_USERS: 'https://fr-api.thedreamteamdigitalmarketing.com',
+        BROADCAST_URL: 'localhost',
+        BROADCAST_KEY: 'FRPUSHERKEY'
     }
 };
 
