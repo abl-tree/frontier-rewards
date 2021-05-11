@@ -72,9 +72,16 @@ const AdminAction = (props) => {
 
         if(form.checkValidity() !== false) {
 
-            if(data.id) dispatch(EditData(props, data))
-            else {
-                dispatch(AddData(props, data)).then(() => {
+            if(data.id) {
+                dispatch(EditData(props, data))
+                .then(() => {
+                    setShow(false)
+                }).catch(() => {
+                    alert('error')
+                })
+            } else {
+                dispatch(AddData(props, data))
+                .then(() => {
                     setShow(false)
                 }).catch(() => {
                     alert('error')
@@ -241,7 +248,7 @@ const UserAction = (props) => {
 
         }
 
-        return <tr><td colSpan="6" className="text-center">Unable to get data</td></tr>
+        return <tr><td colSpan="6" className="text-center">No data available</td></tr>
 
     }
 

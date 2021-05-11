@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Auth\Events\Registered;
 use App\Events\UserRegistered;
 use App\Listeners\SendUserNotification;
+use App\Events\RewardCreated;
+use App\Listeners\SendRewardNotification;
 use App\Events\TransactionStatusUpdated;
 use App\Listeners\SendTransactionUpdatesNotification;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -24,6 +26,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         UserRegistered::class => [
             SendUserNotification::class,
+        ],
+        RewardCreated::class => [
+            SendRewardNotification::class,
         ],
         TransactionStatusUpdated::class => [
             SendTransactionUpdatesNotification::class,

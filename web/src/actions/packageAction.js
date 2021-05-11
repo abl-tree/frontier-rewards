@@ -37,6 +37,8 @@ export const AddPackage = (props, data) => async dispatch => {
             type: "PACKAGE_ADDED",
             payload: res.data.data
         })
+
+        return Promise.resolve();
         
     } catch (error) {
 
@@ -44,6 +46,8 @@ export const AddPackage = (props, data) => async dispatch => {
             type: "PACKAGE_FAIL",
             payload: error.response.data.data
         })
+
+        return Promise.reject();
         
     }
 }
@@ -61,6 +65,8 @@ export const EditPackage = (props, data) => async dispatch => {
             type: "PACKAGE_UPDATED",
             payload: res.data.data
         })
+
+        return Promise.resolve();
         
     } catch (error) {
 
@@ -68,6 +74,8 @@ export const EditPackage = (props, data) => async dispatch => {
             type: "PACKAGE_FAIL",
             payload: error.response.data.data
         })
+
+        return Promise.reject();
         
     }
 }

@@ -180,7 +180,7 @@ const User = (props) => {
             if(data.id) {
                 dispatch(EditData(props, data))
                 .then(() => {
-                    setShow(true)
+                    setShow(false)
                 })
                 .catch(() => {
                     alert('error')
@@ -188,7 +188,7 @@ const User = (props) => {
             } else {
                 dispatch(Register(props, data))
                 .then(() => {
-                    setShow(true);
+                    setShow(false);
                 })
                 .catch(() => {
                     alert('error');

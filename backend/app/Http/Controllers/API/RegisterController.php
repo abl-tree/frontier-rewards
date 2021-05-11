@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserRegistration;
-use App\Events\RewardCreated;
 use App\Events\UserRegistered;
 use App\Http\Resources\User as UserResource;
    
@@ -35,9 +34,6 @@ class RegisterController extends BaseController
             'package_id.value' => 'required_if:user_type_id,3|exists:packages,id',
             'customer_id' => 'required_if:user_type_id,3|unique:user_infos'
         ]);
-
-        // broadcast(new RewardCreated(auth()->user()))->toOthers();
-        // event(broadcast(new RewardCreated(auth()->user()))->toOthers());
    
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());       
@@ -54,8 +50,6 @@ class RegisterController extends BaseController
         $user = User::create($input);
         $success['token'] =  $user->createToken('MyApp')->accessToken;
         $success['name'] =  $user->name;
-
-        // event(new UserRegistered($user));
 
         if($input['user_type_id'] == 3) {
             $info = UserInfo::create([

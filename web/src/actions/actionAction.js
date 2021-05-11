@@ -72,6 +72,8 @@ export const EditData = (props, data) => async dispatch => {
             payload: res.data.data
         })
 
+        return Promise.resolve();
+
     })
     .catch((error) => {
         if(error.response) {
@@ -80,6 +82,8 @@ export const EditData = (props, data) => async dispatch => {
                 payload: error.response.data.message
             })
         }
+
+        return Promise.reject();
     })
 
 }

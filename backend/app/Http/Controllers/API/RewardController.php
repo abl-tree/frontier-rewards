@@ -7,6 +7,7 @@ use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\Reward;
 use Validator;
 use App\Http\Resources\Reward as RewardResource;
+use App\Events\RewardCreated;
 
 class RewardController extends BaseController
 {
@@ -53,6 +54,8 @@ class RewardController extends BaseController
         }
    
         $reward = Reward::create($input);
+
+        event(new RewardCreated($reward));
    
         return $this->sendResponse(new RewardResource($reward), 'Reward created successfully.');
     }

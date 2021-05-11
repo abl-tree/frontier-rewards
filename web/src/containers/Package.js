@@ -6,7 +6,7 @@ import axios from "axios";
 import {AddPackage, DeletePackage, EditPackage, GetPackages} from "../actions/packageAction";
 import AsyncSelect from 'react-select/async';
 
-const Product = (props) => {
+const Package = (props) => {
     
     const dispatch = useDispatch();
     const packageList = useSelector(state => state.Package);
@@ -97,8 +97,22 @@ const Product = (props) => {
 
         if(form.checkValidity() !== false) {
 
-            if(data.id) dispatch(EditPackage(props, data))
-            else dispatch(AddPackage(props, data))
+            if(data.id) {
+                dispatch(EditPackage(props, data))
+                .then(() => {
+                    setShow(false)
+                }).catch(() => {
+                    alert('error')
+                })
+            }
+            else {
+                dispatch(AddPackage(props, data))
+                .then(() => {
+                    setShow(false)
+                }).catch(() => {
+                    alert('error')
+                })
+            }
 
         }
 
@@ -253,4 +267,4 @@ const Product = (props) => {
 
 }
 
-export default Product;
+export default Package;

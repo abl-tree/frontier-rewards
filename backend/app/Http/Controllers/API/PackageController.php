@@ -59,6 +59,7 @@ class PackageController extends BaseController
    
         $package = Package::create($input);
 
+        if(@$input['rewards'])
         foreach ($input['rewards'] as $key => $reward) {
             $package->rewards()->create([
                 'reward_id' => $reward['value']
@@ -125,11 +126,13 @@ class PackageController extends BaseController
         $package->multiplier = $input['multiplier'];
         $package->save();
 
-        foreach ($input['rewards'] as $key => $reward) {
-            $package->rewards()->firstOrCreate(['reward_id' => $reward['value']]);
-        }
+        if(@$input['rewards']) {
+            foreach ($input['rewards'] as $key => $reward) {
+                $package->rewards()->firstOrCreate(['reward_id' => $reward['value']]);
+            }
 
-        $package->rewards()->whereNotIn('reward_id', array_column($input['rewards'], 'value'))->delete();
+            $package->rewards()->whereNotIn('reward_id', array_column($input['rewards'], 'value'))->delete();
+        } else $package->rewards()->delete();
 
         $package = Package::with('rewards.reward')->find($package->id);
    

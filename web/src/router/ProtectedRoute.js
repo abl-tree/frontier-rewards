@@ -23,7 +23,7 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
 
         // axios.defaults.headers['X-Socket-Id'] = "Bearer " + auth.user.token;
 
-        const initEcho = () => {
+        const initEchoB = () => { // own websockets
 
             window.Echo = new Echo({
                 broadcaster: 'pusher',
@@ -49,6 +49,52 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
                             });
                         }
                     };
+                },
+            });
+            
+            window.Echo.private(`notification`)
+            .listen('UserRegistered', (e) => {
+                console.log('channel', e);
+            });
+        }
+
+        const initEcho = () => {
+
+            window.Echo = new Echo({
+                broadcaster: 'pusher',
+                key: '658ad8bb2f982c7fa645',
+                cluster: 'ap1',
+                wsHost: config.url.BROADCAST_URL,
+                wsPort: 6001,
+                forceTLS: true,
+                authorizer: (channel, options) => {
+                    return {
+                        authorize: (socketId, callback) => {
+    
+                            axios.post('/broadcasting/auth', {
+                                socket_id: socketId,
+                                channel_name: channel.name
+                            })
+                            .then(response => {
+                                axios.defaults.headers['X-Socket-ID'] = socketId
+                                callback(false, response.data);
+                            })
+                            .catch(error => {
+                                callback(true, error);
+                            });
+                        }
+                    };
+                },
+                // wsHost: config.url.BROADCAST_URL,
+                // wsPort: 6001,
+                //authEndpoint is your apiUrl + /broadcasting/auth
+                // authEndpoint: config.url.API_URL + '/broadcasting/auth', 
+                // As I'm using JWT tokens, I need to manually set up the headers.
+                auth: {
+                  headers: {
+                    Authorization: `Bearer ${auth.user.token}`,
+                    Accept: 'application/json',
+                  },
                 },
             });
             

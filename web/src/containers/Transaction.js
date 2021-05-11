@@ -58,15 +58,6 @@ const AdminTransaction = (props) => {
         setShow(true);
 
     }
-    const handleEditShow = (packageData) => {
-
-        console.log(packageData);
-
-        setData(packageData)
-
-        setShow(true);
-
-    }
 
     React.useEffect(() => {
         fetchData()
@@ -121,11 +112,6 @@ const AdminTransaction = (props) => {
 
     });
 
-    const handleDelete = id => {
-    
-        dispatch(DeleteData(props, id))
-
-    }
     const showPagination = () => {
         if(!_.isEmpty(transactionList.data.links))
         return transactionList.data.links.map((page, i) => {
@@ -187,7 +173,7 @@ const AdminTransaction = (props) => {
 
         }
 
-        return <tr><td colSpan="10" className="text-center">Unable to get data</td></tr>
+        return <tr><td colSpan="10" className="text-center">No data available</td></tr>
 
     }
 
@@ -222,46 +208,6 @@ const AdminTransaction = (props) => {
 
     return (
         <>
-            <Row>
-                <Button variant="primary" onClick={handleShow}>
-                    Add Package
-                </Button>
-        
-                <Modal show={show} onHide={handleClose}>
-                    <Form noValidate validated={validated} onSubmit={addPackage}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Add Package</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            {fields.map((field, i) => {
-                                return <Form.Group hidden={field.hidden} key={i} as={Row} controlId={field.control_id}>
-                                    <Form.Label column sm={3}>{field.title}</Form.Label>
-                                    <Col sm={9}>
-                                        <Form.Control 
-                                            required={field.required}
-                                            type={field.type} 
-                                            placeholder={field.placeholder}
-                                            value={data[field.key]}
-                                            onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
-                                        />
-                                    </Col>
-                                </Form.Group>
-                            })}
-                            <AsyncSelect cacheOptions defaultOptions loadOptions={promiseRewardOptions} onChange={value => setReward(prev => ({...prev, 'reward_id' : value.value}))} placeholder="None" />
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={handleClose}>
-                            Close
-                            </Button>
-                            <Button variant="primary" type="submit">
-                            Save Changes
-                            </Button>
-                        </Modal.Footer>
-                    </Form>
-                </Modal>
-                
-            </Row>
-
             <Row>
                 <Col md={12}>
                     <Form.Group controlId="exampleForm.SelectCustom">
@@ -386,9 +332,6 @@ const CustomerTransaction = (props) => {
     const [filters, setFilters] = useState({
         type: 'all'
     });
-    const fields = [];
-
-    const [show, setShow] = useState(false);
     const [dialogShow, setDialogShow] = useState(false);
     const [statusUpdateData, setStatusUpdateData] = useState({});
   
@@ -417,23 +360,6 @@ const CustomerTransaction = (props) => {
             }
         })
     }
-    const handleClose = () => setShow(false);
-    const handleShow = (packageData) => {
-
-        setData({})
-
-        setShow(true);
-
-    }
-    const handleEditShow = (packageData) => {
-
-        console.log(packageData);
-
-        setData(packageData)
-
-        setShow(true);
-
-    }
 
     React.useEffect(() => {
         fetchData()
@@ -442,24 +368,6 @@ const CustomerTransaction = (props) => {
     const fetchData = (url = '/transactions', params = filters) => {
 
         dispatch(GetData(props, url, params));
-
-    }
-
-    const addPackage = (e) => {
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        const form = e.currentTarget;
-
-        setValidated(true);
-
-        if(form.checkValidity() !== false) {
-
-            if(data.id) dispatch(EditData(props, data))
-            else dispatch(AddData(props, data))
-
-        }
 
     }
 
@@ -554,7 +462,7 @@ const CustomerTransaction = (props) => {
 
         }
 
-        return <tr><td colSpan="10" className="text-center">Unable to get data</td></tr>
+        return <tr><td colSpan="10" className="text-center">No data available</td></tr>
 
     }
 
@@ -589,46 +497,6 @@ const CustomerTransaction = (props) => {
 
     return (
         <>
-            <Row>
-                <Button variant="primary" onClick={handleShow}>
-                    Add Package
-                </Button>
-        
-                <Modal show={show} onHide={handleClose}>
-                    <Form noValidate validated={validated} onSubmit={addPackage}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>Add Package</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            {fields.map((field, i) => {
-                                return <Form.Group hidden={field.hidden} key={i} as={Row} controlId={field.control_id}>
-                                    <Form.Label column sm={3}>{field.title}</Form.Label>
-                                    <Col sm={9}>
-                                        <Form.Control 
-                                            required={field.required}
-                                            type={field.type} 
-                                            placeholder={field.placeholder}
-                                            value={data[field.key]}
-                                            onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
-                                        />
-                                    </Col>
-                                </Form.Group>
-                            })}
-                            <AsyncSelect cacheOptions defaultOptions loadOptions={promiseRewardOptions} onChange={value => setReward(prev => ({...prev, 'reward_id' : value.value}))} placeholder="None" />
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={handleClose}>
-                            Close
-                            </Button>
-                            <Button variant="primary" type="submit">
-                            Save Changes
-                            </Button>
-                        </Modal.Footer>
-                    </Form>
-                </Modal>
-                
-            </Row>
-
             <Row>
                 <Col md={12}>
                     <Form.Group controlId="exampleForm.SelectCustom">

@@ -12,7 +12,8 @@ const dev = {
         API_URL: 'http://localhost:8000/v1',
         BASE_URL: 'http://localhost:8000',
         BROADCAST_URL: 'localhost',
-        BROADCAST_KEY: 'FRPUSHERKEY'
+        // BROADCAST_KEY: 'FRPUSHERKEY'
+        BROADCAST_KEY: 'ca3b395b209c42fd56c7'
     }
 };
 

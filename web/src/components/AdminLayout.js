@@ -84,7 +84,7 @@ export const AdminHeader = (props) => {
                 heading='Notification Alerts'
                 sortedByKey={false}
                 showDate={false}
-                size={64}
+                size={30}
                 color="yellow"
                 getDayDiff={(e) => {
                     return ''
