@@ -47,7 +47,7 @@ export const AddPackage = (props, data) => async dispatch => {
             payload: error.response.data.data
         })
 
-        return Promise.reject();
+        return Promise.reject(error);
         
     }
 }
@@ -75,7 +75,7 @@ export const EditPackage = (props, data) => async dispatch => {
             payload: error.response.data.data
         })
 
-        return Promise.reject();
+        return Promise.reject(error);
         
     }
 }

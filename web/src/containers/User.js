@@ -6,6 +6,7 @@ import _ from "lodash";
 import axios from "axios";
 import AsyncSelect from 'react-select/async';
 import { Register, GetData, EditData, DeleteData } from "../actions/userAction";
+import { ToastContainer, toast } from 'react-toastify';
 
 const User = (props) => {
 
@@ -181,17 +182,33 @@ const User = (props) => {
                 dispatch(EditData(props, data))
                 .then(() => {
                     setShow(false)
+
+                    toast.success("User updated successfully", {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
                 })
-                .catch(() => {
-                    alert('error')
+                .catch((error) => {
+        
+                    toast.error(error.response.data.message, {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+        
                 })
             } else {
                 dispatch(Register(props, data))
                 .then(() => {
                     setShow(false);
+
+                    toast.success("User added successfully", {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
                 })
-                .catch(() => {
-                    alert('error');
+                .catch((error) => {
+        
+                    toast.error(error.response.data.message, {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+        
                 })
             }
 
@@ -497,6 +514,8 @@ const User = (props) => {
                     {showPagination()}
                 </Pagination>
             </Row>
+
+            <ToastContainer />
         </>
     )
 

@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import { Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
 import _ from "lodash";
 import {AddData, DeleteData, EditData, GetData} from "../actions/actionAction";
+import { ToastContainer, toast } from 'react-toastify';
 
 const AdminAction = (props) => {
     
@@ -76,15 +77,31 @@ const AdminAction = (props) => {
                 dispatch(EditData(props, data))
                 .then(() => {
                     setShow(false)
-                }).catch(() => {
-                    alert('error')
+
+                    toast.success("Action updated successfully", {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+                }).catch((error) => {
+        
+                    toast.error(error.response.data.message, {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+
                 })
             } else {
                 dispatch(AddData(props, data))
                 .then(() => {
                     setShow(false)
-                }).catch(() => {
-                    alert('error')
+
+                    toast.success("Action added successfully", {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+                }).catch((error) => {
+        
+                    toast.error(error.response.data.message, {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+
                 })
             }
 
@@ -208,6 +225,7 @@ const AdminAction = (props) => {
                     {showPagination()}
                 </Pagination>
             </Row>
+            <ToastContainer />
         </>
     )
 

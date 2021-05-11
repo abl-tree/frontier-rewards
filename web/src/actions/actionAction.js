@@ -53,7 +53,7 @@ export const AddData = (props, data) => async dispatch => {
             })
         }
 
-        return Promise.reject();
+        return Promise.reject(error);
     })
 
 }
@@ -83,7 +83,7 @@ export const EditData = (props, data) => async dispatch => {
             })
         }
 
-        return Promise.reject();
+        return Promise.reject(error);
     })
 
 }

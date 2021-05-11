@@ -50,7 +50,7 @@ export const Register = (props, data) => async dispatch => {
             })
         }
 
-        return Promise.reject();
+        return Promise.reject(error);
     })
 }
 
@@ -129,7 +129,7 @@ export const EditData = (props, data) => async dispatch => {
             payload: error.response.data.data
         })
 
-        return Promise.reject()
+        return Promise.reject(error)
         
     }
 }

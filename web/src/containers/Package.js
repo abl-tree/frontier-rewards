@@ -5,6 +5,7 @@ import _ from "lodash";
 import axios from "axios";
 import {AddPackage, DeletePackage, EditPackage, GetPackages} from "../actions/packageAction";
 import AsyncSelect from 'react-select/async';
+import { ToastContainer, toast } from 'react-toastify';
 
 const Package = (props) => {
     
@@ -101,16 +102,32 @@ const Package = (props) => {
                 dispatch(EditPackage(props, data))
                 .then(() => {
                     setShow(false)
-                }).catch(() => {
-                    alert('error')
+
+                    toast.success("Package updated successfully", {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+                }).catch((error) => {
+        
+                    toast.error(error.response.data.message, {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+
                 })
             }
             else {
                 dispatch(AddPackage(props, data))
                 .then(() => {
                     setShow(false)
-                }).catch(() => {
-                    alert('error')
+
+                    toast.success("Package added successfully", {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+                }).catch((error) => {
+        
+                    toast.error(error.response.data.message, {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+
                 })
             }
 
@@ -262,6 +279,8 @@ const Package = (props) => {
                     {showPagination()}
                 </Pagination>
             </Row>
+
+            <ToastContainer />
         </>
     )
 

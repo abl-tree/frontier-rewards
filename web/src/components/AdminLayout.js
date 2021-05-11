@@ -4,7 +4,6 @@ import { Link, Route, Redirect } from "react-router-dom";
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import axios from 'axios';
 import _ from 'lodash';
-import '../css/notifications.css'
 import NotifyMe from 'react-notification-timeline';
 import moment from 'moment';
 

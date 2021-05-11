@@ -4,6 +4,8 @@ import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Ta
 import _ from "lodash";
 import {AddData, DeleteData, EditData, GetData} from "../actions/rewardAction";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const AdminReward = (props) => {
     
@@ -114,18 +116,34 @@ const AdminReward = (props) => {
                 dispatch(EditData(props, data))
                 .then(() => {
                     setShow(false)
+
+                    toast.success("Reward edited successfully", {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
                 })
-                .catch(() => {
-                    alert('error')
+                .catch(error => {
+        
+                    toast.error(error.response.data.message, {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+
                 })
             }
             else {
                 dispatch(AddData(props, data))
                 .then(() => {
                     setShow(false)
+
+                    toast.success("Reward added successfully", {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
                 })
-                .catch(() => {
-                    alert('error')
+                .catch((error) => {
+        
+                    toast.error(error.response.data.message, {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+
                 })
             }
 
@@ -281,6 +299,7 @@ const AdminReward = (props) => {
                     {showPagination()}
                 </Pagination>
             </Row>
+            <ToastContainer />
         </>
     )
 
@@ -293,9 +312,23 @@ const UserReward = (props) => {
 
     const handleRedeem = async (reward_id) => {
         
-        const res = await axios.post('redeem', {'reward_id' : reward_id})
+        try {
+        
+            const res = await axios.post('redeem', {'reward_id' : reward_id})
+    
+            var result = res.data.data
 
-        var result = res.data.data
+            toast.success("Redemption successful", {
+                position: toast.POSITION.BOTTOM_RIGHT
+            });
+            
+        } catch (error) {
+        
+            toast.error(error.response.data.message, {
+                position: toast.POSITION.BOTTOM_RIGHT
+            });
+
+        }
     }
 
     const showData = () => {
@@ -304,8 +337,8 @@ const UserReward = (props) => {
 
             return dataList.data.data.map((el, key) => {
 
-                return <Col md={4} className="mb-3">
-                    <Card key={key} style={{ height: '100%' }}>
+                return <Col md={4} key={key} className="mb-3">
+                    <Card style={{ height: '100%' }}>
                         <Card.Body>
                             <Card.Title>{el.name}</Card.Title>
                             <Card.Text>{el.description}</Card.Text>
@@ -350,6 +383,7 @@ const UserReward = (props) => {
             <Row className="pt-3">
                 {showData()}
             </Row>
+            <ToastContainer />
         </>
     )
 

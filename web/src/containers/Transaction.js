@@ -1,6 +1,6 @@
 import React, {useState, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Button, ButtonGroup, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Badge, Button, ButtonGroup, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
 import _ from "lodash";
 import axios from "axios";
 import {AddData, DeleteData, EditData, GetData} from "../actions/transactionAction";
@@ -371,50 +371,12 @@ const CustomerTransaction = (props) => {
 
     }
 
-    const fetchRewards = async () => {
-
-        const res = await axios.get('/rewards')
-
-        var results = res.data.data
-
-        var options = [];
-
-        for (let a = 0; a < results.data.length; a++) {
-            const result = results.data[a]
-            
-            options = [...options, {value: result.id, label: result.name}]
-        }
-        
-        return options
-    }
-
-    const promiseRewardOptions = inputValue => new Promise(resolve => {
-
-        setTimeout(() => {
-            resolve(fetchRewards(inputValue));
-        }, 1000);
-
-    });
-
-    const handleDelete = id => {
-    
-        dispatch(DeleteData(props, id))
-
-    }
     const showPagination = () => {
         if(!_.isEmpty(transactionList.data.links))
         return transactionList.data.links.map((page, i) => {
             return <Pagination.Item key={i} active={page.active} onClick={() => fetchData(page.url, {})} disabled={!page.url}><span dangerouslySetInnerHTML={{
                 __html: page.label
             }}></span></Pagination.Item>
-        })
-    }
-
-    const handleTransactionStatusChange = (id, status) => {
-        setDialogShow(true);
-        setStatusUpdateData({
-            'id' : id,
-            'status' : status
         })
     }
 
@@ -433,18 +395,7 @@ const CustomerTransaction = (props) => {
                     <td>{el.salesperson ? el.salesperson.name : ''}</td>
                     <td>{el.created_at}</td>
                     <td>{el.updated_at}</td>
-                    <td>
-                        <Form.Group controlId="exampleForm.SelectCustom">
-                            <Form.Row>
-                                <Form.Control as="select" size="sm" custom value={el.status} onChange={(e) => handleTransactionStatusChange(el.id, e.target.value, el.status)}>
-                                    <option value="pending">Pending</option>
-                                    <option value="cancelled">Cancelled</option>
-                                    <option value="confirmed">Confirmed</option>
-                                    <option value="completed">Completed</option>
-                                </Form.Control>
-                            </Form.Row>
-                        </Form.Group>
-                    </td>
+                    <td><Badge variant="info">{el.status}</Badge></td>
                 </tr>
             })
 

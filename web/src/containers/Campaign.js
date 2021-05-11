@@ -8,6 +8,7 @@ import Moment from 'react-moment';
 import AsyncSelect from 'react-select/async';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { ToastContainer, toast } from 'react-toastify';
 
 const AdminCampaign = (props) => {
     
@@ -188,18 +189,34 @@ const AdminCampaign = (props) => {
                 dispatch(EditData(props, data))
                 .then(() => {
                     setShowAddCampaign(false)
+                    
+                    toast.success("Campaign added successfully", {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
                 })
-                .catch(() => {
-                    alert('error')
+                .catch((error) => {
+        
+                    toast.error(error.response.data.message, {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+
                 })
             }
             else {
                 dispatch(AddData(props, data))
                 .then(() => {
                     setShowAddCampaign(false)
+                    
+                    toast.success("Campaign added successfully", {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
                 })
-                .catch(() => {
-                    alert('error')
+                .catch((error) => {
+        
+                    toast.error(error.response.data.message, {
+                        position: toast.POSITION.BOTTOM_RIGHT
+                    });
+
                 })
             }
 
@@ -494,6 +511,8 @@ const AdminCampaign = (props) => {
             </Modal>
 
             {/* End Modals */}
+
+            <ToastContainer />
         </>
     )
 
