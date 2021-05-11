@@ -75,7 +75,7 @@ const AdminProfile = (props) => {
 
         }
 
-        return <tr><td colSpan="6" className="text-center">Unable to get data</td></tr>
+        return <tr><td colSpan="6" className="text-center">No data available</td></tr>
 
     }
 
@@ -377,7 +377,7 @@ const CustomerProfile = (props) => {
 
         }
 
-        return <tr><td colSpan="6" className="text-center">Unable to get data</td></tr>
+        return <tr><td colSpan="6" className="text-center">No data available</td></tr>
 
     }
 

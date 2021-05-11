@@ -251,7 +251,7 @@ const User = (props) => {
 
         }
 
-        return <tr><td colSpan="9" className="text-center">Unable to get data</td></tr>
+        return <tr><td colSpan="9" className="text-center">No data available</td></tr>
 
     }
 
