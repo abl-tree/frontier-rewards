@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const apiRoute = '/actions/'
+const apiRoute = '/actions'
 
 export const GetData = (props, url = apiRoute) => async dispatch => {
 
@@ -64,7 +64,7 @@ export const EditData = (props, data) => async dispatch => {
         type: "ACTION_REQUEST"
     })
 
-    await axios.put(apiRoute + data.id, data)
+    await axios.put(apiRoute + '/' + data.id, data)
     .then((res) => {
 
         dispatch({
@@ -94,7 +94,7 @@ export const DeleteData = (props, id) => async dispatch => {
         type: "ACTION_REQUEST"
     })
 
-    await axios.delete(apiRoute + id)
+    await axios.delete(apiRoute + '/' + id)
     .then((res) => {
 
         dispatch({
