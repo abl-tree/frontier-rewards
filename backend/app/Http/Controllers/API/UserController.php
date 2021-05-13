@@ -228,4 +228,17 @@ class UserController extends BaseController
 
         return $this->sendResponse(new UserResource($user), 'User profile retrieved successfully.');
     }
+    
+    public function showByQR($qrCode)
+    {
+        $user = User::with('info.package')->whereHas('info', function($q) use ($qrCode) {
+            $q->where('customer_id', $qrCode);
+        })->first();
+  
+        if (is_null($user)) {
+            return $this->sendError('User not found.');
+        }
+   
+        return $this->sendResponse(new UserResource($user), 'User retrieved successfully.');
+    }
 }

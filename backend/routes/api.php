@@ -40,6 +40,7 @@ Route::middleware('auth:api')->group( function () {
     Route::resource('rewards', RewardController::class);
     Route::resource('users', UserController::class);
     Route::get('users/{userid}/rewards', [UserController::class, 'rewards']);
+    Route::get('users/{qrCode}/qr', [UserController::class, 'showByQr']);
     Route::get('profile', [UserController::class, 'profile']);
     Route::resource('notifications', UserNotificationController::class);
     Route::resource('transactions', TransactionController::class);
