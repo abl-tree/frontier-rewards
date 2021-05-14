@@ -18,7 +18,7 @@ const AdminReward = (props) => {
             'key': 'id',
             'title': 'Name',
             'type': 'hidden',
-            'placeholder': 'Action ID',
+            'placeholder': 'Reward ID',
             'control_id': 'formActionId',
             'hidden': true
         },
@@ -49,7 +49,7 @@ const AdminReward = (props) => {
             'title': 'Value',
             'type': 'number',
             'min': 0,
-            'placeholder': 'Enter action name',
+            'placeholder': 'Enter reward value',
             'control_id': 'formValue',
             'required': true
         },
@@ -57,7 +57,7 @@ const AdminReward = (props) => {
             'key': 'name',
             'title': 'Name',
             'type': 'text',
-            'placeholder': 'Enter action name',
+            'placeholder': 'Enter reward name',
             'control_id': 'formActionName',
             'required': true
         },
@@ -65,7 +65,7 @@ const AdminReward = (props) => {
             'key': 'description',
             'title': 'Description',
             'type': 'text',
-            'placeholder': 'Enter action description',
+            'placeholder': 'Enter reward description',
             'control_id': 'formActionDescription',
             'required': true
         }
