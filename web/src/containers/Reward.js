@@ -54,6 +54,15 @@ const AdminReward = (props) => {
             'required': true
         },
         {
+            'key': 'cost',
+            'title': 'Cost',
+            'type': 'number',
+            'min': 0,
+            'placeholder': 'Enter reward cost',
+            'control_id': 'formCost',
+            'required': true
+        },
+        {
             'key': 'name',
             'title': 'Name',
             'type': 'text',
@@ -230,7 +239,21 @@ const AdminReward = (props) => {
                                             />
                                         </Col>
                                     </Form.Group>
-                                } else if(field.type === 'number' && data.type != 'item') {
+                                } else if(field.type === 'number' && field.key != 'cost' && data.type != 'item') {
+                                    return <Form.Group hidden={field.hidden} key={i} as={Row} controlId={field.control_id}>
+                                        <Form.Label column sm={3}>{field.title}</Form.Label>
+                                        <Col sm={9}>
+                                            <Form.Control 
+                                                required={field.required}
+                                                type={field.type} 
+                                                placeholder={field.placeholder}
+                                                value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
+                                                min={field.min}
+                                                onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
+                                            />
+                                        </Col>
+                                    </Form.Group>
+                                } else if(field.type === 'number' && field.key === 'cost' && data.type == 'item') {
                                     return <Form.Group hidden={field.hidden} key={i} as={Row} controlId={field.control_id}>
                                         <Form.Label column sm={3}>{field.title}</Form.Label>
                                         <Col sm={9}>
@@ -343,7 +366,7 @@ const UserReward = (props) => {
                             <Card.Title>{el.name}</Card.Title>
                             <Card.Text>{el.description}</Card.Text>
                         </Card.Body>
-                        {el.type != 'points' ? <Button variant="success" onClick={() => handleRedeem(el.id)}>Redeem</Button> : ''}
+                        {el.type != 'points' ? <Button variant="success" onClick={() => handleRedeem(el.id)}>Redeem ({el.cost}pts)</Button> : ''}
                     </Card>
                 </Col>
             })
