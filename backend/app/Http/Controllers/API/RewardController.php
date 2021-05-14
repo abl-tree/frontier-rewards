@@ -55,7 +55,7 @@ class RewardController extends BaseController
    
         $reward = Reward::create($input);
 
-        event(new RewardCreated($reward));
+        // event(new RewardCreated($reward));
    
         return $this->sendResponse(new RewardResource($reward), 'Reward created successfully.');
     }
@@ -113,6 +113,7 @@ class RewardController extends BaseController
         $reward->description = $input['description'];
         $reward->type = $input['type'];
         $reward->value = @$input['value'];
+        $reward->cost = @$input['cost'];
         $reward->save();
    
         return $this->sendResponse(new RewardResource($reward), 'Reward updated successfully.');

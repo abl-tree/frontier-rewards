@@ -19,6 +19,8 @@ class Reward extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'type' => $this->type,
+            'value' => $this->value,
+            'cost' => $this->cost,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];
