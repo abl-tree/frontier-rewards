@@ -61,13 +61,13 @@ export const SuperAdminHeader = (props) => {
     return (
         <Navbar collapseOnSelect className="sticky-top" expand="*" bg="dark" variant="dark">
             <Navbar.Brand className="col-sm-3 col-md-2 mr-0 px-3" href="#home">
-            <img
+            {/* <img
                 alt=""
                 src="/logo.svg"
                 width="30"
                 height="30"
                 className="d-inline-block align-top"
-            />
+            /> */}
             Frontier Rewards
             </Navbar.Brand>
 
