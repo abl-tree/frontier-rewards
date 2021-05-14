@@ -124,7 +124,8 @@ class TransactionController extends BaseController
             'action_id' => $input['action_id'],
             'action_name' => $input['action_name'],
             'campaign_id' => $input['campaign_id'],
-            'campaign_name' => $input['campaign_name']
+            'campaign_name' => $input['campaign_name'],
+            'total' => 0
         ]);
 
         if($item) {
