@@ -55,7 +55,7 @@ class RewardController extends BaseController
    
         $reward = Reward::create($input);
 
-        // event(new RewardCreated($reward));
+        event(new RewardCreated($reward));
    
         return $this->sendResponse(new RewardResource($reward), 'Reward created successfully.');
     }
