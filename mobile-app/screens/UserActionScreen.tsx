@@ -1,50 +1,26 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { Button, StyleSheet } from 'react-native';
+import { Button, Dimensions, StyleSheet } from 'react-native';
 import { Text, View } from '../components/Themed';
 import axios from 'axios';
-import AsyncSelect from 'react-select/async';
-import {Picker} from '@react-native-picker/picker';
 import _ from 'lodash';
-import MultiSelect from 'react-native-multiple-select';
+import SelectBox from 'react-native-multi-selectbox'
+import { xorBy } from 'lodash'
+
+const window = Dimensions.get("window");
+const screen = Dimensions.get("screen");
 
 export default function UserActionScreen({navigation, route}) {
 
+  const [dimensions, setDimensions] = useState({ window, screen });
   const [user, setUser] = useState({})
   const [campaigns, setCampaigns] = useState([])
   const [actions, setActions] = useState([])
   const [rewards, setRewards] = useState([])
   const [data, setData] = useState({});
-  const [selectedItems, setSelectedItems] = useState([])
-  const [items, setItems] = useState([{
-      id: '92iijs7yta',
-      name: 'Ondo'
-    }, {
-      id: 'a0s0a8ssbsd',
-      name: 'Ogun'
-    }, {
-      id: '16hbajsabsd',
-      name: 'Calabar'
-    }, {
-      id: 'nahs75a5sg',
-      name: 'Lagos'
-    }, {
-      id: '667atsas',
-      name: 'Maiduguri'
-    }, {
-      id: 'hsyasajs',
-      name: 'Anambra'
-    }, {
-      id: 'djsjudksjd',
-      name: 'Benue'
-    }, {
-      id: 'sdhyaysdj',
-      name: 'Kaduna'
-    }, {
-      id: 'suudydjsjd',
-      name: 'Abuja'
-      }
-  ]);
+  const [selectedCampaign, setSelectedCampaign] = useState({})
+  const [selectedAction, setSelectedAction] = useState({})
+  const [selectedReward, setSelectedReward] = useState([])
 
   React.useLayoutEffect(() => {
 
@@ -56,19 +32,16 @@ export default function UserActionScreen({navigation, route}) {
 
   useEffect(() => {
 
-    if(data && data.campaign_id) {
-      promiseActionOptions('')
-    }
+    Dimensions.addEventListener("change", onDimensionChange);
+    return () => {
+      Dimensions.removeEventListener("change", onDimensionChange);
+    };
 
-  }, [data.campaign_id]);
+  }, []);
 
-  useEffect(() => {
-
-    if(data && data.action_id) {
-      promiseRewardOptions('')
-    }
-
-  }, [data.action_id]);
+  const onDimensionChange = ({ window, screen }) => {
+    setDimensions({ window, screen });
+  };
   
   const fetchUser = async () => {
 
@@ -95,7 +68,7 @@ export default function UserActionScreen({navigation, route}) {
       for (let a = 0; a < results.data.length; a++) {
           const result = results.data[a]
           
-          options = [...options, {value: result.id, label: result.name}]
+          options = [...options, {id: result.id, item: result.name}]
       }
 
       setCampaigns(options)
@@ -110,9 +83,9 @@ export default function UserActionScreen({navigation, route}) {
       }, 1000);
   });
 
-  const fetchActions = async (search) => {    
+  const fetchActions = async (search, campaign_id) => {
 
-      const res = await axios.get('/campaigns/'+data.campaign_id+'/actions?search=' + search)
+      const res = await axios.get('/campaigns/'+campaign_id+'/actions?search=' + search)
 
       var results = res.data.data
 
@@ -121,7 +94,7 @@ export default function UserActionScreen({navigation, route}) {
       for (let a = 0; a < results.data.length; a++) {
           const result = results.data[a].action
           
-          options = [...options, {value: result.id, label: result.name}]
+          options = [...options, {id: result.id, item: result.name}]
       }
 
       setActions(options)
@@ -129,15 +102,13 @@ export default function UserActionScreen({navigation, route}) {
       return options
   }
   
-  const promiseActionOptions = inputValue => new Promise(resolve => {
-      setTimeout(() => {
-          resolve(fetchActions(inputValue));
-      }, 1000);
+  const promiseActionOptions = (inputValue, id) => new Promise(resolve => {
+      resolve(fetchActions(inputValue, id));
   });
 
-  const fetchRewards = async (search) => {
+  const fetchRewards = async (search, action_id) => {    
 
-      const res = await axios.get('/campaigns/' + data.campaign_id + '/actions/' + data.action_id)
+      const res = await axios.get('/campaigns/' + data.campaign_id + '/actions/' + action_id)
 
       var results = res.data.data
 
@@ -146,7 +117,7 @@ export default function UserActionScreen({navigation, route}) {
       for (let a = 0; a < results.data.length; a++) {
           const result = results.data[a].reward
           
-          options = [...options, {value: result.id, label: result.name}]
+          options = [...options, {id: result.id, item: result.name}]
       }
 
       setRewards(options)
@@ -155,86 +126,101 @@ export default function UserActionScreen({navigation, route}) {
       
   }
 
-  const promiseRewardOptions = inputValue => new Promise(resolve => {
-      setTimeout(() => {
-          resolve(fetchRewards(inputValue));
-      }, 1000);
+  const promiseRewardOptions = (inputValue, id) => new Promise(resolve => {
+      resolve(fetchRewards(inputValue, id));
   });
 
   const addAction = async () => {
+
     const res = await axios.post('transactions', data)
-    
-    console.log(res);
+
+    navigation.goBack()
     
   }
 
-  const onSelectedItemsChange = selectedItems => {
-    console.log(selectedItems);
-    
-  };
+  const onCampaignChange = (val) => {
+    setSelectedCampaign(val)
+    setSelectedAction({})
+    setSelectedReward([])
+
+    setData(prev => ({'type' : 'earn', 'user_id' : user.id, 'campaign_id' : val.id, 'campaign_name' : val.item}))
+
+    promiseActionOptions('', val.id)
+  }
+
+  const onActionChange = (val) => {
+    setSelectedAction(val)
+
+    setData(prev => ({...prev, 'action_id' : val.id, 'action_name' : val.item}))
+
+    promiseRewardOptions('', val.id)
+  }
+
+  function onRewardChange() {
+    return (item) => {
+      let selectedTmp = xorBy(selectedReward, [item], 'id');
+
+      setData(prev => ({...prev, rewards: selectedTmp.map((val, i) => {
+        return {
+          label: val.item,
+          value: val.id
+        }
+      })}));
+      
+      setSelectedReward(xorBy(selectedReward, [item], 'id'))
+    }
+  }
+
+  const rewardOptions = () => {
+    let tmpSelected = [];
+
+    selectedReward.map((el, i) => {
+
+      var index = rewards.findIndex((item) => item.id === el.id)
+
+      if(index == -1) {
+        tmpSelected = [...tmpSelected, el]
+      }
+      
+    })    
+
+    return [...rewards, ...tmpSelected];
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Name: {user.name}</Text>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-        <Text style={styles.title}>Test</Text>
-        {/* <MultiSelect
-          hideTags
-          items={items}
-          uniqueKey="id"
-          onSelectedItemsChange={onSelectedItemsChange}
-          selectedItems={selectedItems}
-          selectText="Pick Items"
-          searchInputPlaceholderText="Search Items..."
-          onChangeInput={ (text)=> console.log(text)}
-          tagRemoveIconColor="#CCC"
-          tagBorderColor="#CCC"
-          tagTextColor="#CCC"
-          selectedItemTextColor="#CCC"
-          selectedItemIconColor="#CCC"
-          itemTextColor="#000"
-          displayKey="name"
-          searchInputStyle={{ color: '#CCC' }}
-          submitButtonColor="#CCC"
-          submitButtonText="Submit"
-        /> */}
-      <Picker
-        style={{color: 'white'}} 
-        selectedValue={data.campaign_id}
-        style={{ height: 50, width: 150 }}
-        onValueChange={(itemValue, itemIndex) => setData(prev => ({'type' : 'earn', 'user_id' : 11, 'campaign_id' : Number.parseInt(itemValue), 'campaign_name' : campaigns[itemIndex-1].label}))}
-      >
-        <Picker.Item label='Please select a campaign...' value='0' />
-        {campaigns.map((item, index) => {
-            return (<Picker.Item label={item.label} value={item.value} key={index}/>) 
-        })}
-      </Picker>
-      {!_.isUndefined(data.campaign_id) ? 
-        <Picker
-          style={{color: 'white'}} 
-          selectedValue={data.action_id}
-          style={{ height: 50, width: 150 }}
-          onValueChange={(itemValue, itemIndex) => setData(prev => ({...prev, 'action_id' : Number.parseInt(itemValue), 'action_name' : actions[itemIndex-1].label}))}
-        >
-          <Picker.Item label='Please select an action...' value='0' />
-          {actions.map((item, index) => {
-              return (<Picker.Item label={item.label} value={item.value} key={index}/>) 
-          })}
-        </Picker>
-      : <Text></Text>}
-      {!_.isUndefined(data.action_id) ? 
-        <Picker
-          style={{color: 'white'}} 
-          selectedValue={data.reward_id}
-          style={{ height: 50, width: 150 }}
-          onValueChange={(itemValue, itemIndex) => setData(prev => ({...prev, 'rewards' : [{'value': Number.parseInt(itemValue), 'label' : rewards[itemIndex-1].label}]}))}
-        >
-          <Picker.Item label='Please select an action...' value='0' />
-          {rewards.map((item, index) => {
-              return (<Picker.Item label={item.label} value={item.value} key={index}/>) 
-          })}
-        </Picker>
-      : <Text></Text>}
+      <View style={styles.section}>
+        <SelectBox
+          label="Select type"
+          options={campaigns}
+          value={selectedCampaign}
+          onChange={onCampaignChange}
+          hideInputFilter={true}
+          optionsLabelStyle={{width: dimensions.screen.width}}
+        />
+      </View>
+      <View style={styles.section}>
+        <SelectBox
+          label="Select type"
+          options={actions}
+          value={selectedAction}
+          onChange={onActionChange}
+          hideInputFilter={true}
+          optionsLabelStyle={{width: dimensions.screen.width}}
+        />
+      </View>
+      <View style={styles.section}>
+        <SelectBox
+          label="Select multiple"
+          options={rewardOptions()}
+          selectedValues={selectedReward}
+          onMultiSelect={onRewardChange()}
+          onTapClose={onRewardChange()}
+          isMulti
+        />
+      </View>
       {!_.isUndefined(data.campaign_id) && !_.isUndefined(data.action_id) && !_.isUndefined(data.rewards) ?
         <Button
           onPress={addAction}
@@ -250,14 +236,19 @@ export default function UserActionScreen({navigation, route}) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: 'white'
   },
   title: {
     fontSize: 20,
     fontWeight: 'bold',
     color: 'black'
+  },
+  section: {
+    flexDirection:'row', 
+    justifyContent: 'space-between', 
+    paddingLeft: 10, 
+    paddingRight: 10,
+    backgroundColor: 'white'
   },
   separator: {
     marginVertical: 30,

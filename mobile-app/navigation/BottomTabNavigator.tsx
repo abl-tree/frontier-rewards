@@ -31,13 +31,13 @@ export default function BottomTabNavigator() {
         //   tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
         // }}
       />
-      {/* <BottomTab.Screen
+      <BottomTab.Screen
         name="QrScannerTab"
         component={QrScannerTabNavigator}
         // options={{
         //   tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
         // }}
-      /> */}
+      />
       {/* <BottomTab.Screen
         name="TabThree"
         component={TabThreeNavigator}
@@ -88,7 +88,7 @@ function QrScannerTabNavigator() {
       <TabTwoStack.Screen
         name="TabTwoScreen"
         component={TabTwoScreen}
-        // options={{ headerTitle: 'QR Scanner' }}
+        options={{ headerTitle: 'QR Scanner' }}
       />
       <TabTwoStack.Screen
         name="UserActionScreen"
