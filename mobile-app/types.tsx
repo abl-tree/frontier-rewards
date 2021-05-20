@@ -42,6 +42,8 @@ export type LogoutParamList = {
 
 export type DrawerParamList = {
   Action: undefined;
+  Reward: undefined;
+  Package: undefined;
   Database: undefined;
   FileSystem: undefined;
   Clients: undefined;
@@ -57,6 +59,12 @@ export type RewardParamList = {
   RewardScreen: undefined;
   RewardScreenEdit: undefined;
   RewardCreateEdit: undefined;
+};
+
+export type PackageParamList = {
+  PackageScreen: undefined;
+  PackageScreenEdit: undefined;
+  PackageCreateEdit: undefined;
 };
 
 export type DatabaseParamList = {

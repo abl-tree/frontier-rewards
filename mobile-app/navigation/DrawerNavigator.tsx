@@ -9,10 +9,13 @@ import DatabaseScreen from '../screens/DatabaseScreen';
 import FileSystemScreen from '../screens/FileSystemScreen';
 import ClientsScreen from '../screens/ClientsScreen';
 import BottomTabNavigator from './BottomTabNavigator';
-import { DrawerParamList, ActionParamList, DatabaseParamList, FileSystemParamList, ClientsParamList, RewardParamList } from '../types';
+import { DrawerParamList, ActionParamList, DatabaseParamList, FileSystemParamList, ClientsParamList, RewardParamList, PackageParamList } from '../types';
 import RewardScreen from '../screens/RewardScreen';
 import RewardEditScreen from '../screens/RewardEditScreen';
 import RewardCreateScreen from '../screens/RewardCreateScreen';
+import PackageScreen from '../screens/PackageScreen';
+import PackageEditScreen from '../screens/PackageEditScreen';
+import PackageCreateScreen from '../screens/PackageCreateScreen';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
@@ -25,6 +28,9 @@ export default function DrawerNavigator() {
       <Drawer.Screen
         name="Reward"
         component={RewardNavigator}/>
+      <Drawer.Screen
+        name="Package"
+        component={PackageNavigator}/>
       <Drawer.Screen
         name="Database"
         component={DatabaseNavigator}/>
@@ -79,6 +85,27 @@ function RewardNavigator() {
         component={RewardCreateScreen}
       />
     </RewardStack.Navigator>
+  )
+}
+
+const PackageStack = createStackNavigator<PackageParamList>();
+
+function PackageNavigator() {
+  return (
+    <PackageStack.Navigator>
+      <PackageStack.Screen
+        name="PackageScreen"
+        component={PackageScreen}
+      />
+      <PackageStack.Screen
+        name="PackageEditScreen"
+        component={PackageEditScreen}
+      />
+      <PackageStack.Screen
+        name="PackageCreateScreen"
+        component={PackageCreateScreen}
+      />
+    </PackageStack.Navigator>
   )
 }
 

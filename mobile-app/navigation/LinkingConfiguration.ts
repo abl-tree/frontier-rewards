@@ -26,6 +26,13 @@ export default {
               RewardCreateScreen: 'reward-create'
             }
           },
+          Package: {
+            screens: {
+              PackageScreen: 'packages',
+              PackageEditScreen: 'package-edit',
+              PackageCreateScreen: 'package-create'
+            }
+          },
           // TabOne: {
           //   screens: {
           //     TabOneScreen: 'one',
