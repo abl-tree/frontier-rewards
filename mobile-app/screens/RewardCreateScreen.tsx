@@ -1,80 +1,25 @@
 import * as React from 'react';
 import { Button, Input, Text } from 'react-native-elements';
 import {useDispatch} from "react-redux";
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import _ from 'lodash';
 import {AddData} from "../actions/RewardAction";
-import { Picker, StyleSheet, View } from 'react-native';
+import { Dimensions, Picker, StyleSheet, View } from 'react-native';
 import SelectBox from 'react-native-multi-selectbox'
-import { xorBy } from 'lodash'
 
+const window = Dimensions.get("window");
+const screen = Dimensions.get("screen");
 
 export default function RewardCreateScreen({navigation, route}) {
   const dispatch = useDispatch();
+  const [dimensions, setDimensions] = useState({ window, screen });
   const [reward, setReward] = React.useState({type: 'item'});
   const [valueError, setValueError] = useState('');
   const [costError, setCostError] = useState('');
   const [nameError, setNameError] = useState('');
   const [descriptionError, setDescriptionError] = useState('');
   const [saving, setSaving] = useState(false);
-  const K_OPTIONS = [
-    {
-      item: 'Juventus',
-      id: 'JUVE',
-    },
-    {
-      item: 'Real Madrid',
-      id: 'RM',
-    },
-    {
-      item: 'Barcelona',
-      id: 'BR',
-    },
-    {
-      item: 'PSG',
-      id: 'PSG',
-    },
-    {
-      item: 'FC Bayern Munich',
-      id: 'FBM',
-    },
-    {
-      item: 'Manchester United FC',
-      id: 'MUN',
-    },
-    {
-      item: 'Manchester City FC',
-      id: 'MCI',
-    },
-    {
-      item: 'Everton FC',
-      id: 'EVE',
-    },
-    {
-      item: 'Tottenham Hotspur FC',
-      id: 'TOT',
-    },
-    {
-      item: 'Chelsea FC',
-      id: 'CHE',
-    },
-    {
-      item: 'Liverpool FC',
-      id: 'LIV',
-    },
-    {
-      item: 'Arsenal FC',
-      id: 'ARS',
-    },
-  
-    {
-      item: 'Leicester City FC',
-      id: 'LEI',
-    },
-  ]
   const [rewardType, setRewardType] = useState({"id": "item","item": "Item"})
-  const [selectedTeams, setSelectedTeams] = useState([])
-  
 
   useEffect(() => {
 
@@ -82,7 +27,16 @@ export default function RewardCreateScreen({navigation, route}) {
       showHeader: true
     });
 
+    Dimensions.addEventListener("change", onDimensionChange);
+    return () => {
+      Dimensions.removeEventListener("change", onDimensionChange);
+    };
+
   });
+
+  const onDimensionChange = ({ window, screen }) => {
+    setDimensions({ window, screen });
+  };
 
   const handleEditSave = () => {
 
@@ -131,10 +85,6 @@ export default function RewardCreateScreen({navigation, route}) {
     
   }
 
-  function onMultiChange() {
-    return (item) => setSelectedTeams(xorBy(selectedTeams, [item], 'id'))
-  }
-
   const onTypeChange = (val) => {
     setRewardType(val)
 
@@ -143,14 +93,6 @@ export default function RewardCreateScreen({navigation, route}) {
 
   return (
     <View style={styles.container}>
-      {/* <SelectBox
-        label="Select multiple"
-        options={K_OPTIONS}
-        selectedValues={selectedTeams}
-        onMultiSelect={onMultiChange()}
-        onTapClose={onMultiChange()}
-        isMulti
-      /> */}
       <View style={styles.section}>
         <SelectBox
           label="Select type"
@@ -171,6 +113,7 @@ export default function RewardCreateScreen({navigation, route}) {
           value={rewardType}
           onChange={onTypeChange}
           hideInputFilter={true}
+          optionsLabelStyle={{width: dimensions.screen.width}}
         />
       </View>
       {rewardType.id == 'item' ? <Input

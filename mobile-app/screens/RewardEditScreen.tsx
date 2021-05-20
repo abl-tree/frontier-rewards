@@ -4,12 +4,15 @@ import {useDispatch} from "react-redux";
 import { useEffect, useState } from 'react';
 import _ from 'lodash';
 import {EditData} from "../actions/RewardAction";
-import { StyleSheet, View } from 'react-native';
+import { Dimensions, StyleSheet, View } from 'react-native';
 import SelectBox from 'react-native-multi-selectbox'
-import { xorBy } from 'lodash'
+
+const window = Dimensions.get("window");
+const screen = Dimensions.get("screen");
 
 export default function RewardEditScreen({navigation, route}) {
   const dispatch = useDispatch();
+  const [dimensions, setDimensions] = useState({ window, screen });
   const [reward, setReward] = React.useState(route.params.data);
   const [valueError, setValueError] = useState('');
   const [costError, setCostError] = useState('');
@@ -17,18 +20,23 @@ export default function RewardEditScreen({navigation, route}) {
   const [descriptionError, setDescriptionError] = useState('');
   const [saving, setSaving] = useState(false);
   const [rewardType, setRewardType] = useState({"id": reward.type,"item": reward.type})
-  const [selectedTeams, setSelectedTeams] = useState([])
 
-  useEffect(() => {
-
-    console.log(route.params.data);
-    
+  useEffect(() => {    
 
     navigation.setOptions({
       showHeader: true
     });
 
+    Dimensions.addEventListener("change", onDimensionChange);
+    return () => {
+      Dimensions.removeEventListener("change", onDimensionChange);
+    };
+
   });
+
+  const onDimensionChange = ({ window, screen }) => {
+    setDimensions({ window, screen });
+  };
 
   const handleEditSave = () => {
 
@@ -105,6 +113,7 @@ export default function RewardEditScreen({navigation, route}) {
           value={rewardType}
           onChange={onTypeChange}
           hideInputFilter={true}
+          optionsLabelStyle={{width: dimensions.screen.width}}
         />
       </View>
       {rewardType.id == 'item' ? <Input

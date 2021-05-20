@@ -98,8 +98,9 @@ export default function RewardScreen() {
           <View style={styles.rowFront}>
             <TouchableHighlight style={styles.rowFrontVisible}>
                 <View>
-                    <Text style={styles.title} numberOfLines={1}>{data.item.name}</Text>
-                    <Text style={styles.title} numberOfLines={1}>{data.item.description}</Text>
+                    <Text style={styles.title} numberOfLines={1}>Name: {data.item.name}</Text>
+                    <Text style={styles.title} numberOfLines={1}>Description: {data.item.description}</Text>
+                    <Text style={styles.title} numberOfLines={1}>Type: {data.item.type}</Text>
                 </View>
             </TouchableHighlight>
           </View>
@@ -206,7 +207,7 @@ const styles = StyleSheet.create({
   rowFront: {
     backgroundColor: '#FFF',
     borderRadius: 5,
-    height: 60,
+    height: 'auto',
     margin: 5,
     marginBottom: 15,
     shadowColor: '#999',
