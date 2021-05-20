@@ -44,6 +44,7 @@ export type DrawerParamList = {
   Action: undefined;
   Reward: undefined;
   Package: undefined;
+  User: undefined;
   Database: undefined;
   FileSystem: undefined;
   Clients: undefined;
@@ -65,6 +66,12 @@ export type PackageParamList = {
   PackageScreen: undefined;
   PackageScreenEdit: undefined;
   PackageCreateEdit: undefined;
+};
+
+export type UserParamList = {
+  UserScreen: undefined;
+  UserScreenEdit: undefined;
+  UserCreateEdit: undefined;
 };
 
 export type DatabaseParamList = {

@@ -33,6 +33,13 @@ export default {
               PackageCreateScreen: 'package-create'
             }
           },
+          User: {
+            screens: {
+              UserScreen: 'users',
+              UserEditScreen: 'user-edit',
+              UserCreateScreen: 'user-create'
+            }
+          },
           // TabOne: {
           //   screens: {
           //     TabOneScreen: 'one',

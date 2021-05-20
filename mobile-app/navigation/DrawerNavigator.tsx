@@ -9,13 +9,16 @@ import DatabaseScreen from '../screens/DatabaseScreen';
 import FileSystemScreen from '../screens/FileSystemScreen';
 import ClientsScreen from '../screens/ClientsScreen';
 import BottomTabNavigator from './BottomTabNavigator';
-import { DrawerParamList, ActionParamList, DatabaseParamList, FileSystemParamList, ClientsParamList, RewardParamList, PackageParamList } from '../types';
+import { DrawerParamList, ActionParamList, DatabaseParamList, FileSystemParamList, ClientsParamList, RewardParamList, PackageParamList, UserParamList } from '../types';
 import RewardScreen from '../screens/RewardScreen';
 import RewardEditScreen from '../screens/RewardEditScreen';
 import RewardCreateScreen from '../screens/RewardCreateScreen';
 import PackageScreen from '../screens/PackageScreen';
 import PackageEditScreen from '../screens/PackageEditScreen';
 import PackageCreateScreen from '../screens/PackageCreateScreen';
+import UserScreen from '../screens/UserScreen';
+import UserEditScreen from '../screens/UserEditScreen';
+import UserCreateScreen from '../screens/UserCreateScreen';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
@@ -31,6 +34,9 @@ export default function DrawerNavigator() {
       <Drawer.Screen
         name="Package"
         component={PackageNavigator}/>
+      <Drawer.Screen
+        name="User"
+        component={UserNavigator}/>
       <Drawer.Screen
         name="Database"
         component={DatabaseNavigator}/>
@@ -106,6 +112,27 @@ function PackageNavigator() {
         component={PackageCreateScreen}
       />
     </PackageStack.Navigator>
+  )
+}
+
+const UserStack = createStackNavigator<UserParamList>();
+
+function UserNavigator() {
+  return (
+    <UserStack.Navigator>
+      <UserStack.Screen
+        name="UserScreen"
+        component={UserScreen}
+      />
+      <UserStack.Screen
+        name="UserEditScreen"
+        component={UserEditScreen}
+      />
+      <UserStack.Screen
+        name="UserCreateScreen"
+        component={UserCreateScreen}
+      />
+    </UserStack.Navigator>
   )
 }
 
