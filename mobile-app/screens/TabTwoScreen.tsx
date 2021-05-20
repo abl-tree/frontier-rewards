@@ -4,6 +4,8 @@ import { Alert, Button, StyleSheet } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 
 import { Text, View } from '../components/Themed';
+import { StackHeaderLeftButtonProps } from '@react-navigation/stack';
+import MenuIcon from '../components/MenuIcon';
 
 export default function TabTwoScreen({navigation}) {
   const [hasPermission, setHasPermission] = useState(null);
@@ -11,6 +13,11 @@ export default function TabTwoScreen({navigation}) {
   const [qrTxt, setqrTxt] = useState('');
 
   useEffect(() => {
+    
+    navigation.setOptions({
+      showHeader: true,
+      headerLeft: (props: StackHeaderLeftButtonProps) => (<MenuIcon/>)
+    });
 
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();

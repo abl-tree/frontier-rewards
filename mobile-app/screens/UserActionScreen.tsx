@@ -193,7 +193,7 @@ export default function UserActionScreen({navigation, route}) {
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
       <View style={styles.section}>
         <SelectBox
-          label="Select type"
+          label="Select campaign"
           options={campaigns}
           value={selectedCampaign}
           onChange={onCampaignChange}
@@ -203,7 +203,7 @@ export default function UserActionScreen({navigation, route}) {
       </View>
       <View style={styles.section}>
         <SelectBox
-          label="Select type"
+          label="Select action"
           options={actions}
           value={selectedAction}
           onChange={onActionChange}
@@ -213,7 +213,7 @@ export default function UserActionScreen({navigation, route}) {
       </View>
       <View style={styles.section}>
         <SelectBox
-          label="Select multiple"
+          label="Select rewards"
           options={rewardOptions()}
           selectedValues={selectedReward}
           onMultiSelect={onRewardChange()}

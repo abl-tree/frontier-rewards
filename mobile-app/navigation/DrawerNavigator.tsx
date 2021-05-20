@@ -19,12 +19,22 @@ import PackageCreateScreen from '../screens/PackageCreateScreen';
 import UserScreen from '../screens/UserScreen';
 import UserEditScreen from '../screens/UserEditScreen';
 import UserCreateScreen from '../screens/UserCreateScreen';
+import CustomSidebarMenu from './CustomSidebarMenu';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
 export default function DrawerNavigator() {
   return (
-    <Drawer.Navigator>
+    <Drawer.Navigator
+      drawerContent={(props) => <CustomSidebarMenu {...props} />}
+    >
+      <Drawer.Screen
+        name="Dashboard"
+        component={BottomTabNavigator}
+        options={{
+          title: 'Dashboard'
+        }}
+      />
       <Drawer.Screen
         name="Action"
         component={ActionNavigator}/>
@@ -37,17 +47,13 @@ export default function DrawerNavigator() {
       <Drawer.Screen
         name="User"
         component={UserNavigator}/>
-      <Drawer.Screen
+      {/* <Drawer.Screen
         name="Database"
         component={DatabaseNavigator}/>
       <Drawer.Screen
         name="FileSystem"
         component={FileSystemNavigator}
-      />
-      <Drawer.Screen
-        name="Clients"
-        component={BottomTabNavigator}
-      />
+      /> */}
     </Drawer.Navigator>
   );
 }

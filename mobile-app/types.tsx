@@ -41,6 +41,7 @@ export type LogoutParamList = {
 };
 
 export type DrawerParamList = {
+  Dashboard: undefined;
   Action: undefined;
   Reward: undefined;
   Package: undefined;

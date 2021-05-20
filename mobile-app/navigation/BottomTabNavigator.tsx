@@ -27,16 +27,18 @@ export default function BottomTabNavigator() {
       <BottomTab.Screen
         name="TabOne"
         component={TabOneNavigator}
-        // options={{
-        //   tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
-        // }}
+        options={{
+          title: 'Dashboard',
+          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
+        }}
       />
       <BottomTab.Screen
         name="QrScannerTab"
         component={QrScannerTabNavigator}
-        // options={{
-        //   tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
-        // }}
+        options={{
+          title: 'QR Scanner',
+          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
+        }}
       />
       {/* <BottomTab.Screen
         name="TabThree"
@@ -72,9 +74,9 @@ function TabOneNavigator() {
       <TabOneStack.Screen
         name="TabOneScreen"
         component={TabOneScreen}
-        // options={{ 
-        //   headerTitle: 'Dashboard'
-        // }}
+        options={{ 
+          headerTitle: 'Dashboard'
+        }}
       />
     </TabOneStack.Navigator>
   );
@@ -93,7 +95,7 @@ function QrScannerTabNavigator() {
       <TabTwoStack.Screen
         name="UserActionScreen"
         component={UserActionScreen}
-        // options={{ headerTitle: 'User Actions' }}
+        options={{ headerTitle: 'User Actions' }}
       />
     </TabTwoStack.Navigator>
   );
