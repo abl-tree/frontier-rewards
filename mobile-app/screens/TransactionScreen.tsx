@@ -296,7 +296,7 @@ const CustomerScreen = () => {
   }
 
   const deleteRow = (rowMap, item) => {
-    let key = item.key
+    let key = item.id
 
     Alert.alert(
       "Are you sure?",

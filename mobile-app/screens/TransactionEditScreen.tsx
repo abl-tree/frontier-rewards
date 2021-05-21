@@ -205,10 +205,7 @@ export default function TransactionEditScreen({navigation, route}) {
       }, 1000);
   });
 
-  const renderRewards = () => {
-
-    console.log(transaction.item.rewards);
-    
+  const renderRewards = () => {    
 
     if(!_.isEmpty(transaction.item) && !_.isEmpty(transaction.item.rewards)) {
 
