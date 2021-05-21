@@ -235,7 +235,7 @@ class TransactionController extends BaseController
 
         $total = $reward->cost;
         
-        if($request->user()->points > $total) return $this->sendError('Points is insufficient.');   
+        if($request->user()->points < $total) return $this->sendError('Points is insufficient.');   
 
         $item = TransactionItem::create([
             'action_name' => 'Redeem',
