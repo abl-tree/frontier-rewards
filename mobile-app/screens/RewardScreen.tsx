@@ -11,6 +11,7 @@ import { DeleteData, GetData } from "../actions/RewardAction";
 import { ActivityIndicator, Alert, StyleSheet, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import axios from 'axios'
 
 const AdminScreen = () => {
   const navigation = useNavigation();
@@ -264,20 +265,60 @@ const CustomerScreen = () => {
           style: "cancel"
         },
         { text: "Continue", onPress: () => {
-          dispatch(DeleteData(item.id))
+
+          handleRedeem(item.id)
           .then(() => {
-      
-            // navigation.goBack()
-            
-          }).catch((error) => {
-      
+
+            rowMap[key].closeRow()
+
+            Alert.alert(
+              "Successful!",
+              "Reward redeemed successfully.",
+              [
+                {
+                  text: "OK"
+                }
+              ]
+            )
+
           })
+          .catch((error) => {
+
+            Alert.alert(
+              "Error!",
+              error.response.data.message,
+              [
+                {
+                  text: "OK"
+                }
+              ]
+            )
+            
+          })
+
         } }
       ],
       {
         cancelable: false
       }
     );
+  }
+  
+  const handleRedeem = async (reward_id) => {
+      
+      try {
+      
+          const res = await axios.post('redeem', {'reward_id' : reward_id})
+  
+          var result = res.data.data
+
+          return Promise.resolve()
+          
+      } catch (error) {
+
+        return Promise.reject(error)
+
+      }
   }
 
   const closeRow = (rowMap, item) => {
@@ -374,18 +415,7 @@ const CustomerScreen = () => {
           }}
           onRefresh={() => fetchRewards()}
           refreshing={rewardList.loading}
-      /> : <Text>Loading...</Text>}
-      <FAB 
-        placement="right"
-        icon={
-          <Icon
-            name="add"
-            size={15}
-            color="white"
-          />
-        }
-        onPress={handleAddAction}
-      />
+      /> : <Text style={{color: 'black'}}>Loading...</Text>}
     </View >
   )
 }
