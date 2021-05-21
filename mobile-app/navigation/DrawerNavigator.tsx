@@ -164,18 +164,31 @@ function UserNavigator() {
 const TransactionStack = createStackNavigator<TransactionParamList>();
 
 function TransactionNavigator() {
-  return (
-    <TransactionStack.Navigator>
-      <TransactionStack.Screen
-        name="TransactionScreen"
-        component={TransactionScreen}
-      />
-      <TransactionStack.Screen
-        name="TransactionEditScreen"
-        component={TransactionEditScreen}
-      />
-    </TransactionStack.Navigator>
-  )
+  const Auth = useSelector(state => state.Auth);
+  
+  if(Auth.user.type == 1 || Auth.user.type == 2) {
+    return (
+      <TransactionStack.Navigator>
+        <TransactionStack.Screen
+          name="TransactionScreen"
+          component={TransactionScreen}
+        />
+        <TransactionStack.Screen
+          name="TransactionEditScreen"
+          component={TransactionEditScreen}
+        />
+      </TransactionStack.Navigator>
+    )
+  } else {
+    return (
+      <TransactionStack.Navigator>
+        <TransactionStack.Screen
+          name="TransactionScreen"
+          component={TransactionScreen}
+        />
+      </TransactionStack.Navigator>
+    )
+  }
 }
 
 const DatabaseStack = createStackNavigator<DatabaseParamList>();

@@ -14,8 +14,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import moment from "moment";
 import DateRangePicker from "react-native-daterange-picker";
 
-
-export default function TransactionScreen() {
+const AdminScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const transactionList = useSelector(state => state.Transaction);
@@ -238,6 +237,225 @@ export default function TransactionScreen() {
       />
     </View >
   )
+};
+
+const CustomerScreen = () => {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const transactionList = useSelector(state => state.Transaction);
+  const [loading, setLoading] = React.useState(false);
+  const [filters, setFilters] = React.useState({
+      type: 'all'
+  });
+  const [date, setDate] = React.useState({
+    startDate: moment(),
+    endDate: moment(),
+    displayedDate: moment()
+  });
+
+  useEffect(() => {
+    navigation.setOptions({
+      showHeader: true,
+      headerLeft: (props: StackHeaderLeftButtonProps) => (<MenuIcon/>)
+    });
+
+  });
+  
+  React.useLayoutEffect(() => {
+
+    fetchTransactions()
+
+  }, [navigation])
+  
+  const fetchTransactions = async (url = '/transactions', params = {}) => {
+    if(url == null || loading) return
+
+    setLoading(true)    
+
+    dispatch(GetData(url, params))
+    .then(() => {
+
+      setLoading(false)
+
+    }).catch((error) => {
+
+      setLoading(false)
+
+    })
+
+  }
+
+  const editRow = (rowMap, item) => {
+    let key = item.id
+    
+    if(rowMap[key]) {
+        rowMap[key].closeRow() 
+    }
+
+    navigation.navigate('TransactionEditScreen', { data: item })
+  }
+
+  const deleteRow = (rowMap, item) => {
+    let key = item.key
+
+    Alert.alert(
+      "Are you sure?",
+      "This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => rowMap[key].closeRow(),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => {
+          dispatch(DeleteData(item.id))
+          .then(() => {
+      
+            // navigation.goBack()
+            
+          }).catch((error) => {
+      
+          })
+        } }
+      ],
+      {
+        cancelable: false
+      }
+    );     
+      
+  }
+
+  const VisibleItem = props => {
+      const {data} = props
+      let badgeStatus = 'warning';
+
+      if(data.item.status === 'completed') badgeStatus = 'success';
+      else if(data.item.status === 'cancelled') badgeStatus = 'error';
+      else if(data.item.status === 'confirmed') badgeStatus = 'primary';
+
+      return (
+          <View style={styles.rowFront}>
+            <TouchableHighlight style={styles.rowFrontVisible}>
+                <View>
+                    <Text style={styles.title} numberOfLines={1}>Transaction ID: {data.item.transaction_id}</Text>
+                    <Text style={styles.title} numberOfLines={1}>Customer: {data.item.customer ? data.item.customer.name : ''}</Text>
+                    <Text style={styles.title} numberOfLines={1}>Type: {data.item.type}</Text>
+                    <Text style={styles.title} numberOfLines={1}>Status: <Badge status={badgeStatus} value={data.item.status} /></Text>
+                </View>
+            </TouchableHighlight>
+          </View>
+      )
+  }
+
+  const renderItem = (data, rowMap) => {
+
+    return (
+        <VisibleItem data={data}/>
+    )
+
+  }
+
+  const HiddenItemWithAction = props => {
+      const {onEdit, onDelete} = props;
+
+      return (
+          <View style={styles.rowBack}>
+              <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnRight, {backgroundColor: '#1f65ff'}]} onPress={onEdit}>
+                <MaterialCommunityIcons name="pencil-outline" size={25} style={styles.trash} color="#fff"/>
+              </TouchableOpacity>
+          </View>
+      )
+  }
+
+  const renderHiddenItem = (data, rowMap) => {
+      return (
+          <HiddenItemWithAction
+            data={data}
+            rowMap={rowMap}
+            onEdit={() => editRow(rowMap, data.item)}
+            onDelete={() => deleteRow(rowMap, data.item)}
+          />
+      )
+  }
+
+  const setDates = (dates) => {
+    setDate(prev => ({...prev, ...dates}))
+
+    if(dates.endDate) {
+      let start = date.startDate;
+      let end = dates.endDate;
+
+      let tmpFilter = {...filters, start_date: start.format('YYYY-MM-DD'), end_date: end ? end.format('YYYY-MM-DD') : start.format('YYYY-MM-DD')};
+
+      setFilters(tmpFilter);
+
+      fetchTransactions('/transactions', tmpFilter);
+    }
+    
+  }
+
+  return (
+    <View style={styles.container}>
+      <View>
+        <DateRangePicker
+            onChange={setDates}
+            endDate={date.endDate}
+            startDate={date.startDate}
+            displayedDate={date.displayedDate}
+            range
+            presetButtons={true}
+          >
+            <Text style={{color: 'black', fontSize: 20}}>Date: {date.startDate ? date.startDate.format('YYYY-MM-DD') : 'null'} - {date.endDate ? date.endDate.format('YYYY-MM-DD') : (date.startDate ? date.startDate.format('YYYY-MM-DD') : 'null')}</Text>
+        </DateRangePicker>
+      </View>
+      {transactionList.data.data ? <SwipeListView
+          keyExtractor={(item) => item.id.toString()}
+          data={transactionList.data.data}
+          renderItem={renderItem}
+          renderHiddenItem={renderHiddenItem}
+          ListEmptyComponent={() => {
+            return <Text style={{color: 'black', textAlign: 'center'}}>No data available</Text>
+          }}
+          leftOpenValue={75}
+          rightOpenValue={-75}
+          disableRightSwipe
+          disableLeftSwipe
+          initialNumToRender={10}
+          onEndReachedThreshold={0.5}
+          onEndReached={() => {fetchTransactions(transactionList.data.next_page_url)}}
+          // ListHeaderComponent={() => {
+          //   return <SearchBar placeholder="Type Here..." lightTheme round />;
+          // }}
+          ListFooterComponent={() => {
+            return (<View
+                    style={{
+                      paddingVertical: 20,
+                      borderTopWidth: 1,
+                      borderColor: "#CED0CE"
+                    }}
+                  >
+                    {
+                      loading ? <ActivityIndicator animating size="large" color="#0000ff" />
+                      : (transactionList.next == null ? <Text style={{color: 'black', textAlign: 'center'}}>End</Text> : null)
+                    }
+                    
+                  </View>)
+          }}
+          onRefresh={() => fetchTransactions()}
+          refreshing={transactionList.loading}
+      /> : <Text>Loading...</Text>}
+    </View >
+  )
+};
+
+export default function TransactionScreen() {
+
+  const Auth = useSelector(state => state.Auth);
+
+  if(Auth.user.type == 1 || Auth.user.type == 2) {
+    return AdminScreen();
+  } else return CustomerScreen();
+
 };
 
 const styles = StyleSheet.create({
