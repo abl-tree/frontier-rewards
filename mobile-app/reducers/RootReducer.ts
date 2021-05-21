@@ -3,6 +3,7 @@ import ActionReducer from "./ActionReducer";
 import AuthReducer from "./AuthReducer";
 import PackageReducer from "./PackageReducer";
 import RewardReducer from "./RewardReducer";
+import TransactionReducer from "./TransactionReducer";
 import UserReducer from "./UserReducer";
 
 const RootReducer = combineReducers({
@@ -10,6 +11,7 @@ const RootReducer = combineReducers({
     Action: ActionReducer,
     Package: PackageReducer,
     Reward: RewardReducer,
+    Transaction: TransactionReducer,
     User: UserReducer
 });
 

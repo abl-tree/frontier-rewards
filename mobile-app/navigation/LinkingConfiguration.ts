@@ -40,6 +40,12 @@ export default {
               UserCreateScreen: 'user-create'
             }
           },
+          Transaction: {
+            screens: {
+              TransactionScreen: 'transactions',
+              TransactionEditScreen: 'transaction-edit'
+            }
+          },
           // TabOne: {
           //   screens: {
           //     TabOneScreen: 'one',

@@ -9,7 +9,7 @@ import DatabaseScreen from '../screens/DatabaseScreen';
 import FileSystemScreen from '../screens/FileSystemScreen';
 import ClientsScreen from '../screens/ClientsScreen';
 import BottomTabNavigator from './BottomTabNavigator';
-import { DrawerParamList, ActionParamList, DatabaseParamList, FileSystemParamList, ClientsParamList, RewardParamList, PackageParamList, UserParamList } from '../types';
+import { DrawerParamList, ActionParamList, DatabaseParamList, FileSystemParamList, ClientsParamList, RewardParamList, PackageParamList, UserParamList, TransactionParamList } from '../types';
 import RewardScreen from '../screens/RewardScreen';
 import RewardEditScreen from '../screens/RewardEditScreen';
 import RewardCreateScreen from '../screens/RewardCreateScreen';
@@ -21,6 +21,8 @@ import UserEditScreen from '../screens/UserEditScreen';
 import UserCreateScreen from '../screens/UserCreateScreen';
 import CustomSidebarMenu from './CustomSidebarMenu';
 import { useSelector } from 'react-redux';
+import TransactionScreen from '../screens/TransactionScreen';
+import TransactionEditScreen from '../screens/TransactionEditScreen';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
@@ -48,6 +50,9 @@ export default function DrawerNavigator() {
       <Drawer.Screen
         name="User"
         component={UserNavigator}/>
+      <Drawer.Screen
+        name="Transaction"
+        component={TransactionNavigator}/>
       {/* <Drawer.Screen
         name="Database"
         component={DatabaseNavigator}/>
@@ -153,6 +158,23 @@ function UserNavigator() {
         component={UserCreateScreen}
       />
     </UserStack.Navigator>
+  )
+}
+
+const TransactionStack = createStackNavigator<TransactionParamList>();
+
+function TransactionNavigator() {
+  return (
+    <TransactionStack.Navigator>
+      <TransactionStack.Screen
+        name="TransactionScreen"
+        component={TransactionScreen}
+      />
+      <TransactionStack.Screen
+        name="TransactionEditScreen"
+        component={TransactionEditScreen}
+      />
+    </TransactionStack.Navigator>
   )
 }
 
