@@ -81,6 +81,10 @@ export type TransactionParamList = {
   TransactionScreenEdit: undefined;
 };
 
+export type ProfileParamList = {
+  ProfileScreen: undefined;
+};
+
 export type DatabaseParamList = {
   DatabaseScreen: undefined;
 };

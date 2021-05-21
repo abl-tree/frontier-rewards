@@ -23,6 +23,7 @@ import CustomSidebarMenu from './CustomSidebarMenu';
 import { useSelector } from 'react-redux';
 import TransactionScreen from '../screens/TransactionScreen';
 import TransactionEditScreen from '../screens/TransactionEditScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
@@ -53,6 +54,9 @@ export default function DrawerNavigator() {
       <Drawer.Screen
         name="Transaction"
         component={TransactionNavigator}/>
+        <Drawer.Screen
+          name="Profile"
+          component={ProfileNavigator}/>
       {/* <Drawer.Screen
         name="Database"
         component={DatabaseNavigator}/>
@@ -187,6 +191,36 @@ function TransactionNavigator() {
           component={TransactionScreen}
         />
       </TransactionStack.Navigator>
+    )
+  }
+}
+
+const ProfileStack = createStackNavigator<TransactionParamList>();
+
+function ProfileNavigator() {
+  const Auth = useSelector(state => state.Auth);
+  
+  if(Auth.user.type == 1 || Auth.user.type == 2) {
+    return (
+      <ProfileStack.Navigator>
+        <ProfileStack.Screen
+          name="TransactionScreen"
+          component={TransactionScreen}
+        />
+        <ProfileStack.Screen
+          name="TransactionEditScreen"
+          component={TransactionEditScreen}
+        />
+      </ProfileStack.Navigator>
+    )
+  } else {
+    return (
+      <ProfileStack.Navigator>
+        <ProfileStack.Screen
+          name="ProfileScreen"
+          component={ProfileScreen}
+        />
+      </ProfileStack.Navigator>
     )
   }
 }

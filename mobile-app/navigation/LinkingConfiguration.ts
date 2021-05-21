@@ -46,6 +46,11 @@ export default {
               TransactionEditScreen: 'transaction-edit'
             }
           },
+          Profile: {
+            screens: {
+              ProfileScreen: 'profile'
+            }
+          },
           // TabOne: {
           //   screens: {
           //     TabOneScreen: 'one',
