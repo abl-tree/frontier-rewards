@@ -12,8 +12,7 @@ import { ActivityIndicator, Alert, StyleSheet, TouchableHighlight, TouchableOpac
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
-
-export default function ActionScreen() {
+const AdminScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const actionList = useSelector(state => state.Action);
@@ -193,6 +192,182 @@ export default function ActionScreen() {
       />
     </View >
   )
+};
+
+const CustomerScreen = () => {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const actionList = useSelector(state => state.Action);
+  const [loading, setLoading] = React.useState(false);
+
+  useEffect(() => {
+    navigation.setOptions({
+      showHeader: true,
+      headerLeft: (props: StackHeaderLeftButtonProps) => (<MenuIcon/>)
+    });
+
+  });
+  
+  React.useLayoutEffect(() => {
+
+    fetchActions()
+
+  }, [navigation])
+  
+  const fetchActions = async (url = '/actions') => {
+    if(url == null || loading) return
+
+    setLoading(true)
+
+    dispatch(GetData(url))
+    .then(() => {
+
+      setLoading(false)
+
+    }).catch((error) => {
+
+      setLoading(false)
+
+    })
+
+  }
+
+  const editRow = (rowMap, item) => {
+    let key = item.key
+    
+    if(rowMap[key]) {
+        rowMap[key].closeRow() 
+    }
+
+    navigation.navigate('ActionEditScreen', { data: item })
+  }
+
+  const deleteRow = (rowMap, item) => {
+    let key = item.key
+
+    Alert.alert(
+      "Are you sure?",
+      "This action cannot be undone.",
+      [
+        {
+          text: "Cancel",
+          onPress: () => rowMap[key].closeRow(),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => {
+          dispatch(DeleteData(item.id))
+          .then(() => {
+      
+            // navigation.goBack()
+            
+          }).catch((error) => {
+      
+          })
+        } }
+      ],
+      {
+        cancelable: false
+      }
+    );     
+      
+  }
+
+  const VisibleItem = props => {
+      const {data} = props
+
+      return (
+          <View style={styles.rowFront}>
+            <TouchableHighlight style={styles.rowFrontVisible}>
+                <View>
+                    <Text style={styles.title} numberOfLines={1}>{data.item.name}</Text>
+                    <Text style={styles.title} numberOfLines={1}>{data.item.description}</Text>
+                </View>
+            </TouchableHighlight>
+          </View>
+      )
+  }
+
+  const renderItem = (data, rowMap) => {
+
+    return (
+        <VisibleItem data={data}/>
+    )
+
+  }
+
+  const HiddenItemWithAction = props => {
+      const {onEdit, onDelete} = props;
+
+      return (
+          <View style={styles.rowBack}>
+              <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnLeft]} onPress={onEdit}>
+                <MaterialCommunityIcons name="pencil-outline" size={25} style={styles.trash} color="#fff"/>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnRight]} onPress={onDelete}>
+                <MaterialCommunityIcons name="trash-can-outline" size={25} style={styles.trash} color="#fff"/>
+              </TouchableOpacity>
+          </View>
+      )
+  }
+
+  const renderHiddenItem = (data, rowMap) => {
+      return (
+          <HiddenItemWithAction
+            data={data}
+            rowMap={rowMap}
+            onEdit={() => editRow(rowMap, data.item)}
+            onDelete={() => deleteRow(rowMap, data.item)}
+          />
+      )
+  }
+
+  return (
+    <View style={styles.container}>
+      {actionList.data.data ? <SwipeListView
+          keyExtractor={(item) => item.id.toString()}
+          data={actionList.data.data}
+          renderItem={renderItem}
+          renderHiddenItem={renderHiddenItem}
+          leftOpenValue={75}
+          rightOpenValue={-150}
+          disableRightSwipe
+          disableLeftSwipe
+          initialNumToRender={10}
+          onEndReachedThreshold={0.5}
+          onEndReached={() => {fetchActions(actionList.data.next_page_url)}}
+          // ListHeaderComponent={() => {
+          //   return <SearchBar placeholder="Type Here..." lightTheme round />;
+          // }}
+          ListFooterComponent={() => {
+            return (<View
+                    style={{
+                      paddingVertical: 20,
+                      borderTopWidth: 1,
+                      borderColor: "#CED0CE"
+                    }}
+                  >
+                    {
+                      loading ? <ActivityIndicator animating size="large" color="#0000ff" />
+                      : (actionList.next == null ? <Text style={{color: 'black', textAlign: 'center'}}>End</Text> : null)
+                    }
+                    
+                  </View>)
+          }}
+          onRefresh={() => fetchActions()}
+          refreshing={actionList.loading}
+      /> : <Text>Loading...</Text>}
+    </View >
+  )
+};
+
+export default function ActionScreen() {
+
+  const Auth = useSelector(state => state.Auth);
+
+  if(Auth.user.type == 1 || Auth.user.type == 2) {
+    return AdminScreen();
+  } else return CustomerScreen();
+
 };
 
 const styles = StyleSheet.create({

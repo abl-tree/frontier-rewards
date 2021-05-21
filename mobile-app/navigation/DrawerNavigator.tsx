@@ -57,13 +57,6 @@ export default function DrawerNavigator() {
         <Drawer.Screen
           name="Profile"
           component={ProfileNavigator}/>
-      {/* <Drawer.Screen
-        name="Database"
-        component={DatabaseNavigator}/>
-      <Drawer.Screen
-        name="FileSystem"
-        component={FileSystemNavigator}
-      /> */}
     </Drawer.Navigator>
   );
 }
