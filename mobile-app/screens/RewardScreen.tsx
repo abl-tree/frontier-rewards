@@ -12,8 +12,7 @@ import { ActivityIndicator, Alert, StyleSheet, TouchableHighlight, TouchableOpac
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 
-
-export default function RewardScreen() {
+const AdminScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const rewardList = useSelector(state => state.Reward);
@@ -87,7 +86,7 @@ export default function RewardScreen() {
       {
         cancelable: false
       }
-    );     
+    );
       
   }
 
@@ -194,6 +193,211 @@ export default function RewardScreen() {
       />
     </View >
   )
+}
+
+const CustomerScreen = () => {
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const rewardList = useSelector(state => state.Reward);
+  const [loading, setLoading] = React.useState(false);
+
+  useEffect(() => {
+    navigation.setOptions({
+      showHeader: true,
+      headerLeft: (props: StackHeaderLeftButtonProps) => (<MenuIcon/>)
+    });
+
+  });
+  
+  React.useLayoutEffect(() => {
+
+    fetchRewards()
+
+  }, [navigation])
+  
+  const fetchRewards = async (url = '/rewards') => {
+    if(url == null || loading) return
+
+    setLoading(true)
+
+    dispatch(GetData(url))
+    .then(() => {
+
+      setLoading(false)
+
+    }).catch((error) => {
+
+      setLoading(false)
+
+    })
+
+  }
+
+  const redeemRow = (rowMap, item) => {
+    let key = item.id
+
+    if(item.type === 'points') {
+      Alert.alert(
+        "Not redeemable!",
+        "Points rewards are not redeemable.",
+        [
+          {
+            text: "OK",
+            onPress: () => rowMap[key].closeRow()
+          }
+        ],
+        {
+          cancelable: false
+        }
+      )
+
+      return
+    }
+
+    Alert.alert(
+      "Are you sure?",
+      "It requires " + item.cost + " points",
+      [
+        {
+          text: "Cancel",
+          onPress: () => rowMap[key].closeRow(),
+          style: "cancel"
+        },
+        { text: "Continue", onPress: () => {
+          dispatch(DeleteData(item.id))
+          .then(() => {
+      
+            // navigation.goBack()
+            
+          }).catch((error) => {
+      
+          })
+        } }
+      ],
+      {
+        cancelable: false
+      }
+    );
+  }
+
+  const closeRow = (rowMap, item) => {
+    let key = item.id
+    
+    if(rowMap[key]) {
+        rowMap[key].closeRow() 
+    }
+  }
+
+  const VisibleItem = props => {
+      const {data} = props
+
+      return (
+          <View style={styles.rowFront}>
+            <TouchableHighlight style={styles.rowFrontVisible}>
+                <View>
+                    <Text style={styles.title} numberOfLines={1}>Name: {data.item.name}</Text>
+                    <Text style={styles.title} numberOfLines={1}>Description: {data.item.description}</Text>
+                    <Text style={styles.title} numberOfLines={1}>Type: {data.item.type}</Text>
+                </View>
+            </TouchableHighlight>
+          </View>
+      )
+  }
+
+  const renderItem = (data, rowMap) => {
+
+    return (
+        <VisibleItem data={data}/>
+    )
+
+  }
+
+  const HiddenItemWithAction = props => {
+      const {onRedeem, onClose} = props;
+
+      return (
+          <View style={styles.rowBack}>
+              <TouchableOpacity style={[styles.backRightBtn, styles.backRightBtnRight, {backgroundColor: '#18d643'}]} onPress={onRedeem}>
+                <MaterialCommunityIcons name="star-outline" size={25} style={styles.trash} color="#fff"/>
+              </TouchableOpacity>
+          </View>
+      )
+  }
+
+  const renderHiddenItem = (data, rowMap) => {
+      return (
+          <HiddenItemWithAction
+            data={data}
+            rowMap={rowMap}
+            onRedeem={() => redeemRow(rowMap, data.item)}
+            onClose={() => closeRow(rowMap, data.item)}
+          />
+      )
+  }
+
+  const handleAddAction = () => {
+    
+    navigation.navigate('RewardCreateScreen')
+    
+  }
+
+  return (
+    <View style={styles.container}>
+      {rewardList.data.data ? <SwipeListView
+          keyExtractor={(item) => item.id.toString()}
+          data={rewardList.data.data}
+          renderItem={renderItem}
+          renderHiddenItem={renderHiddenItem}
+          leftOpenValue={75}
+          rightOpenValue={-75}
+          disableRightSwipe
+          initialNumToRender={10}
+          onEndReachedThreshold={0.5}
+          onEndReached={() => {fetchRewards(rewardList.data.next_page_url)}}
+          // ListHeaderComponent={() => {
+          //   return <SearchBar placeholder="Type Here..." lightTheme round />;
+          // }}
+          ListFooterComponent={() => {
+            return (<View
+                    style={{
+                      paddingVertical: 20,
+                      borderTopWidth: 1,
+                      borderColor: "#CED0CE"
+                    }}
+                  >
+                    {
+                      loading ? <ActivityIndicator animating size="large" color="#0000ff" />
+                      : (rewardList.next == null ? <Text style={{color: 'black', textAlign: 'center'}}>End</Text> : null)
+                    }
+                    
+                  </View>)
+          }}
+          onRefresh={() => fetchRewards()}
+          refreshing={rewardList.loading}
+      /> : <Text>Loading...</Text>}
+      <FAB 
+        placement="right"
+        icon={
+          <Icon
+            name="add"
+            size={15}
+            color="white"
+          />
+        }
+        onPress={handleAddAction}
+      />
+    </View >
+  )
+}
+
+export default function RewardScreen() {
+
+  const Auth = useSelector(state => state.Auth);
+
+  if(Auth.user.type == 1 || Auth.user.type == 2) {
+    return AdminScreen();
+  } else return CustomerScreen();
+
 };
 
 const styles = StyleSheet.create({

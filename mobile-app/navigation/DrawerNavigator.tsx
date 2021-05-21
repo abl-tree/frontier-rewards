@@ -20,6 +20,7 @@ import UserScreen from '../screens/UserScreen';
 import UserEditScreen from '../screens/UserEditScreen';
 import UserCreateScreen from '../screens/UserCreateScreen';
 import CustomSidebarMenu from './CustomSidebarMenu';
+import { useSelector } from 'react-redux';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
@@ -82,22 +83,35 @@ function ActionNavigator() {
 const RewardStack = createStackNavigator<RewardParamList>();
 
 function RewardNavigator() {
-  return (
-    <RewardStack.Navigator>
-      <RewardStack.Screen
-        name="RewardScreen"
-        component={RewardScreen}
-      />
-      <RewardStack.Screen
-        name="RewardEditScreen"
-        component={RewardEditScreen}
-      />
-      <RewardStack.Screen
-        name="RewardCreateScreen"
-        component={RewardCreateScreen}
-      />
-    </RewardStack.Navigator>
-  )
+  const Auth = useSelector(state => state.Auth);
+  
+  if(Auth.user.type == 1 || Auth.user.type == 2) {
+    return (
+      <RewardStack.Navigator>
+        <RewardStack.Screen
+          name="RewardScreen"
+          component={RewardScreen}
+        />
+        <RewardStack.Screen
+          name="RewardEditScreen"
+          component={RewardEditScreen}
+        />
+        <RewardStack.Screen
+          name="RewardCreateScreen"
+          component={RewardCreateScreen}
+        />
+      </RewardStack.Navigator>
+    )
+  } else {
+    return (
+      <RewardStack.Navigator>
+        <RewardStack.Screen
+          name="RewardScreen"
+          component={RewardScreen}
+        />
+      </RewardStack.Navigator>
+    )
+  }
 }
 
 const PackageStack = createStackNavigator<PackageParamList>();
