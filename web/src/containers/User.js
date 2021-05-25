@@ -148,6 +148,14 @@ const User = (props) => {
             'required': true
         },
         {
+            'key': 'points',
+            'title': 'Points',
+            'type': 'number',
+            'placeholder': 'Enter points',
+            'control_id': 'formPoints',
+            'required': false
+        },
+        {
             'key': 'package_id',
             'title': 'Search name',
             'type': 'asyncselect',
@@ -332,7 +340,7 @@ const User = (props) => {
         if(data.user_type_id == 3) form = customerFields
 
         return form.map((field, i) => {
-            if(field.type === 'text' || field.type === 'email') {
+            if(field.type === 'text' || field.type === 'email' || field.type === 'number') {
                 return <Form.Group as={Row} key={i} controlId={field.control_id}>
                     <Form.Label column sm={3}>{field.title}</Form.Label>
                     <Col sm={9}>

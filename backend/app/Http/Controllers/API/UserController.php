@@ -122,14 +122,55 @@ class UserController extends BaseController
         $input['package_id'] = $input['package_id']['value'];
         $name = $input['firstname'] . ' ' . (@$input['middlename'] ? $input['middlename'] : '') . ' ' . $input['lastname'];
 
+        $input['points'] = !isset($input['points']) ? 0 : $input['points'];
+
         $user = User::with('info.package')->find($id);
         $user->firstname = $input['firstname'];
         $user->middlename = @$input['middlename'];
         $user->lastname = $input['lastname'];
         $user->email = $input['email'];
+        $user->phone_number = $input['phone_number'];
         $user->user_type_id = $input['user_type_id'];
         $user->name = $name;
-        $user->save();
+
+        $prev_points = $user->points;
+
+        $user->points = $input['points'];
+        // $user->save();
+
+        if($prev_points != $user->points) {
+            if($prev_points > $user->points) {
+                $total = $prev_points - $user->points;
+
+                $item = TransactionItem::create([
+                    'action_name' => 'Manual Deduct Points',
+                    'total' => $total
+                ]);
+
+                $transaction = Transaction::create([
+                    'type' => 'earn',
+                    'cost' => -$total,
+                    'user_id' => $user->id,
+                    'transaction_item_id' => $item->id
+                ]);
+            } else {
+                $total = $user->points - $prev_points;
+
+                $item = TransactionItem::create([
+                    'action_name' => 'Manual Add Points',
+                    'total' => $total
+                ]);
+
+                $transaction = Transaction::create([
+                    'type' => 'earn',
+                    'cost' => $total,
+                    'user_id' => $user->id,
+                    'transaction_item_id' => $item->id
+                ]);
+            }
+        }
+
+        return $this->sendError('Validation Error.', ['data' => $prev_points == $input['points']]);     
 
         if($input['user_type_id'] == 3) {
             $info = $user->info()->first();
