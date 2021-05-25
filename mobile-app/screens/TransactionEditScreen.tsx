@@ -3,11 +3,11 @@ import { Button, Input, ListItem, Text } from 'react-native-elements';
 import {useDispatch} from "react-redux";
 import { useEffect, useState } from 'react';
 import _ from 'lodash';
-import {EditData} from "../actions/UserAction";
 import { Alert, Dimensions, StyleSheet, View } from 'react-native';
 import SelectBox from 'react-native-multi-selectbox'
 import axios from 'axios'
 import moment from 'moment'
+import Dialog from "react-native-dialog";
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -16,17 +16,10 @@ export default function TransactionEditScreen({navigation, route}) {
   const dispatch = useDispatch();
   const [dimensions, setDimensions] = useState({ window, screen });
   const [transaction, setTransaction] = React.useState({});
-  const [customerIDError, setCustomerIDError] = useState('');
-  const [firstnameError, setFirstnameError] = useState('');
-  const [middlenameError, setMiddlenameError] = useState('');
-  const [lastnameError, setLastnameError] = useState('');
-  const [emailError, setEmailError] = useState('');
-  const [phoneNumberError, setPhoneNumberError] = useState('');
-  const [packageError, setPackageError] = useState('');
-  const [saving, setSaving] = useState(false);
+  const [referenceError, setReferenceError] = useState('');
   const [userType, setUserType] = useState({})
-  const [selectedPackage, setSelectedPackage] = useState({})
-  const [packageOptions, setPackageOptions] = useState([])
+  const [visible, setVisible] = useState(false);
+  const [dialog, setDialog] = useState({});
 
   useEffect(() => {
 
@@ -50,12 +43,6 @@ export default function TransactionEditScreen({navigation, route}) {
 
   }, []);
 
-  React.useLayoutEffect(() => {
-
-    promisePackagesOptions('')
-
-  }, [navigation])
-
   const Capitalize = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
@@ -64,146 +51,13 @@ export default function TransactionEditScreen({navigation, route}) {
     setDimensions({ window, screen });
   };
 
-  const handleEditSave = () => {    
-
-    setCustomerIDError('')
-    setFirstnameError('')
-    setLastnameError('')
-    setMiddlenameError('')
-    setEmailError('')
-    setPhoneNumberError('')
-    setPackageError('')
-    setSaving(true)
-    
-    dispatch(EditData(transaction))
-    .then(() => {
-
-      setSaving(false)
-
-      navigation.goBack()
-
-    }).catch((error) => {
-      
-      setSaving(false)
-
-      if(error.response.data && error.response.data.data && error.response.data.data.customer_id) {
-        setCustomerIDError(error.response.data.data.customer_id[0])
-      }
-
-      if(error.response.data && error.response.data.data && error.response.data.data.firstname) {
-        setFirstnameError(error.response.data.data.firstname[0])
-      }
-
-      if(error.response.data && error.response.data.data && error.response.data.data.middlename) {
-        setMiddlenameError(error.response.data.data.middlename[0])
-      }
-
-      if(error.response.data && error.response.data.data && error.response.data.data.lastname) {
-        setLastnameError(error.response.data.data.lastname[0])
-      }
-
-      if(error.response.data && error.response.data.data && error.response.data.data.email) {
-        setEmailError(error.response.data.data.email[0])
-      }
-
-      if(error.response.data && error.response.data.data && error.response.data.data.phone_number) {
-        setPhoneNumberError(error.response.data.data.phone_number[0])
-      }
-
-      if(error.response.data && error.response.data.data && error.response.data.data['package_id.value']) {
-        setPackageError(error.response.data.data['package_id.value'][0])
-      }
-
-    })
-    
-  }
-
-  const handleCancel = () => {
-      
-    setSaving(false)
-
-    navigation.goBack()
-
-  }
-
   const onStatusChange = (val) => {
-    console.log(val);
+
+    setDialog(prev=> ({status: val.id, type: val.item, id: transaction.id}))
     
+    showDialog();
 
-    Alert.alert(
-      "Are you sure?",
-      "You want to mark this as "+val.item+"?",
-      [
-        {
-          text: "Cancel",
-          // onPress: () => ,
-          style: "cancel"
-        },
-        { text: "OK", onPress: async () => {
-
-          await axios.put('transactions/' + transaction.id, {
-            id: transaction.id,
-            status: val.id
-          })
-          .then((res) => {
-      
-              dispatch({
-                  type: "TRANSACTION_UPDATE",
-                  payload: res.data.data
-              })
-  
-              setUserType(val)
-          })
-          .catch((error) => {
-              if(error.response) {
-                  dispatch({
-                      type: "TRANSACTION_FAIL",
-                      payload: error.response.data.message
-                  })
-              }
-          })
-
-        } }
-      ],
-      {
-        cancelable: false
-      }
-    );
-
-    // setTransaction(prev => ({user_type_id: val.id}))
   }
-
-  const onPackageChange = (val) => {
-    setSelectedPackage(val)
-
-    setTransaction(prev => ({...prev, package_id: {value: val.id, label: val.item}}))
-  }
-
-  const fetchPackages = async (search) => {
-
-      const res = await axios.get('/packages?search=' + search)
-
-      var results = res.data.data
-
-      var options = [];
-
-      for (let a = 0; a < results.data.length; a++) {
-          const result = results.data[a]
-          
-          options = [...options, {id: result.id, item: result.name}]
-      }
-
-      setPackageOptions(options)      
-
-      return options
-      
-  }
-
-  const promisePackagesOptions = inputValue => new Promise(resolve => {
-      setTimeout(() => {
-          resolve(fetchPackages(inputValue));
-      }, 1000);
-  });
 
   const renderRewards = () => {    
 
@@ -228,8 +82,69 @@ export default function TransactionEditScreen({navigation, route}) {
     }
   }
 
+  const showDialog = () => {
+    setReferenceError('')
+
+    setVisible(true);
+  };
+
+  const handleCancelDialog = () => {
+    setVisible(false);
+
+    setDialog({})
+  };
+
+  const handleContinueDialog = async () => {
+
+    await axios.put('transactions/' + transaction.id, dialog)
+    .then((res) => {
+
+        dispatch({
+            type: "TRANSACTION_UPDATE",
+            payload: res.data.data
+        })
+
+        setUserType({id: dialog.status, item: dialog.type})
+        
+        setVisible(false);
+
+        setDialog({})
+
+    })
+    .catch((error) => {      
+
+      if(error.response.data && error.response.data.data && error.response.data.data.reference_no) {
+
+        console.log(error.response.data.data.reference_no);
+        setReferenceError(error.response.data.data.reference_no[0])
+      }
+
+    })
+    
+  };
+
   return (
     <View style={styles.container}>
+      <Dialog.Container visible={visible}>
+        <Dialog.Title style={{color: 'black'}}>Are you sure?</Dialog.Title>
+        <Dialog.Description>
+            You want to mark this as {dialog.type}?
+        </Dialog.Description>
+        {
+          dialog.status == 'confirmed' ?
+          <>
+          <Dialog.Input 
+            style={{color: 'black'}}
+            placeholder='Enter reference number'
+            onChangeText={(value) => setDialog(prev => ({...prev, reference_no: value}))}
+          /> 
+          <Text style={{marginTop: -20, marginLeft: 10, marginRight: 10, color: 'red'}}>{referenceError}</Text>
+          </>
+          : null
+        }
+        <Dialog.Button label="Cancel" onPress={handleCancelDialog} />
+        <Dialog.Button label="Continue" onPress={handleContinueDialog} />
+      </Dialog.Container>
       <View style={styles.section}>
         <SelectBox
           label="Select type"

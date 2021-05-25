@@ -52,7 +52,7 @@ export default function UserScreen() {
   }
 
   const editRow = (rowMap, item) => {
-    let key = item.key
+    let key = item.id
     
     if(rowMap[key]) {
         rowMap[key].closeRow() 
@@ -62,7 +62,7 @@ export default function UserScreen() {
   }
 
   const deleteRow = (rowMap, item) => {
-    let key = item.key
+    let key = item.id
 
     Alert.alert(
       "Are you sure?",
