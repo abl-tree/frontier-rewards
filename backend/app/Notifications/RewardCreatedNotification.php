@@ -43,8 +43,8 @@ class RewardCreatedNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                ->subject('Reward Created')
-                ->markdown('mail.reward.created');
+                ->subject('New reward created')
+                ->markdown('mail.reward.created', ['data' => $this->reward]);
     }
 
     /**

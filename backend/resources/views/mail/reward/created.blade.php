@@ -1,11 +1,9 @@
 @component('mail::message')
-# Introduction
+# GOOD NEWS!
 
-The body of your message.
+Are you ready to win {{$data->name}}? Earn at least Required points to get this awesome reward! Visit {{ config('app.url') }} for more info.
 
-@component('mail::button', ['url' => ''])
-Button Text
-@endcomponent
+Note: This reward is only eligible for  Eligibility requirements for the reward users.
 
 Thanks,<br>
 {{ config('app.name') }}
