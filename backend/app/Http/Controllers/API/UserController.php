@@ -136,7 +136,7 @@ class UserController extends BaseController
         $prev_points = $user->points;
 
         $user->points = $input['points'];
-        // $user->save();
+        $user->save();
 
         if($prev_points != $user->points) {
             if($prev_points > $user->points) {
@@ -169,8 +169,6 @@ class UserController extends BaseController
                 ]);
             }
         }
-
-        return $this->sendError('Validation Error.', ['data' => $prev_points == $input['points']]);     
 
         if($input['user_type_id'] == 3) {
             $info = $user->info()->first();
