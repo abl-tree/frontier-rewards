@@ -43,9 +43,8 @@ class UserRegistered extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->subject('Frontier Rewards Registration')
-                    ->line('Your password is '.$this->user->tmpPass.'.')
-                    ->line('Thank you for using our application!');
+                    ->subject('User registration')
+                    ->markdown('mail.user.registered', ['password' => $this->user->tmpPass]);
     }
 
     /**
