@@ -1,11 +1,16 @@
 @component('mail::message')
-# Introduction
+# Congratulations!
 
-The body of your message.
+You have received a total point/s of {{$data->cost}}{{count($data->item->rewards) ? ' and '.count($data->item->rewards).' item/s' : ''}}. Your total points balance is now {{$data->balance}}. Collect more points to win awesome prizes! 
 
-@component('mail::button', ['url' => ''])
-Button Text
-@endcomponent
+@if(count($data->item->rewards))
+Item/s:
+@foreach ($data->item->rewards as $key=>$reward)
+{{$key+1}}. {{$reward->reward_name}}
+@endforeach
+@endif
+
+Visit {{ config('app.url') }} for more info.
 
 Thanks,<br>
 {{ config('app.name') }}

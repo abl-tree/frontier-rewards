@@ -132,15 +132,13 @@ class UserController extends BaseController
         $user->phone_number = $input['phone_number'];
         $user->user_type_id = $input['user_type_id'];
         $user->name = $name;
+        $user->save();
 
         $prev_points = $user->points;
 
-        $user->points = $input['points'];
-        $user->save();
-
-        if($prev_points != $user->points) {
-            if($prev_points > $user->points) {
-                $total = $prev_points - $user->points;
+        if($prev_points != $input['points']) {
+            if($prev_points > $input['points']) {
+                $total = $prev_points - $input['points'];
 
                 $item = TransactionItem::create([
                     'action_name' => 'Manual Deduct Points',
@@ -153,8 +151,10 @@ class UserController extends BaseController
                     'user_id' => $user->id,
                     'transaction_item_id' => $item->id
                 ]);
+
+                $user->points = $transaction->balance;
             } else {
-                $total = $user->points - $prev_points;
+                $total = $input['points'] - $prev_points;
 
                 $item = TransactionItem::create([
                     'action_name' => 'Manual Add Points',
@@ -167,6 +167,8 @@ class UserController extends BaseController
                     'user_id' => $user->id,
                     'transaction_item_id' => $item->id
                 ]);
+
+                $user->points = $transaction->balance;
             }
         }
 
