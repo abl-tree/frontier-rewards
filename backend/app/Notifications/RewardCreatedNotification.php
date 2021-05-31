@@ -6,6 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\ExpoPushNotifications\ExpoChannel;
+use NotificationChannels\ExpoPushNotifications\ExpoMessage;
 
 class RewardCreatedNotification extends Notification
 {
@@ -31,7 +33,7 @@ class RewardCreatedNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['broadcast', 'database', 'mail'];
+        return ['broadcast', 'database', 'mail', ExpoChannel::class];
     }
 
     /**
@@ -59,5 +61,14 @@ class RewardCreatedNotification extends Notification
             'title' => 'New reward created',
             'data' => $this->reward
         ];
+    }
+
+    public function toExpoPush($notifiable)
+    {
+        return ExpoMessage::create()
+            ->badge(1)
+            ->enableSound()
+            ->title("Congratulations!")
+            ->body("Your {$notifiable->service} account was approved!");
     }
 }
