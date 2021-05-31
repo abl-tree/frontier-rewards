@@ -69,7 +69,6 @@ class RewardCreatedNotification extends Notification
             ->badge(1)
             ->enableSound()
             ->title("Congratulations!")
-            ->body("Your {$notifiable->service} account was approved!")
-            ->setChannelId('default');
+            ->body("Your {$notifiable->service} account was approved!");
     }
 }
