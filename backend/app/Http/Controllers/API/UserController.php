@@ -13,6 +13,7 @@ use App\Models\UserReward;
 use Validator;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\Rule;
 
 class UserController extends BaseController
 {
@@ -281,5 +282,34 @@ class UserController extends BaseController
         }
    
         return $this->sendResponse(new UserResource($user), 'User retrieved successfully.');
+    }
+
+    public function settings(Request $request)
+    {
+        $userid = $request->user()->id;
+        $validator = Validator::make($request->all(), [
+            'firstname' => 'required',
+            'lastname' => 'required',
+            'email' => 'required|email|unique:users,email,'.$userid.',id',
+            'password' => 'required|password:api',
+            'new_password' => 'nullable|min:8|confirmed'
+        ]);
+
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors());       
+        }
+
+        $input = $request->all();
+
+        $user = User::find($userid);
+        $user->firstname = $input['firstname'];
+        $user->middlename = @$input['middlename'];
+        $user->lastname = $input['lastname'];
+        $user->email = $input['email'];
+        if(isset($input['new_password'])) $user->password = $input['new_password'];
+        $user->phone_number = $input['phone_number'];
+        $user->save();
+   
+        return $this->sendResponse(new UserResource($user), 'Settings updated successfully.');
     }
 }

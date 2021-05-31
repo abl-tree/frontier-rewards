@@ -6,6 +6,7 @@ import axios from "axios";
 const Setting = (props) => {
     
     const [user, setUser] = useState({})
+    const [validated, setValidated] = useState(false);
 
     React.useEffect(() => {
         fetchProfile(1)
@@ -21,36 +22,82 @@ const Setting = (props) => {
 
     }
 
+    const handleSettingSubmit = async (e) => {
+        e.preventDefault()
+
+        const res = await axios.post('/settings', user)
+
+        console.log(user);
+    }
+
     return (
         <>
         <Card>
-            <Card.Body>
-                <Card.Title>Personal Information</Card.Title>
-                <Card.Text>
-                    <Form>
+            <Form noValidate validated={validated} onSubmit={handleSettingSubmit}>
+                <Card.Body>
+                    <Card.Title>Personal Information</Card.Title>
+                    <Card.Text>
                         <Row><Col>Name</Col></Row>
                         <Row>
                             <Col>
-                                <Form.Control placeholder="First name" />
+                                <Form.Control 
+                                placeholder="First name"
+                                value={user.firstname}
+                                onChange={ (e) => setUser(prev => ({...prev, firstname : e.target.value})) } />
                             </Col>
                             <Col>
-                                <Form.Control placeholder="Middle name" />
+                                <Form.Control placeholder="Middle name"
+                                value={user.middlename}
+                                onChange={ (e) => setUser(prev => ({...prev, middlename : e.target.value})) } />
                             </Col>
                             <Col>
-                                <Form.Control placeholder="Last name" />
+                                <Form.Control placeholder="Last name"
+                                value={user.lastname}
+                                onChange={ (e) => setUser(prev => ({...prev, lastname : e.target.value})) } />
                             </Col>
                         </Row>
 
-                        <Row>
-                            <Col ></Col>
-                        </Row>
                         <Form.Group controlId="formGridAddress1">
                             <Form.Label>Phone number</Form.Label>
-                            <Form.Control placeholder="1234 Main St" />
+                            <Form.Control placeholder="1234 Main St"
+                            value={user.phone_number}
+                            onChange={ (e) => setUser(prev => ({...prev, phone_number : e.target.value})) } />
                         </Form.Group>
-                    </Form>
-                </Card.Text>
-            </Card.Body>
+                    </Card.Text>
+                </Card.Body>
+                <Card.Body>
+                    <Card.Title>Security</Card.Title>
+                    <Card.Text>
+                        <Form.Group controlId="formGridEmail">
+                            <Form.Label>Email</Form.Label>
+                            <Form.Control placeholder="Email"
+                            value={user.email}
+                            onChange={ (e) => setUser(prev => ({...prev, email : e.target.value})) } />
+                        </Form.Group>
+                        <Form.Group controlId="formGridPassword">
+                            <Form.Label>Password</Form.Label>
+                            <Form.Control placeholder="Password"
+                            type="password"
+                            onChange={ (e) => setUser(prev => ({...prev, password : e.target.value})) } />
+                        </Form.Group>
+                        <Form.Group controlId="formGridNewPassword">
+                            <Form.Label>New Password</Form.Label>
+                            <Form.Control placeholder="New Password"
+                            type="password"
+                            onChange={ (e) => setUser(prev => ({...prev, new_password : e.target.value})) } />
+                        </Form.Group>
+                        <Form.Group controlId="formGridConfirmPassword">
+                            <Form.Label>Confirm Password</Form.Label>
+                            <Form.Control placeholder="Confirm Password"
+                            type="password"
+                            onChange={ (e) => setUser(prev => ({...prev, new_password_confirmation : e.target.value})) } />
+                        </Form.Group>
+                        <Button variant="primary" type="submit">
+                            Update
+                        </Button>
+                    </Card.Text>
+                </Card.Body>
+            </Form>
         </Card>
         </>
     )

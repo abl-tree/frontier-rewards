@@ -28,7 +28,7 @@ function App() {
             <ProtectedRoute path={"/users"} exact component={User} allowed={[1,2]}/>
             <ProtectedRoute path={"/user/:user"} exact component={UserProfile} allowed={[1,2]}/>
             <ProtectedRoute path={"/profile"} exact component={MyProfile} allowed={[2,3]}/>
-            <ProtectedRoute path={"/setting"} exact component={Setting} allowed={[1,2,3]}/>
+            <ProtectedRoute path={"/settings"} exact component={Setting} allowed={[1,2,3]}/>
             <ProtectedRoute path={"/packages"} exact component={Package} allowed={[1,2]}/>
             <ProtectedRoute path={"/actions"} exact component={Action} allowed={[1,2]}/>
             <ProtectedRoute path={"/rewards"} exact component={Reward} allowed={[1,2,3]}/>
