@@ -33,7 +33,7 @@ class SendRewardNotification
         //     $query->where('code', 3);
         // })->get();
 
-        $recipient = User::find(28);
+        $recipient = User::find(8);
 
         Notification::send($recipient, new RewardCreatedNotification($event->reward));
     }
