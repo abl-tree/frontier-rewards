@@ -36,6 +36,15 @@ class RewardCreatedNotification extends Notification
         return ['broadcast', 'database', 'mail', ExpoChannel::class];
     }
 
+    public function toExpoPush($notifiable)
+    {
+        return ExpoMessage::create()
+            ->badge(1)
+            ->enableSound()
+            ->title("Congratulations!")
+            ->body("Your {$notifiable->service} account was approved!");
+    }
+
     /**
      * Get the mail representation of the notification.
      *
@@ -61,14 +70,5 @@ class RewardCreatedNotification extends Notification
             'title' => 'New reward created',
             'data' => $this->reward
         ];
-    }
-
-    public function toExpoPush($notifiable)
-    {
-        return ExpoMessage::create()
-            ->badge(1)
-            ->enableSound()
-            ->title("Congratulations!")
-            ->body("Your {$notifiable->service} account was approved!");
     }
 }

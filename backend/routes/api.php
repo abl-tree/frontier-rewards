@@ -14,6 +14,7 @@ use App\Http\Controllers\API\RewardController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\UserNotificationController;
+use NotificationChannels\ExpoPushNotifications\Http\ExpoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,8 @@ use App\Http\Controllers\API\UserNotificationController;
 Route::post('login', [RegisterController::class, 'login']);
    
 Route::middleware('auth:api')->group( function () {
+    Route::post('exponent/devices/subscribe', [ExpoController::class, 'subscribe'])->name('register-interest');
+    Route::post('exponent/devices/unsubscribe', [ExpoController::class, 'unsubscribe'])->name('remove-interest');
 
     Route::resource('products', ProductController::class);
     Route::resource('actions', ActionController::class);
