@@ -13,7 +13,11 @@ export const ProtectedLogin = ({ component: Component, ...rest }) => {
             render = { props => {
                 if(_.isEmpty(auth.user)) {
 
-                    return <Component { ...props }/>
+                    return <div className="login-page">
+                        <span className="top-shape"></span>
+                        <span className="bottom-shape"></span>
+                        <Component { ...props }/>
+                    </div>
 
                 } else {
 

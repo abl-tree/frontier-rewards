@@ -6,6 +6,8 @@ import axios from "axios";
 import {AddPackage, DeletePackage, EditPackage, GetPackages} from "../actions/packageAction";
 import AsyncSelect from 'react-select/async';
 import { ToastContainer, toast } from 'react-toastify';
+import moment from 'moment-timezone';
+import {config} from '../utils/Constants'
 
 const Package = (props) => {
     
@@ -29,6 +31,7 @@ const Package = (props) => {
             'type': 'text',
             'placeholder': 'Enter package name',
             'control_id': 'formPackageName',
+            'errorMsg': 'Please provide package name.',
             'required': true
         },
         {
@@ -37,14 +40,17 @@ const Package = (props) => {
             'type': 'text',
             'placeholder': 'Enter package description',
             'control_id': 'formPackageDescription',
+            'errorMsg': 'Please provide package description.',
             'required': true
         },
         {
             'key': 'multiplier',
             'title': 'Multiplier',
-            'type': 'text',
+            'type': 'number',
             'placeholder': 'Enter package multiplier',
             'control_id': 'formPackageMultiplier',
+            'errorMsg': 'Please provide package multiplier.',
+            'min': 0,
             'required': true
         }
     ];
@@ -174,6 +180,13 @@ const Package = (props) => {
         })
     }
 
+    const timezoneConvert = (time) => {
+        var userTz = moment.tz.guess(true);
+        var time = moment.tz(time, config.url.TIMEZONE);
+
+        return time.tz(userTz).format('YYYY-MM-DD hh:mm:ss A');
+    }
+
     const showData = () => {
 
         if(!_.isEmpty(packageList.data.data)) {
@@ -183,8 +196,8 @@ const Package = (props) => {
                     <td>{el.name}</td>
                     <td>{el.description}</td>
                     <td>{el.multiplier}</td>
-                    <td>{el.created_at}</td>
-                    <td>{el.updated_at}</td>
+                    <td>{timezoneConvert(el.created_at)}</td>
+                    <td>{timezoneConvert(el.updated_at)}</td>
                     <td>
                         <ButtonGroup size="sm">
                             <Button variant="danger" onClick={() => {handleDelete(el.id)}}>Delete</Button>
@@ -220,9 +233,11 @@ const Package = (props) => {
         <>
             {showTmp()}
             <Row>
-                <Button variant="primary" onClick={handleShow}>
-                    Add Package
-                </Button>
+                <Col md={12}>
+                    <Button variant="primary" onClick={handleShow}>
+                        Add Package
+                    </Button>
+                </Col>
         
                 <Modal show={show} onHide={handleClose}>
                     <Form noValidate validated={validated} onSubmit={addPackage}>
@@ -234,13 +249,27 @@ const Package = (props) => {
                                 return <Form.Group hidden={field.hidden} key={i} as={Row} controlId={field.control_id}>
                                     <Form.Label column sm={3}>{field.title}</Form.Label>
                                     <Col sm={9}>
-                                        <Form.Control 
-                                            required={field.required}
-                                            type={field.type} 
-                                            placeholder={field.placeholder}
-                                            value={data[field.key]}
-                                            onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
-                                        />
+                                        {field.type == 'number' ?                                        
+                                            <Form.Control 
+                                                required={field.required}
+                                                type={field.type} 
+                                                min={field.min} 
+                                                placeholder={field.placeholder}
+                                                value={data[field.key]}
+                                                onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
+                                            />
+                                        :
+                                            <Form.Control 
+                                                required={field.required}
+                                                type={field.type} 
+                                                placeholder={field.placeholder}
+                                                value={data[field.key]}
+                                                onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
+                                            />
+                                        }
+                                        <Form.Control.Feedback type="invalid">
+                                          {field.errorMsg}
+                                        </Form.Control.Feedback>
                                     </Col>
                                 </Form.Group>
                             })}
@@ -259,25 +288,27 @@ const Package = (props) => {
             </Row>
 
             <Row>
-                <Table responsive striped bordered hover size="sm">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Multiplier</th>
-                            <th>Created</th>
-                            <th>Updated</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {showData()}
-                    </tbody>
-                </Table>
+                <Col md={12}>
+                    <Table responsive hover size="sm">
+                        <thead className="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Multiplier</th>
+                                <th>Created</th>
+                                <th>Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {showData()}
+                        </tbody>
+                    </Table>
 
-                <Pagination>                    
-                    {showPagination()}
-                </Pagination>
+                    <Pagination size="sm" className="float-right">                    
+                        {showPagination()}
+                    </Pagination>
+                </Col>
             </Row>
 
             <ToastContainer />

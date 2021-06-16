@@ -12,6 +12,8 @@ import {SuperAdminHeader, SuperAdminSidebar} from "../components/SuperAdminLayou
 import {AdminHeader, AdminSidebar} from "../components/AdminLayout"
 import {CustomerHeader, CustomerSidebar} from "../components/CustomerLayout"
 import '../css/style.css'
+import moment from 'moment-timezone';
+moment.tz.setDefault(moment.tz.guess(true));
 
 export const ProtectedRoute = ({ component: Component, ...rest }) => {
     
@@ -135,17 +137,17 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
 
                         return (
     
-                            <>
+                            <div className="superadmin-page">
                                 <SuperAdminHeader onLogout={onLogout}/>
                                 <Container fluid>
                                     <div className="row">
                                         <SuperAdminSidebar/>
-                                        <main role="main" className="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                                        <main role="main" className="col-md-8 col-lg-9 ml-sm-auto px-md-4">
                                             <Component { ...props }/>
                                         </main>
                                     </div>
                                 </Container>
-                            </>
+                            </div>
                             
                         )
 
@@ -153,34 +155,34 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
 
                         return (
     
-                            <>
+                            <div className="admin-page">
                                 <AdminHeader onLogout={onLogout}/>
                                 <Container fluid>
                                     <div className="row">
                                         <AdminSidebar/>
-                                        <main role="main" className="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                                        <main role="main" className="col-md-8 col-lg-9 ml-sm-auto px-md-4">
                                             <Component { ...props }/>
                                         </main>
                                     </div>
                                 </Container>
-                            </>
+                            </div>
                             
                         )
 
                     } else {
 
                         return (
-                            <>
+                            <div className="customer-page">
                                 <CustomerHeader onLogout={onLogout}/>
                                 <Container fluid>
                                     <div className="row">
                                         <CustomerSidebar userid={auth.user.id}/>
-                                        <main role="main" className="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                                        <main role="main" className="col-md-8 col-lg-9 ml-sm-auto px-md-4">
                                             <Component { ...props }/>
                                         </main>
                                     </div>
                                 </Container>
-                            </>
+                            </div>
                         )
 
                     }

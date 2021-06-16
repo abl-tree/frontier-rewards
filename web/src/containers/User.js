@@ -7,6 +7,8 @@ import axios from "axios";
 import AsyncSelect from 'react-select/async';
 import { Register, GetData, EditData, DeleteData } from "../actions/userAction";
 import { ToastContainer, toast } from 'react-toastify';
+import moment from 'moment-timezone';
+import {config} from '../utils/Constants'
 
 const User = (props) => {
 
@@ -239,6 +241,13 @@ const User = (props) => {
         })
     }
 
+    const timezoneConvert = (time) => {
+        var userTz = moment.tz.guess(true);
+        var time = moment.tz(time, config.url.TIMEZONE);
+
+        return time.tz(userTz);
+    }
+
     const showData = () => {
 
         if(!_.isEmpty(userList.data.data)) {
@@ -251,8 +260,8 @@ const User = (props) => {
                     <td>{el.email}</td>
                     <td>{el.phone_number}</td>
                     <td>{el.info && el.info.package ? el.info.package.name : 'None'}</td>
-                    <td>{el.created_at}</td>
-                    <td>{el.updated_at}</td>
+                    <td>{timezoneConvert(el.created_at).format('YYYY-MM-DD hh:mm:ss A')}</td>
+                    <td>{timezoneConvert(el.updated_at).format('YYYY-MM-DD hh:mm:ss A')}</td>
                     <td>
                         <ButtonGroup size="sm">
                             <Button variant="danger" onClick={() => {handleDelete(el.id)}}>Delete</Button>
@@ -399,20 +408,7 @@ const User = (props) => {
         fetchUsers('/users', tmpFilter)
     }
 
-    // Start Laravel Echo
-
-    const initEcho = () => {
-        window.Echo.private(`reward`)
-        .listen('RewardCreated', (e) => {
-            console.log('channel', e);
-        });
-    }
-
-    // End Laravel Echo
-
     React.useEffect(() => {
-
-        // initEcho()
 
         fetchUsers()
 
@@ -423,9 +419,11 @@ const User = (props) => {
     return (
         <>
             <Row>
-                <Button variant="primary" onClick={handleShow}>
-                    Add User
-                </Button>
+                <Col md={12}>
+                    <Button variant="primary" onClick={handleShow}>
+                        Add User
+                    </Button>
+                </Col>
         
                 <Modal show={show} onHide={handleClose}>
                     <Form noValidate validated={validated} onSubmit={addUser}>
@@ -498,29 +496,31 @@ const User = (props) => {
                 </Col>
             </Row>
 
-            <Row>                
-                <Table responsive striped bordered hover size="sm">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Type</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Package</th>
-                            <th>Created</th>
-                            <th>Updated</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {showData()}
-                    </tbody>
-                </Table>
+            <Row>
+                <Col md={12}>
+                    <Table responsive hover size="sm">
+                        <thead className="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Package</th>
+                                <th>Created</th>
+                                <th>Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {showData()}
+                        </tbody>
+                    </Table>
 
-                <Pagination>                    
-                    {showPagination()}
-                </Pagination>
+                    <Pagination size="sm" className="float-right">                    
+                        {showPagination()}
+                    </Pagination>
+                </Col>
             </Row>
 
             <ToastContainer />

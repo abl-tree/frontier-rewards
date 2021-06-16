@@ -100,7 +100,10 @@ const AdminProfile = (props) => {
 
     const fetchActions = async (search) => {
 
-        const res = await axios.get('/campaigns/'+data.campaign_id+'/actions?search=' + search)
+        const res = await axios.get('/campaigns/'+data.campaign_id+'/actions', {
+            'search': search,
+            'activity': true
+        })
 
         var results = res.data.data
 
@@ -148,7 +151,12 @@ const AdminProfile = (props) => {
 
     const fetchCampaigns = async (search) => {
 
-        const res = await axios.get('/campaigns?search=' + search)
+        const res = await axios.get('/campaigns', {
+            params : {
+                'search': search,
+                'activity': true
+            }
+        })
 
         var results = res.data.data
 
@@ -184,15 +192,17 @@ const AdminProfile = (props) => {
         <>
             <Row>
                 <Col md="6">
-                    <Card>
+                    <Card className="user-info">
                         <Card.Body>
                             {qrCode()}
                             <Card.Title>{user.name}</Card.Title>
                             <Card.Subtitle className="mb-2 text-muted">{!_.isEmpty(user.info) && !_.isEmpty(user.info.address) ? user.info.address : '' }</Card.Subtitle>
                             <Card.Text>
                                 <Row>
-                                    <Col md="3" className="font-weight-bold">Points</Col>
-                                    <Col md="9"><Badge variant="info">{user.points}</Badge></Col>
+                                    <Col md={9} className="user-points-container d-flex pr-0 pl-0 pb-1">
+                                        <Col md="5" className="font-weight-bold m-0">Points</Col>
+                                        <Col md="7" className="m-0">{user.points}</Col>
+                                    </Col>
                                 </Row>
                             </Card.Text>
                         </Card.Body>
@@ -257,7 +267,7 @@ const AdminProfile = (props) => {
                     </Card>
                 </Col>
                 <Col md="6">
-                    <Card>
+                    <Card className="user-info">
                         <Card.Body>
                             <Card.Title>Add User Action</Card.Title>
                             <Card.Text>
@@ -269,7 +279,7 @@ const AdminProfile = (props) => {
                             </Card.Text>
                         </Card.Body>
                     </Card>
-                    <Card>
+                    <Card className="user-rewards">
                         <Card.Body>
                             <Card.Title>Rewards</Card.Title>
                             <Card.Text>
@@ -277,7 +287,7 @@ const AdminProfile = (props) => {
                                 {showRewards()}
                                 </ListGroup>
                                 
-                                <Pagination>                    
+                                <Pagination size="sm" className="float-right">                    
                                     {showRewardsPagination()}
                                 </Pagination>
                             </Card.Text>
@@ -485,7 +495,7 @@ const CustomerProfile = (props) => {
                                 {showRewards()}
                                 </ListGroup>
                                 
-                                <Pagination>                    
+                                <Pagination size="sm" className="float-right">                    
                                     {showRewardsPagination()}
                                 </Pagination>
                             </Card.Text>

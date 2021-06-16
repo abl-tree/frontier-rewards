@@ -15,6 +15,7 @@
     "jquery": "^3.6.0",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
     "popper.js": "^1.16.1",
     "qrcode.react": "^1.0.1",
     "react": "^17.0.1",

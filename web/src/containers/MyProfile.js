@@ -25,7 +25,7 @@ const AdminProfile = (props) => {
         <>
             <Row>
                 <Col md="12">
-                    <Card>
+                    <Card className="user-info">
                         <Card.Body>
                             <Card.Title>{user.name}</Card.Title>
                             <Card.Subtitle className="mb-2 text-muted">{user.type_name}</Card.Subtitle>
@@ -140,7 +140,7 @@ const CustomerProfile = (props) => {
         if(!_.isEmpty(dataList.data.data)) {
 
             return dataList.data.data.map((el, key) => {
-                return <ListGroup.Item key={key}>{el.reward_name} <Button size="sm" onClick={() => handleClaim(el.id)}>Claim</Button></ListGroup.Item>
+                return <ListGroup.Item key={key}>{el.reward_name}<Button size="sm" className="float-right" variant="dark" onClick={() => handleClaim(el.id)}>Claim</Button></ListGroup.Item>
             })
 
         }
@@ -176,7 +176,7 @@ const CustomerProfile = (props) => {
         <>
             <Row>
                 <Col md="6">
-                    <Card>
+                    <Card className="user-info">
                         <Card.Body>
                             {qrCode()}
                             <Card.Title>{user.name}</Card.Title>
@@ -249,7 +249,7 @@ const CustomerProfile = (props) => {
                     </Card>
                 </Col>
                 <Col md="6">
-                    <Card>
+                    <Card className="user-rewards">
                         <Card.Body>
                             <Card.Title>Rewards</Card.Title>
                             <Card.Text>
@@ -257,7 +257,7 @@ const CustomerProfile = (props) => {
                                 {showRewards()}
                                 </ListGroup>
                                 
-                                <Pagination>                    
+                                <Pagination className="float-right">                    
                                     {showRewardsPagination()}
                                 </Pagination>
                             </Card.Text>

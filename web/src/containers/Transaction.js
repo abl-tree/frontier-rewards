@@ -1,6 +1,6 @@
 import React, {useState, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Badge, Button, ButtonGroup, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Accordion, Badge, Button, ButtonGroup, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
 import _ from "lodash";
 import axios from "axios";
 import {AddData, DeleteData, EditData, GetData} from "../actions/transactionAction";
@@ -294,29 +294,31 @@ const AdminTransaction = (props) => {
                     </Modal.Footer>
                 </Modal>
 
-                <Table responsive striped bordered hover size="sm">
-                    <thead>
-                        <tr>
-                            <th>Transaction ID</th>
-                            <th>Type</th>
-                            <th>Reference No.</th>
-                            <th>Running Balance</th>
-                            <th>Cost</th>
-                            <th>Customer</th>
-                            <th>Salesperson</th>
-                            <th>Created</th>
-                            <th>Updated</th>
-                            <th style={{width: "10%"}}>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {showData()}
-                    </tbody>
-                </Table>
+                <Col md={12}>
+                    <Table responsive hover size="sm">
+                        <thead className="table-dark">
+                            <tr>
+                                <th>Transaction ID</th>
+                                <th>Type</th>
+                                <th>Reference No.</th>
+                                <th>Running Balance</th>
+                                <th>Cost</th>
+                                <th>Customer</th>
+                                <th>Salesperson</th>
+                                <th>Created</th>
+                                <th>Updated</th>
+                                <th style={{width: "10%"}}>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {showData()}
+                        </tbody>
+                    </Table>
 
-                <Pagination>                    
-                    {showPagination()}
-                </Pagination>
+                    <Pagination size="sm" className="float-right">                    
+                        {showPagination()}
+                    </Pagination>
+                </Col>
             </Row>
         </>
     )
@@ -546,7 +548,7 @@ const CustomerTransaction = (props) => {
                     </tbody>
                 </Table>
 
-                <Pagination>                    
+                <Pagination size="sm" className="float-right">                    
                     {showPagination()}
                 </Pagination>
             </Row>

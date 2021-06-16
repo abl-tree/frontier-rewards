@@ -6,6 +6,8 @@ import {AddData, DeleteData, EditData, GetData} from "../actions/rewardAction";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import moment from 'moment-timezone';
+import {config} from '../utils/Constants'
 
 const AdminReward = (props) => {
     
@@ -27,6 +29,7 @@ const AdminReward = (props) => {
             'title': 'Type',
             'type': 'select',
             'placeholder': 'Enter action type',
+            'errorMsg': 'Please select type.',
             'options': [
                 {
                     'label': 'Item',
@@ -50,6 +53,7 @@ const AdminReward = (props) => {
             'type': 'number',
             'min': 0,
             'placeholder': 'Enter reward value',
+            'errorMsg': 'Please provide reward value.',
             'control_id': 'formValue',
             'required': true
         },
@@ -59,6 +63,7 @@ const AdminReward = (props) => {
             'type': 'number',
             'min': 0,
             'placeholder': 'Enter reward cost',
+            'errorMsg': 'Please provide reward cost.',
             'control_id': 'formCost',
             'required': true
         },
@@ -67,6 +72,7 @@ const AdminReward = (props) => {
             'title': 'Name',
             'type': 'text',
             'placeholder': 'Enter reward name',
+            'errorMsg': 'Please provide reward name.',
             'control_id': 'formActionName',
             'required': true
         },
@@ -75,6 +81,7 @@ const AdminReward = (props) => {
             'title': 'Description',
             'type': 'text',
             'placeholder': 'Enter reward description',
+            'errorMsg': 'Please provide reward description.',
             'control_id': 'formActionDescription',
             'required': true
         }
@@ -174,6 +181,13 @@ const AdminReward = (props) => {
         })
     }
 
+    const timezoneConvert = (time) => {
+        var userTz = moment.tz.guess(true);
+        var time = moment.tz(time, config.url.TIMEZONE);
+
+        return time.tz(userTz).format('YYYY-MM-DD hh:mm:ss A');
+    }
+
     const showData = () => {
 
         if(!_.isEmpty(dataList.data.data)) {
@@ -183,8 +197,8 @@ const AdminReward = (props) => {
                     <td>{el.name}</td>
                     <td>{el.description}</td>
                     <td>{el.type}</td>
-                    <td>{el.created_at}</td>
-                    <td>{el.updated_at}</td>
+                    <td>{timezoneConvert(el.created_at)}</td>
+                    <td>{timezoneConvert(el.updated_at)}</td>
                     <td>
                         <ButtonGroup size="sm">
                             <Button variant="danger" onClick={() => {handleDelete(el.id)}}>Delete</Button>
@@ -215,9 +229,11 @@ const AdminReward = (props) => {
     return (
         <>
             <Row>
-                <Button variant="primary" onClick={handleShow}>
-                    Add Reward
-                </Button>
+                <Col md={12}>
+                    <Button variant="primary" onClick={handleShow}>
+                        Add Reward
+                    </Button>
+                </Col>
         
                 <Modal show={show} onHide={handleClose}>
                     <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -237,6 +253,9 @@ const AdminReward = (props) => {
                                                 value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
                                                 onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                             />
+                                            <Form.Control.Feedback type="invalid">
+                                              {field.errorMsg}
+                                            </Form.Control.Feedback>
                                         </Col>
                                     </Form.Group>
                                 } else if(field.type === 'number' && field.key != 'cost' && data.type != 'item') {
@@ -251,6 +270,9 @@ const AdminReward = (props) => {
                                                 min={field.min}
                                                 onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                             />
+                                            <Form.Control.Feedback type="invalid">
+                                              {field.errorMsg}
+                                            </Form.Control.Feedback>
                                         </Col>
                                     </Form.Group>
                                 } else if(field.type === 'number' && field.key === 'cost' && data.type == 'item') {
@@ -265,6 +287,9 @@ const AdminReward = (props) => {
                                                 min={field.min}
                                                 onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                             />
+                                            <Form.Control.Feedback type="invalid">
+                                              {field.errorMsg}
+                                            </Form.Control.Feedback>
                                         </Col>
                                     </Form.Group>
                                 } else if(field.type === 'select') {
@@ -284,6 +309,9 @@ const AdminReward = (props) => {
                                                 })}
 
                                             </Form.Control>
+                                            <Form.Control.Feedback type="invalid">
+                                            {field.errorMsg}
+                                            </Form.Control.Feedback>
                                         </Col>
                                     </Form.Group>
                                 }
@@ -302,25 +330,27 @@ const AdminReward = (props) => {
             </Row>
 
             <Row>
-                <Table responsive striped bordered hover size="sm">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Type</th>
-                            <th>Created</th>
-                            <th>Updated</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {showData()}
-                    </tbody>
-                </Table>
+                <Col md={12}>
+                    <Table responsive hover size="sm">
+                        <thead className="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Type</th>
+                                <th>Created</th>
+                                <th>Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {showData()}
+                        </tbody>
+                    </Table>
 
-                <Pagination>                    
-                    {showPagination()}
-                </Pagination>
+                    <Pagination size="sm" className="float-right">                    
+                        {showPagination()}
+                    </Pagination>
+                </Col>
             </Row>
             <ToastContainer />
         </>
@@ -360,13 +390,13 @@ const UserReward = (props) => {
 
             return dataList.data.data.map((el, key) => {
 
-                return <Col md={4} key={key} className="mb-3">
+                return <Col md={4} key={key} className="mb-3 reward-content">
                     <Card style={{ height: '100%' }}>
                         <Card.Body>
                             <Card.Title>{el.name}</Card.Title>
                             <Card.Text>{el.description}</Card.Text>
                         </Card.Body>
-                        {el.type != 'points' ? <Button variant="success" onClick={() => handleRedeem(el.id)}>Redeem ({el.cost}pts)</Button> : ''}
+                        {el.type != 'points' ? <Button variant="dark" onClick={() => handleRedeem(el.id)}>Redeem ({el.cost} PTS)</Button> : ''}
                     </Card>
                 </Col>
             })
@@ -389,6 +419,15 @@ const UserReward = (props) => {
 
     }
 
+    const showPagination = () => {
+        if(!_.isEmpty(dataList.data.links))
+        return dataList.data.links.map((page, i) => {
+            return <Pagination.Item key={i} active={page.active} onClick={() => fetchData(page.url)} disabled={!page.url}><span dangerouslySetInnerHTML={{
+                __html: page.label
+            }}></span></Pagination.Item>
+        })
+    }
+
     const fetchData = (url = '/rewards') => {
 
         dispatch(GetData(props, url));
@@ -404,7 +443,18 @@ const UserReward = (props) => {
     return (
         <>
             <Row className="pt-3">
-                {showData()}
+                <Card className="reward-container ml-5 mr-5">
+                    <Card.Body className="row">
+                        {showData()}
+                    </Card.Body>
+                    <Card.Body className="row">
+                        <Col md={12}>
+                            <Pagination size="sm" className="float-right">                    
+                                {showPagination()}
+                            </Pagination>
+                        </Col>
+                    </Card.Body>
+                </Card>
             </Row>
             <ToastContainer />
         </>

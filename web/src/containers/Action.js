@@ -4,6 +4,8 @@ import { Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Table } f
 import _ from "lodash";
 import {AddData, DeleteData, EditData, GetData} from "../actions/actionAction";
 import { ToastContainer, toast } from 'react-toastify';
+import moment from 'moment-timezone';
+import {config} from '../utils/Constants'
 
 const AdminAction = (props) => {
     
@@ -26,6 +28,7 @@ const AdminAction = (props) => {
             'type': 'text',
             'placeholder': 'Enter action name',
             'control_id': 'formActionName',
+            'errorMsg': 'Please provide action name.',
             'required': true
         },
         {
@@ -34,6 +37,7 @@ const AdminAction = (props) => {
             'type': 'text',
             'placeholder': 'Enter action description',
             'control_id': 'formActionDescription',
+            'errorMsg': 'Please provide action description.',
             'required': true
         }
     ];
@@ -124,6 +128,13 @@ const AdminAction = (props) => {
         })
     }
 
+    const timezoneConvert = (time) => {
+        var userTz = moment.tz.guess(true);
+        var time = moment.tz(time, config.url.TIMEZONE);
+
+        return time.tz(userTz).format('YYYY-MM-DD hh:mm:ss A');
+    }
+
     const showData = () => {
 
         if(!_.isEmpty(actionList.data.data)) {
@@ -132,8 +143,8 @@ const AdminAction = (props) => {
                 return <tr key={key}>
                     <td>{el.name}</td>
                     <td>{el.description}</td>
-                    <td>{el.created_at}</td>
-                    <td>{el.updated_at}</td>
+                    <td>{timezoneConvert(el.created_at)}</td>
+                    <td>{timezoneConvert(el.updated_at)}</td>
                     <td>
                         <ButtonGroup size="sm">
                             <Button variant="danger" onClick={() => {handleDelete(el.id)}}>Delete</Button>
@@ -168,9 +179,11 @@ const AdminAction = (props) => {
     return (
         <>
             <Row>
-                <Button variant="primary" onClick={handleShow}>
-                    Add Action
-                </Button>
+                <Col md={12}>
+                    <Button variant="primary" onClick={handleShow}>
+                        Add Action
+                    </Button>
+                </Col>
         
                 <Modal show={show} onHide={handleClose}>
                     <Form noValidate validated={validated} onSubmit={handleSubmit}>
@@ -189,6 +202,9 @@ const AdminAction = (props) => {
                                             value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
                                             onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                         />
+                                        <Form.Control.Feedback type="invalid">
+                                          {field.errorMsg}
+                                        </Form.Control.Feedback>
                                     </Col>
                                 </Form.Group>
                             })}
@@ -206,24 +222,26 @@ const AdminAction = (props) => {
             </Row>
 
             <Row>
-                <Table responsive striped bordered hover size="sm">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Created</th>
-                            <th>Updated</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {showData()}
-                    </tbody>
-                </Table>
+                <Col md={12}>
+                    <Table responsive hover size="sm">
+                        <thead className="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Created</th>
+                                <th>Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {showData()}
+                        </tbody>
+                    </Table>
 
-                <Pagination>                    
-                    {showPagination()}
-                </Pagination>
+                    <Pagination size="sm" className="float-right">                    
+                        {showPagination()}
+                    </Pagination>
+                </Col>
             </Row>
             <ToastContainer />
         </>

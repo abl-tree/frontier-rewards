@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
 import _ from "lodash";
 import axios from "axios";
 import {AddData, DeleteData, EditData, GetData} from "../actions/campaignAction";
@@ -9,6 +9,8 @@ import AsyncSelect from 'react-select/async';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ToastContainer, toast } from 'react-toastify';
+import moment from 'moment-timezone';
+import {config} from '../utils/Constants'
 
 const AdminCampaign = (props) => {
     
@@ -38,6 +40,7 @@ const AdminCampaign = (props) => {
             'title': 'Name',
             'type': 'text',
             'placeholder': 'Enter campaign name',
+            'errorMsg': 'Please provide campaign name.',
             'control_id': 'formCampaignName',
             'required': true
         },
@@ -46,6 +49,7 @@ const AdminCampaign = (props) => {
             'title': 'Description',
             'type': 'text',
             'placeholder': 'Enter campaign description',
+            'errorMsg': 'Please provide campaign description.',
             'control_id': 'formCampaignDescription',
             'required': true
         },
@@ -54,6 +58,7 @@ const AdminCampaign = (props) => {
             'title': 'Start Date',
             'type': 'datepicker',
             'placeholder': 'Enter campaign start date',
+            'errorMsg': 'Please provide campaign name.',
             'control_id': 'formStartDescription',
             'required': true
         },
@@ -299,18 +304,25 @@ const AdminCampaign = (props) => {
         }
     }
 
+    const timezoneConvert = (time) => {
+        var userTz = moment.tz.guess(true);
+        var time = moment.tz(time, config.url.TIMEZONE);
+
+        return time.tz(userTz);
+    }
+
     const showData = () => {
 
         if(!_.isEmpty(dataList.data.data)) {
 
             return dataList.data.data.map((el, key) => {
                 return <tr key={key}>
-                    <td>{el.name}</td>
+                    <td>{el.name} <Badge variant={(el.is_expired ? "danger": "success")}>{(el.is_expired ? "expired": "active")}</Badge></td>
                     <td>{el.description}</td>
-                    <td><Moment format="YYYY/MM/DD">{el.start_date}</Moment></td>
-                    <td><Moment format="YYYY/MM/DD">{el.end_date}</Moment></td>
-                    <td><Moment format="YYYY/MM/DD hh:mm:ss">{el.created_at}</Moment></td>
-                    <td><Moment format="YYYY/MM/DD hh:mm:ss">{el.updated_at}</Moment></td>
+                    <td><Moment format="YYYY/MM/DD">{timezoneConvert(el.start_date)}</Moment></td>
+                    <td><Moment format="YYYY/MM/DD">{timezoneConvert(el.end_date)}</Moment></td>
+                    <td><Moment format="YYYY/MM/DD hh:mm:ss">{timezoneConvert(el.created_at)}</Moment></td>
+                    <td><Moment format="YYYY/MM/DD hh:mm:ss">{timezoneConvert(el.updated_at)}</Moment></td>
                     <td>
                         <ButtonGroup size="sm">
                             <Button variant="success" onClick={() => {handleRewardsShow(el.id)}}>Rewards</Button>
@@ -325,17 +337,17 @@ const AdminCampaign = (props) => {
 
         if(dataList.loading) {
 
-            return <tr><td colSpan="6" className="text-center">Loading...</td></tr>
+            return <tr><td colSpan="7" className="text-center">Loading...</td></tr>
 
         }
 
         if(dataList.errorMsg !== "") {
 
-            return <tr><td colSpan="6" className="text-center">{dataList.errorMsg}</td></tr>
+            return <tr><td colSpan="7" className="text-center">{dataList.errorMsg}</td></tr>
 
         }
 
-        return <tr><td colSpan="6" className="text-center">No data available</td></tr>
+        return <tr><td colSpan="7" className="text-center">No data available</td></tr>
 
     }
 
@@ -376,32 +388,36 @@ const AdminCampaign = (props) => {
     return (
         <>
             <Row>
-                <Button variant="primary" onClick={handleShow}>
-                    Add Campaign
-                </Button>
+                <Col md={12}>
+                    <Button variant="primary" onClick={handleShow}>
+                        Add Campaign
+                    </Button>
+                </Col>
             </Row>
 
             <Row>
-                <Table responsive striped bordered hover size="sm">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Description</th>
-                            <th>Start</th>
-                            <th>End</th>
-                            <th>Created</th>
-                            <th>Updated</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {showData()}
-                    </tbody>
-                </Table>
+                <Col md={12}>
+                    <Table responsive striped bordered hover size="sm">
+                        <thead className="table-dark">
+                            <tr>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Created</th>
+                                <th>Updated</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {showData()}
+                        </tbody>
+                    </Table>
 
-                <Pagination>                    
-                    {showPagination()}
-                </Pagination>
+                    <Pagination size="sm" className="float-right">                    
+                        {showPagination()}
+                    </Pagination>
+                </Col>
             </Row>
 
             {/* Start Modals */}
@@ -424,6 +440,9 @@ const AdminCampaign = (props) => {
                                             value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
                                             onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                         />
+                                        <Form.Control.Feedback type="invalid">
+                                          {field.errorMsg}
+                                        </Form.Control.Feedback>
                                     </Col>
                                 </Form.Group>
                             } else if(field.type === 'select') {
@@ -443,13 +462,19 @@ const AdminCampaign = (props) => {
                                             })}
 
                                         </Form.Control>
+                                        <Form.Control.Feedback type="invalid">
+                                            {field.errorMsg}
+                                        </Form.Control.Feedback>
                                     </Col>
                                 </Form.Group>
                             } else if(field.type === 'datepicker') {
                                 return <Form.Group hidden={field.hidden} key={i} as={Row} controlId={field.control_id}>
                                 <Form.Label column sm={3}>{field.title}</Form.Label>
                                 <Col sm={9}>
-                                    <DatePicker className="form-control" minDate={new Date()} dateFormat="MM/dd/yyyy" selected={data[field.key]} onChange={date => setData(prev => ({...prev, [field.key] : date}))} />
+                                    <DatePicker className="form-control" minDate={new Date()} dateFormat="MM/dd/yyyy" selected={data[field.key]} onChange={date => setData(prev => ({...prev, [field.key] : (date == null ? new Date() : date)}))} required={field.required} />
+                                    <Form.Control.Feedback type="invalid">
+                                        {field.errorMsg}
+                                    </Form.Control.Feedback>
                                 </Col>
                             </Form.Group>
                             }
@@ -502,7 +527,7 @@ const AdminCampaign = (props) => {
                                 </tbody>
                             </Table>
 
-                            <Pagination>                    
+                            <Pagination size="sm" className="float-right">                    
                                 {showPagination('campaigns')}
                             </Pagination>
                         </Col>
