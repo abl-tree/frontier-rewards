@@ -18,7 +18,7 @@ class RewardController extends BaseController
      */
     public function index()
     {
-        $rewards = Reward::paginate(10);
+        $rewards = Reward::latest()->paginate(10);
     
         return $this->sendResponse($rewards, 'Rewards retrieved successfully.');
     }

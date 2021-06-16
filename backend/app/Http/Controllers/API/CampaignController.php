@@ -9,6 +9,7 @@ use App\Models\CampaignActionReward;
 use Validator;
 use App\Http\Resources\Campaign as CampaignResource;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class CampaignController extends BaseController
 {
@@ -19,9 +20,13 @@ class CampaignController extends BaseController
      */
     public function index(Request $request)
     {
+        $input = $request->all();
+
         $campaigns = Campaign::when($request->user()->type->code == 3, function($query) {
             $query->whereDate('end_date', '>=', Carbon::now());
-        })->paginate(10);
+        })->when(@$input['activity'] == true, function($query) {
+            $query->whereDate('end_date', '>=', Carbon::now());
+        })->latest()->paginate(10);
     
         return $this->sendResponse($campaigns, 'Campaigns retrieved successfully.');
     }
@@ -146,5 +151,15 @@ class CampaignController extends BaseController
         $rewards = CampaignActionReward::with('reward')->where(['campaign_id' => $campaign_id, 'action_id' => $action_id])->paginate(10);
    
         return $this->sendResponse($rewards, 'Rewards retrieved successfully.');
+    }
+
+    public function active_campaigns(Request $request) {
+        $user = $request->user();
+        $transactions = DB::table('campaigns')
+                    ->selectRaw('count(*) as total')
+                    ->where('end_date', '>=', Carbon::now())
+                    ->first();
+   
+        return $this->sendResponse($transactions, 'Total active campaigns retrieved successfully.');
     }
 }

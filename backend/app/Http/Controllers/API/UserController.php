@@ -14,6 +14,8 @@ use Validator;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends BaseController
 {
@@ -41,7 +43,7 @@ class UserController extends BaseController
                         $query->where('customer_id', 'LIKE', '%' . $input['customer_id'] . '%');
                     });
                 })
-                ->orderBy('created_at', 'desc')
+                ->latest()
                 ->paginate(10)
                 ->withQueryString();
     
@@ -311,5 +313,14 @@ class UserController extends BaseController
         $user->save();
    
         return $this->sendResponse(new UserResource($user), 'Settings updated successfully.');
+    }
+
+    public function total_customers(Request $request) {
+        $user = $request->user();
+        $transactions = DB::table('users')
+                    ->selectRaw("count(case when user_type_id = 3 then 1 end) as total")
+                    ->first();
+   
+        return $this->sendResponse($transactions, 'Total number of customers retrieved successfully.');
     }
 }

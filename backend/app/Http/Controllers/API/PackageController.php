@@ -8,6 +8,8 @@ use App\Models\Package;
 use App\Models\PackageReward;
 use Validator;
 use App\Http\Resources\Package as PackageResource;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class PackageController extends BaseController
 {
@@ -20,8 +22,8 @@ class PackageController extends BaseController
     {
         $input = $request->all();
 
-        if(@$input['search']) $packages = Package::with('rewards.reward')->whereRaw("MATCH(`name`) AGAINST(? IN BOOLEAN MODE)", array($input['search']))->paginate(10)->withQueryString();
-        else $packages = Package::with('rewards.reward')->paginate(10)->withQueryString();
+        if(@$input['search']) $packages = Package::with('rewards.reward')->whereRaw("MATCH(`name`) AGAINST(? IN BOOLEAN MODE)", array($input['search']))->latest()->paginate(10)->withQueryString();
+        else $packages = Package::with('rewards.reward')->latest()->paginate(10)->withQueryString();
         
         return $this->sendResponse($packages, 'Packages retrieved successfully.');
     }
@@ -151,5 +153,14 @@ class PackageController extends BaseController
         $package->delete();
    
         return $this->sendResponse($package, 'Package deleted successfully.');
+    }
+
+    public function total_packages(Request $request) {
+        $user = $request->user();
+        $packages = DB::table('packages')
+                    ->selectRaw('count(*) as total')
+                    ->first();
+   
+        return $this->sendResponse($packages, 'Total number of packages retrieved successfully.');
     }
 }

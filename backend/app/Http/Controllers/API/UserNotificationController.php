@@ -90,4 +90,12 @@ class UserNotificationController extends BaseController
     {
         //
     }
+
+    public function mark_read(Request $request) {
+        $user = $request->user();
+
+        $user->unreadNotifications->markAsRead();
+
+        return $this->sendResponse([], 'Notifications marked as read successfully.');
+    }
 }

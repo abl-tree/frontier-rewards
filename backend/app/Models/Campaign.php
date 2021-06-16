@@ -23,7 +23,17 @@ class Campaign extends Model
     protected $casts = [
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
     ];
+
+    protected $appends = [
+        'is_expired'
+    ];
+
+    public function getIsExpiredAttribute($value) {
+        return Carbon::parse($this->end_date)->lt(Carbon::now());
+    }
 
     public function getEndDateAttribute($value) {
         return Carbon::parse($value)->format('Y-m-d');

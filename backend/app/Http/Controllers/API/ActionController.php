@@ -7,6 +7,8 @@ use App\Http\Controllers\API\BaseController as BaseController;
 use App\Models\Action;
 use Validator;
 use App\Http\Resources\Action as ActionResource;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class ActionController extends BaseController
 {
@@ -19,8 +21,8 @@ class ActionController extends BaseController
     {
         $input = $request->all();
 
-        if(@$input['search']) $actions = Action::whereRaw("MATCH(`name`) AGAINST(? IN BOOLEAN MODE)", array($input['search']))->paginate(10)->withQueryString();
-        else $actions = Action::paginate(10)->withQueryString();
+        if(@$input['search']) $actions = Action::whereRaw("MATCH(`name`) AGAINST(? IN BOOLEAN MODE)", array($input['search']))->latest()->paginate(10)->withQueryString();
+        else $actions = Action::latest()->paginate(10)->withQueryString();
     
         return $this->sendResponse($actions, 'Actions retrieved successfully.');
     }
@@ -125,5 +127,16 @@ class ActionController extends BaseController
         $action->delete();
    
         return $this->sendResponse($action, 'Action deleted successfully.');
+    }
+
+    public function active_actions(Request $request) {
+        $user = $request->user();
+        $transactions = DB::table('campaign_action_rewards')
+                    ->selectRaw('count(DISTINCT(campaign_action_rewards.action_id)) as total')
+                    ->join('campaigns', 'campaign_action_rewards.campaign_id', '=', 'campaigns.id')
+                    ->where('campaigns.end_date', '>=', Carbon::now())
+                    ->first();
+   
+        return $this->sendResponse($transactions, 'Total active actions retrieved successfully.');
     }
 }

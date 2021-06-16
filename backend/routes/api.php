@@ -47,12 +47,17 @@ Route::middleware('auth:api')->group( function () {
     Route::get('profile', [UserController::class, 'profile']);
     Route::post('settings', [UserController::class, 'settings']);
     Route::resource('notifications', UserNotificationController::class);
+    Route::post('notifications/read', [UserNotificationController::class, 'mark_read']);
     Route::resource('transactions', TransactionController::class);
     Route::post('redeem', [TransactionController::class, 'redeem']);
     Route::post('claim', [TransactionController::class, 'claim']);
     Route::post('register', [RegisterController::class, 'register']);
     Route::post('logout', [RegisterController::class, 'logout']);
     Route::get('summary/transactions', [TransactionController::class, 'summary']);
+    Route::get('summary/active_campaigns', [CampaignController::class, 'active_campaigns']);
+    Route::get('summary/active_actions', [ActionController::class, 'active_actions']);
+    Route::get('summary/total_customers', [UserController::class, 'total_customers']);
+    Route::get('summary/total_packages', [PackageController::class, 'total_packages']);
     
 });
 

@@ -12,4 +12,9 @@ class Reward extends Model
     protected $fillable = [
         'name', 'description', 'type', 'value', 'cost'
     ];
+
+    protected $casts = [
+        'created_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s',
+    ];
 }

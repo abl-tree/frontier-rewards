@@ -29,11 +29,9 @@ class SendRewardNotification
      */
     public function handle(RewardCreated $event)
     {
-        // $recipient = User::whereHas('type', function($query) {
-        //     $query->where('code', 3);
-        // })->get();
-
-        $recipient = User::find(8);
+        $recipient = User::whereHas('type', function($query) {
+            $query->where('code', 3);
+        })->get();
 
         Notification::send($recipient, new RewardCreatedNotification($event->reward));
     }
