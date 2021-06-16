@@ -56,7 +56,7 @@ class UserRegistered extends Notification
     public function toArray($notifiable)
     {
         return [
-            'title' => 'Frontier Rewards Registration.',
+            'title' => 'Points and Perks Registration.',
             'data' => $this->user
         ];
     }
