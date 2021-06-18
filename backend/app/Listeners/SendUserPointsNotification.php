@@ -29,7 +29,7 @@ class SendUserPointsNotification
      */
     public function handle(UserPointsUpdated $event)
     {
-        $recipient = User::find(28);
+        $recipient = User::find($event->transaction->user_id);
 
         Notification::send($recipient, new UserPointsNotification($event->transaction));
     }
