@@ -5,10 +5,12 @@ import _ from "lodash";
 import axios from "axios";
 import QRCode from "qrcode.react";
 import AsyncSelect from 'react-select/async';
+import { ToastContainer, toast } from 'react-toastify';
 
 const AdminProfile = (props) => {
     
     const dispatch = useDispatch();
+    const asyncSel = useRef(null);
 
     const userid = props.match.params.user;
     const [data, setData] = useState({});
@@ -24,8 +26,7 @@ const AdminProfile = (props) => {
         fetchData()
         fetchUserRewards()
         
-        setData(prev => ({...prev, 'type' : 'earn'}))
-        setData(prev => ({...prev, 'user_id' : userid}))
+        setData(prev => ({'type' : 'earn', 'user_id' : userid}))
     }, [])
 
     const fetchUserRewards = async ($url = null) => {
@@ -179,13 +180,26 @@ const AdminProfile = (props) => {
     });
 
     const handleRewardSubmit = async () => {
-        const res = await axios.post('transactions', data)
+        try {
+            const res = await axios.post('transactions', data)
+    
+            var result = res.data.data
+            
+            setData(prev => ({'type' : 'earn', 'user_id' : userid}))
+            setUser(prev => ({...prev, 'points' : result.balance}))
+    
+            asyncSel.current.select.select.clearValue();
 
-        var result = res.data.data
-
-        setUser(prev => ({...prev, 'points' : result.balance}))
-
-        fetchUserRewards()
+            toast.success("Reward has been added successfully", {
+                position: toast.POSITION.BOTTOM_RIGHT
+            });
+    
+            fetchUserRewards()
+        } catch (error) {
+            toast.error(error.response.data.message, {
+                position: toast.POSITION.BOTTOM_RIGHT
+            });
+        }
     }
 
     return (
@@ -271,7 +285,7 @@ const AdminProfile = (props) => {
                         <Card.Body>
                             <Card.Title>Add User Action</Card.Title>
                             <Card.Text>
-                                <AsyncSelect cacheOptions defaultOptions loadOptions={promiseCampaignOptions} onChange={value => setData(prev => ({'type' : 'earn', 'user_id' : userid, 'campaign_id' : value.value, 'campaign_name' : value.label}))} />
+                                <AsyncSelect ref={asyncSel} defaultOptions loadOptions={promiseCampaignOptions} onChange={value => {(value != null) ? setData(prev => ({'type' : 'earn', 'user_id' : userid, 'campaign_id' : value.value, 'campaign_name' : value.label})) : setData(prev => ({'type' : 'earn', 'user_id' : userid}))}} />
                                 {data.campaign_id ? <AsyncSelect key={'campaign-' + data.campaign_id} defaultOptions loadOptions={promiseActionOptions} onChange={value => setData(prev => ({...prev, 'action_id' : value.value, 'action_name' : value.label}))} /> : ''}
                                 {data.action_id ? <AsyncSelect key={'action-' + data.action_id} isMulti defaultOptions loadOptions={promiseRewardOptions} onChange={value => setData(prev => ({...prev, 'rewards' : value}))} /> : ''}
 
@@ -295,6 +309,7 @@ const AdminProfile = (props) => {
                     </Card>
                 </Col>
             </Row>
+            <ToastContainer />
         </>
     )
 

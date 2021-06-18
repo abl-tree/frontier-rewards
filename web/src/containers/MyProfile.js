@@ -23,8 +23,8 @@ const AdminProfile = (props) => {
 
     return (
         <>
-            <Row>
-                <Col md="12">
+            <Row className="justify-content-md-center">
+                <Col md="8">
                     <Card className="user-info">
                         <Card.Body>
                             <Card.Title>{user.name}</Card.Title>

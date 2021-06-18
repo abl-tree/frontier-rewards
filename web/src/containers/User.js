@@ -40,6 +40,7 @@ const User = (props) => {
             ],
             'default': 2,
             'control_id': 'formActionType',
+            'errorMsg': 'Please select type.',
             'required': true
         },
         {
@@ -48,6 +49,7 @@ const User = (props) => {
             'type': 'text',
             'placeholder': 'Enter first name',
             'control_id': 'formFirstName',
+            'errorMsg': 'Please provide first name.',
             'required': true
         },
         {
@@ -63,6 +65,7 @@ const User = (props) => {
             'type': 'text',
             'placeholder': 'Enter last name',
             'control_id': 'formLastName',
+            'errorMsg': 'Please provide last name.',
             'required': true
         },
         {
@@ -71,6 +74,7 @@ const User = (props) => {
             'type': 'email',
             'placeholder': 'Enter email',
             'control_id': 'formEmail',
+            'errorMsg': 'Please provide email address.',
             'required': true
         },
         {
@@ -79,6 +83,7 @@ const User = (props) => {
             'type': 'text',
             'placeholder': 'Enter phone number',
             'control_id': 'formPhone',
+            'errorMsg': 'Please provide phone number.',
             'required': true
         }
     ];
@@ -100,6 +105,7 @@ const User = (props) => {
             ],
             'default': 2,
             'control_id': 'formActionType',
+            'errorMsg': 'Please select type.',
             'required': true
         },
         {
@@ -108,6 +114,7 @@ const User = (props) => {
             'type': 'text',
             'placeholder': 'Enter customer ID',
             'control_id': 'formCustomerId',
+            'errorMsg': 'Please provide customer ID.',
             'required': true
         },
         {
@@ -116,6 +123,7 @@ const User = (props) => {
             'type': 'text',
             'placeholder': 'Enter first name',
             'control_id': 'formFirstName',
+            'errorMsg': 'Please provide first name.',
             'required': true
         },
         {
@@ -131,6 +139,7 @@ const User = (props) => {
             'type': 'text',
             'placeholder': 'Enter last name',
             'control_id': 'formLastName',
+            'errorMsg': 'Please provide last name.',
             'required': true
         },
         {
@@ -139,6 +148,7 @@ const User = (props) => {
             'type': 'email',
             'placeholder': 'Enter email',
             'control_id': 'formEmail',
+            'errorMsg': 'Please provide email address.',
             'required': true
         },
         {
@@ -147,6 +157,7 @@ const User = (props) => {
             'type': 'text',
             'placeholder': 'Enter phone number',
             'control_id': 'formPhone',
+            'errorMsg': 'Please provide phone number.',
             'required': true
         },
         {
@@ -163,6 +174,7 @@ const User = (props) => {
             'type': 'asyncselect',
             'placeholder': 'Enter name',
             'control_id': 'formName',
+            'errorMsg': 'Please add package.',
             'required': true
         }
     ];
@@ -361,6 +373,9 @@ const User = (props) => {
                             defaultValue={data[field.key]}
                             onChange={ e => setData(prev => ({...prev, [field.key] : e.target.value})) }
                         />
+                        <Form.Control.Feedback type="invalid">
+                            {field.errorMsg}
+                        </Form.Control.Feedback>
                     </Col>
                 </Form.Group>
             } else if(field.type === 'select') {
@@ -380,6 +395,9 @@ const User = (props) => {
                             })}
 
                         </Form.Control>
+                        <Form.Control.Feedback type="invalid">
+                            {field.errorMsg}
+                        </Form.Control.Feedback>
                     </Col>
                 </Form.Group>
             } else if(field.type === 'asyncselect') {
