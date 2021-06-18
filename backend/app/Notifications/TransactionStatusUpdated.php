@@ -50,7 +50,7 @@ class TransactionStatusUpdated extends Notification
     public function toTwilio($notifiable)
     {
         return (new TwilioSmsMessage())
-            ->content("Your {$notifiable->service} account was approved!");
+            ->content("GOOD NEWS!\n\nAre you ready to win test? Earn at least Required points to get this awesome reward! Visit ".config('app.url')." for more info.\n\nNote: This reward is only eligible for  Eligibility requirements for the reward users.");
     }
 
     /**

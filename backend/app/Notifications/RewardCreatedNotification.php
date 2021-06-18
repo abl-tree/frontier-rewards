@@ -8,6 +8,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use NotificationChannels\ExpoPushNotifications\ExpoChannel;
 use NotificationChannels\ExpoPushNotifications\ExpoMessage;
+use NotificationChannels\Twilio\TwilioChannel;
+use NotificationChannels\Twilio\TwilioSmsMessage;
 
 class RewardCreatedNotification extends Notification
 {
@@ -33,7 +35,7 @@ class RewardCreatedNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['broadcast', 'database', 'mail', ExpoChannel::class];
+        return ['broadcast', 'database', 'mail', ExpoChannel::class, TwilioChannel::class];
     }
 
     public function toExpoPush($notifiable)
@@ -43,6 +45,12 @@ class RewardCreatedNotification extends Notification
             ->enableSound()
             ->title("Congratulations!")
             ->body("Your {$notifiable->service} account was approved!");
+    }
+
+    public function toTwilio($notifiable)
+    {
+        return (new TwilioSmsMessage())
+            ->content("GOOD NEWS!\n\nAre you ready to win ".$this->reward->name."? Earn at least Required points to get this awesome reward! Visit ".config('app.url')." for more info.\n\nNote: This reward is only eligible for  Eligibility requirements for the reward users.");
     }
 
     /**

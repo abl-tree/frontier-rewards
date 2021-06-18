@@ -6,6 +6,8 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use NotificationChannels\Twilio\TwilioChannel;
+use NotificationChannels\Twilio\TwilioSmsMessage;
 
 class UserPointsNotification extends Notification
 {
@@ -31,7 +33,7 @@ class UserPointsNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail', TwilioChannel::class];
     }
 
     /**
@@ -45,6 +47,22 @@ class UserPointsNotification extends Notification
         return (new MailMessage)
                 ->subject('Received rewards')
                 ->markdown('mail.user.points', ['data' => $this->transaction]);
+    }
+
+    public function toTwilio($notifiable)
+    {
+        $data = $this->transaction;
+
+        if(count($data->item->rewards)) {
+            $items = "Item/s:\n\n";
+
+            foreach ($data->item->rewards as $key => $reward) {
+                $items .= ($key+1).". ".$reward->reward_name."\n";
+            }
+        }
+
+        return (new TwilioSmsMessage())
+            ->content("Congratulations!\n\nYou have received a total point/s of $data->cost".(count($data->item->rewards) ? ' and '.count($data->item->rewards).' item/s' : '').". Your total points balance is now $data->balance. Collect more points to win awesome prizes!\n\n".@$items);
     }
 
     /**
