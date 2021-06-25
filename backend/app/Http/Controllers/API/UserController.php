@@ -16,6 +16,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends BaseController
 {
@@ -322,5 +324,9 @@ class UserController extends BaseController
                     ->first();
    
         return $this->sendResponse($transactions, 'Total number of customers retrieved successfully.');
+    }
+
+    public function export(Request $request) {
+        return (new UsersExport)->download('users.xlsx');
     }
 }

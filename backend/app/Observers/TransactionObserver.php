@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Transaction;
 use App\Events\UserPointsUpdated;
+use App\Events\TransactionStatusUpdated;
 
 class TransactionObserver
 {
@@ -33,7 +34,7 @@ class TransactionObserver
      */
     public function updated(Transaction $transaction)
     {
-        //
+        if($transaction->type == 'claim') event(new TransactionStatusUpdated($transaction));
     }
 
     /**

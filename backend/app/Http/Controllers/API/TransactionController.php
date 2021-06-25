@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Builder;
 use App\Http\Resources\Transaction as TransactionResource;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use App\Events\TransactionStatusUpdated;
 
 class TransactionController extends BaseController
 {
@@ -203,8 +202,6 @@ class TransactionController extends BaseController
         $transaction->status = $input['status'];
         $transaction->status_updated_by = $request->user()->id;
         $transaction->save();
-
-        event(new TransactionStatusUpdated($transaction));
    
         return $this->sendResponse(new TransactionResource($transaction), 'Transaction updated successfully.');
     }

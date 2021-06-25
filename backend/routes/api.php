@@ -58,7 +58,10 @@ Route::middleware('auth:api')->group( function () {
     Route::get('summary/active_actions', [ActionController::class, 'active_actions']);
     Route::get('summary/total_customers', [UserController::class, 'total_customers']);
     Route::get('summary/total_packages', [PackageController::class, 'total_packages']);
-    
+
+    Route::prefix('export')->group(function () {
+        Route::get('user', [UserController::class, 'export']);
+    });
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
