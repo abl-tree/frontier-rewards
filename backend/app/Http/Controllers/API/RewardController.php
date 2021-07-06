@@ -16,9 +16,23 @@ class RewardController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $rewards = Reward::latest()->paginate(10);
+        $input = $request->all();
+        $validation = [];
+
+        if(isset($input['type'])) {
+            $validation = array_merge($validation, [
+                'show' => 'required|in:all,eligible'
+            ]);
+        }
+
+        $rewards = Reward::latest()
+                ->when((isset($input['show']) && $input['show'] == 'eligible'), function($query) use ($request) {
+                    $query->where('type', '!=', 'points');
+                    $query->where('cost', '<=', $request->user()->points);
+                })
+                ->paginate(10);
     
         return $this->sendResponse($rewards, 'Rewards retrieved successfully.');
     }
