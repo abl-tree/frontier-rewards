@@ -20,7 +20,7 @@ class UserNotificationController extends BaseController
     public function index(Request $request)
     {
         $user = $request->user();
-        $notifications = $user->notifications;
+        $notifications = $user->notifications()->paginate();
 
         return $this->sendResponse($notifications, 'Notifications retrieved successfully.');
     }
