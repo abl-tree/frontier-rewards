@@ -17,7 +17,6 @@ const NotificationMenu = (props) => {
     const [messageCount, setMessageCount] = useState(0);
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState(null);
-    const [raedIndex, setReadIndex] = useState(0);
 
     // Useref for the overlay
     const ref = useRef(null);
@@ -59,8 +58,20 @@ const NotificationMenu = (props) => {
 
         setNotifications(prev => ({...prev, data: data, loading: false}));
 
-        setMessageCount(data.filter((notification) => {return notification.read_at == null}).length);
-        setShowCount(data.filter((notification) => {return notification.read_at == null}).length);
+        setMessageCount(data.data.filter((notification) => {return notification.read_at == null}).length);
+        setShowCount(data.data.filter((notification) => {return notification.read_at == null}).length);
+    }
+
+    const seeMoreNotification = async (link) => {
+        setNotifications(prev => ({...prev, loading: true}))
+
+        const res = await axios.get(link);
+
+        let data = res.data.data;
+
+        data.data = [...notifications.data.data, ...data.data];
+
+        setNotifications(prev => ({...prev, data: data, loading: false}));
     }
 
     const hide = () => {
@@ -136,7 +147,7 @@ const NotificationMenu = (props) => {
     const markAsRead = async (event) => {
         const res = await axios.post('notifications/read');
 
-        setNotifications(prev => ({...prev, data: notifications.data.map((el, key) => {
+        setNotifications(prev => ({...prev, data: notifications.data.data.map((el, key) => {
             return {...el, read_at: moment().format()}
         })}));
 
@@ -176,9 +187,9 @@ const NotificationMenu = (props) => {
                         }
                         <ul className="notification-info-panel">
                             {
-                                notifications.data.length > 0 ?
+                                notifications.data && notifications.data.data && notifications.data.data.length > 0 ?
                                 
-                                notifications.data.map((message, index) =>
+                                notifications.data.data.map((message, index) =>
                                     <li
                                         className={!message['read_at'] ? 'notification-message unread' : 'notification-message'}
                                         key={index}>
@@ -196,6 +207,12 @@ const NotificationMenu = (props) => {
                             }
                         </ul>
                     </Popover.Content>
+                    {
+                        notifications.data && notifications.data.next_page_url && 
+                        <Popover.Title className="text-center">
+                            <Button variant="link" disabled={notifications.loading} onClick={() => seeMoreNotification(notifications.data.next_page_url)}>{notifications.loading ? 'Loading…' : 'See more'}</Button>
+                        </Popover.Title>
+                    }
                 </Popover>
             </Overlay>
         </div>
