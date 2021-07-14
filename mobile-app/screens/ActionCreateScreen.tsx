@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { Button, Input } from 'react-native-elements';
+import { Input } from 'react-native-elements';
 import {useDispatch} from "react-redux";
 import { useEffect, useState } from 'react';
 import _ from 'lodash';
 import {AddData} from "../actions/ActionAction";
 import { StyleSheet, View } from 'react-native';
+import { Box, Button, Center, FormControl, Image, Stack, VStack } from 'native-base';
 
 
 export default function ActionCreateScreen({navigation, route}) {
@@ -60,40 +61,53 @@ export default function ActionCreateScreen({navigation, route}) {
   }
 
   return (
-    <View style={styles.container}>
-      <Input
-        label='Name'
-        value={action.name}
-        onChangeText={(value) => setAction(prev => ({...prev, name: value}))}
-        placeholder='Enter action name'
-        errorStyle={{ color: 'red' }}
-        errorMessage={nameError}
-      />
-      <Input
-        label='Description'
-        value={action.description}
-        onChangeText={(value) => setAction(prev => ({...prev, description: value}))}
-        placeholder='Enter action description'
-        errorStyle={{ color: 'red' }}
-        errorMessage={descriptionError}
-      />
-      <View style={{flexDirection:'row', justifyContent: 'space-between', paddingLeft: 10, paddingRight: 10}}>
-        <View style={{width: '50%'}}>
-          <Button
-            title="Cancel"
-            buttonStyle={{backgroundColor: '#bdbdbd'}}
-            onPress={handleCancel}
+    <Center flex={1} backgroundColor="white">
+      <Image style={{position: 'absolute', bottom: 0, opacity: 0.30}} w="100%" h={250} resizeMode="contain" source={require('../assets/images/car-bg.png')} alt="car background"/>
+      <Box flex={1} w="100%" padding={2}>
+        <VStack space={3}>
+          <Input
+            label='Name'
+            value={action.name}
+            onChangeText={(value) => setAction(prev => ({...prev, name: value}))}
+            placeholder='Enter action name'
+            errorStyle={{ color: 'red' }}
+            errorMessage={nameError}
           />
-        </View>
-        <View style={{width: '50%'}}>
-          <Button
-            title="Save"
-            onPress={handleEditSave}
-            loading={saving}
+          <Input
+            label='Description'
+            value={action.description}
+            onChangeText={(value) => setAction(prev => ({...prev, description: value}))}
+            placeholder='Enter action description'
+            errorStyle={{ color: 'red' }}
+            errorMessage={descriptionError}
           />
-        </View>
-      </View>
-    </View >
+          
+          <Button.Group
+            variant="solid"
+            isAttached
+            mx={{
+              base: "auto",
+              md: 0,
+            }}
+          >
+            <Button isLoading={saving} isLoadingText="Saving" w="45%" colorScheme="teal" mr="2%" 
+            onPress={handleEditSave}>
+              Save
+            </Button>
+            <Button
+              w="45%"
+              colorScheme="danger"
+              _text={{
+                color: "white",
+              }}
+              onPress={handleCancel}
+            >
+              Cancel
+            </Button>
+          </Button.Group>
+        </VStack>
+      </Box>
+    </Center>
   )
 };
 

@@ -3,7 +3,6 @@ import { useNavigation } from '@react-navigation/native';
 import { StackHeaderLeftButtonProps } from '@react-navigation/stack';
 import { Button, FAB, Icon, ListItem, SearchBar } from 'react-native-elements';
 import {useDispatch, useSelector} from "react-redux";
-import { Text } from '../components/Themed';
 import MenuIcon from '../components/MenuIcon';
 import { useEffect } from 'react';
 import _ from 'lodash';
@@ -11,6 +10,7 @@ import { DeleteData, GetData } from "../actions/ActionAction";
 import { ActivityIndicator, Alert, StyleSheet, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { Box, Center, Heading, HStack, Image, Spinner, Text, useColorModeValue } from 'native-base';
 
 const AdminScreen = () => {
   const navigation = useNavigation();
@@ -146,9 +146,12 @@ const AdminScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      {actionList.data.data ? <SwipeListView
+    <Center flex={1} backgroundColor="white">
+      <Image style={{position: 'absolute', bottom: 0, opacity: 0.30}} w="100%" h={250} resizeMode="contain" source={require('../assets/images/car-bg.png')} alt="car background"/>
+      {
+        actionList.data.data ? <SwipeListView
           keyExtractor={(item) => item.id.toString()}
+          style={{padding: 5, width: '100%'}}
           data={actionList.data.data}
           renderItem={renderItem}
           renderHiddenItem={renderHiddenItem}
@@ -178,7 +181,69 @@ const AdminScreen = () => {
           }}
           onRefresh={() => fetchActions()}
           refreshing={actionList.loading}
-      /> : <Text>Loading...</Text>}
+        /> : <Center flex={1}>
+          <HStack space={2}>
+            <Heading color={"gray.500"}>Loading</Heading>
+            <Spinner color={useColorModeValue("gray.500", "gray.100")} accessibilityLabel="Loading posts" />
+          </HStack></Center>
+      }
+
+      <FAB
+        color="rgb(235, 164, 0)"
+        placement="right"
+        icon={
+          <Icon
+            name="add"
+            size={15}
+            color="white"
+          />
+        }
+        onPress={handleAddAction}
+      />
+    </Center>
+  )
+
+  return (
+    <View style={styles.container}>
+      {actionList.data.data ? <SwipeListView
+          keyExtractor={(item) => item.id.toString()}
+          style={{padding: 5, width: '100%'}}
+          data={actionList.data.data}
+          renderItem={renderItem}
+          renderHiddenItem={renderHiddenItem}
+          leftOpenValue={75}
+          rightOpenValue={-150}
+          disableRightSwipe
+          initialNumToRender={10}
+          onEndReachedThreshold={0.5}
+          onEndReached={() => {fetchActions(actionList.data.next_page_url)}}
+          // ListHeaderComponent={() => {
+          //   return <SearchBar placeholder="Type Here..." lightTheme round />;
+          // }}
+          ListFooterComponent={() => {
+            return (<View
+                    style={{
+                      paddingVertical: 20,
+                      borderTopWidth: 1,
+                      borderColor: "#CED0CE"
+                    }}
+                  >
+                    {
+                      loading ? <ActivityIndicator animating size="large" color="#0000ff" />
+                      : (actionList.next == null ? <Text style={{color: 'black', textAlign: 'center'}}>End</Text> : null)
+                    }
+                    
+                  </View>)
+          }}
+          onRefresh={() => fetchActions()}
+          refreshing={actionList.loading}
+      /> : <Center flex={1}>
+        <HStack space={2}>
+          <Heading color={"gray.500"}>Loading</Heading>
+          <Spinner color={useColorModeValue("gray.500", "gray.100")} accessibilityLabel="Loading posts" />
+        </HStack></Center>
+      }
+
       <FAB 
         placement="right"
         icon={
@@ -276,14 +341,11 @@ const CustomerScreen = () => {
       const {data} = props
 
       return (
-          <View style={styles.rowFront}>
-            <TouchableHighlight style={styles.rowFrontVisible}>
-                <View>
-                    <Text style={styles.title} numberOfLines={1}>{data.item.name}</Text>
-                    <Text style={styles.title} numberOfLines={1}>{data.item.description}</Text>
-                </View>
-            </TouchableHighlight>
-          </View>
+        <Box shadow={2} p={5} marginBottom={3} borderRadius={20} w="100%" backgroundColor="white">
+          <HStack w="100%" minHeight={70} alignItems="center">
+            <Text style={{fontSize: 20, fontWeight: 'bold', textTransform: 'capitalize'}}>{data.item.name}</Text>
+          </HStack>
+        </Box>
       )
   }
 
@@ -322,12 +384,14 @@ const CustomerScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <Center flex={1} backgroundColor="white">
+      <Image style={{position: 'absolute', bottom: 0, opacity: 0.30}} w="100%" h={250} resizeMode="contain" source={require('../assets/images/car-bg.png')} alt="car background"/>
       {actionList.data.data ? <SwipeListView
+          style={{padding: 5, width: '100%'}}
+          contentContainerStyle={{paddingLeft: 20, paddingRight: 20}}
           keyExtractor={(item) => item.id.toString()}
           data={actionList.data.data}
           renderItem={renderItem}
-          renderHiddenItem={renderHiddenItem}
           leftOpenValue={75}
           rightOpenValue={-150}
           disableRightSwipe
@@ -335,9 +399,6 @@ const CustomerScreen = () => {
           initialNumToRender={10}
           onEndReachedThreshold={0.5}
           onEndReached={() => {fetchActions(actionList.data.next_page_url)}}
-          // ListHeaderComponent={() => {
-          //   return <SearchBar placeholder="Type Here..." lightTheme round />;
-          // }}
           ListFooterComponent={() => {
             return (<View
                     style={{
@@ -356,7 +417,8 @@ const CustomerScreen = () => {
           onRefresh={() => fetchActions()}
           refreshing={actionList.loading}
       /> : <Text>Loading...</Text>}
-    </View >
+      {/* </Center> */}
+    </Center>
   )
 };
 
