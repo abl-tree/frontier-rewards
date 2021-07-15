@@ -33,7 +33,7 @@ const ActionReducer = (state = DefaultState, action) => {
         case "ACTION_ADD":
 
             var stateData = state.data
-            var newData = [...state.data.data, action.payload]
+            var newData = [action.payload, ...state.data.data]
 
             stateData.data = newData;
 
