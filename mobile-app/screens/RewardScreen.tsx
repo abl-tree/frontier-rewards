@@ -1,17 +1,19 @@
 import * as React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { StackHeaderLeftButtonProps } from '@react-navigation/stack';
-import { Button, FAB, Icon, ListItem, SearchBar } from 'react-native-elements';
+import { Button, Card, FAB, Icon, ListItem, SearchBar } from 'react-native-elements';
 import {useDispatch, useSelector} from "react-redux";
 import { Text } from '../components/Themed';
 import MenuIcon from '../components/MenuIcon';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import _ from 'lodash';
 import { DeleteData, GetData } from "../actions/RewardAction";
 import { ActivityIndicator, Alert, StyleSheet, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import axios from 'axios'
+import { Box, Center, CheckIcon, Heading, HStack, Image, ScrollView, Select, Spinner, useColorModeValue, VStack } from 'native-base';
+import {Collapse,CollapseHeader, CollapseBody, AccordionList} from 'accordion-collapse-react-native';
 
 const AdminScreen = () => {
   const navigation = useNavigation();
@@ -97,11 +99,22 @@ const AdminScreen = () => {
       return (
           <View style={styles.rowFront}>
             <TouchableHighlight style={styles.rowFrontVisible}>
-                <View>
-                    <Text style={styles.title} numberOfLines={1}>Name: {data.item.name}</Text>
-                    <Text style={styles.title} numberOfLines={1}>Description: {data.item.description}</Text>
-                    <Text style={styles.title} numberOfLines={1}>Type: {data.item.type}</Text>
-                </View>
+                <VStack space={1} h="100%">
+                  <HStack w="100%" h="100%">
+                    <Box flex={3}>
+                      <VStack space={2}>
+                        <Text style={[styles.title, {fontSize: 20, textTransform: 'capitalize'}]} numberOfLines={1}>{data.item.name}</Text>
+                        <Text style={{color: 'black'}} numberOfLines={1}>{data.item.description}</Text>
+                      </VStack>
+                    </Box>
+                    <Box flex={1}>
+                      <VStack space={4}>
+                        <Text style={{textTransform: 'uppercase', textAlign: 'right', fontSize: 12, color: 'gray'}} numberOfLines={1}>{data.item.type}</Text>
+                        <Text style={{textTransform: 'uppercase', textAlign: 'right', fontSize: 16, color: 'gray'}}>{parseFloat(data.item.cost)} PTS</Text>
+                      </VStack>
+                    </Box>
+                  </HStack>
+                </VStack>
             </TouchableHighlight>
           </View>
       )
@@ -148,8 +161,10 @@ const AdminScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <Center flex={1} backgroundColor="white">
+      <Image style={{position: 'absolute', bottom: 0, opacity: 0.30}} w="100%" h={250} resizeMode="contain" source={require('../assets/images/car-bg.png')} alt="car background"/>
       {rewardList.data.data ? <SwipeListView
+          style={{padding: 5, width: '100%'}}
           keyExtractor={(item) => item.id.toString()}
           data={rewardList.data.data}
           renderItem={renderItem}
@@ -180,8 +195,14 @@ const AdminScreen = () => {
           }}
           onRefresh={() => fetchRewards()}
           refreshing={rewardList.loading}
-      /> : <Text>Loading...</Text>}
+      /> : <Center flex={1}>
+        <HStack space={2}>
+          <Heading color={"gray.500"}>Loading</Heading>
+          <Spinner color={useColorModeValue("gray.500", "gray.100")} accessibilityLabel="Loading posts" />
+        </HStack></Center>
+      }
       <FAB 
+        color="rgb(235, 164, 0)"
         placement="right"
         icon={
           <Icon
@@ -192,7 +213,7 @@ const AdminScreen = () => {
         }
         onPress={handleAddAction}
       />
-    </View >
+    </Center>
   )
 }
 
@@ -201,6 +222,9 @@ const CustomerScreen = () => {
   const dispatch = useDispatch();
   const rewardList = useSelector(state => state.Reward);
   const [loading, setLoading] = React.useState(false);
+  const [filters, setFilters] = useState({
+    show: 'all'
+  })
 
   useEffect(() => {
     navigation.setOptions({
@@ -212,16 +236,16 @@ const CustomerScreen = () => {
   
   React.useLayoutEffect(() => {
 
-    fetchRewards()
+    fetchRewards('/rewards', filters)
 
   }, [navigation])
   
-  const fetchRewards = async (url = '/rewards') => {
+  const fetchRewards = async (url = '/rewards', params = {}) => {
     if(url == null || loading) return
 
     setLoading(true)
 
-    dispatch(GetData(url))
+    dispatch(GetData(url, params))
     .then(() => {
 
       setLoading(false)
@@ -234,8 +258,7 @@ const CustomerScreen = () => {
 
   }
 
-  const redeemRow = (rowMap, item) => {
-    let key = item.id
+  const redeemRow = (item) => {
 
     if(item.type === 'points') {
       Alert.alert(
@@ -243,8 +266,7 @@ const CustomerScreen = () => {
         "Points rewards are not redeemable.",
         [
           {
-            text: "OK",
-            onPress: () => rowMap[key].closeRow()
+            text: "OK"
           }
         ],
         {
@@ -261,15 +283,12 @@ const CustomerScreen = () => {
       [
         {
           text: "Cancel",
-          onPress: () => rowMap[key].closeRow(),
           style: "cancel"
         },
         { text: "Continue", onPress: () => {
 
           handleRedeem(item.id)
           .then(() => {
-
-            rowMap[key].closeRow()
 
             Alert.alert(
               "Successful!",
@@ -330,18 +349,19 @@ const CustomerScreen = () => {
   }
 
   const VisibleItem = props => {
-      const {data} = props
+      const {data} = props     
 
       return (
-          <View style={styles.rowFront}>
-            <TouchableHighlight style={styles.rowFrontVisible}>
-                <View>
-                    <Text style={styles.title} numberOfLines={1}>Name: {data.item.name}</Text>
-                    <Text style={styles.title} numberOfLines={1}>Description: {data.item.description}</Text>
-                    <Text style={styles.title} numberOfLines={1}>Type: {data.item.type}</Text>
-                </View>
-            </TouchableHighlight>
-          </View>
+        <Box marginBottom={3}>
+          <Box backgroundColor="white" margin={3} marginBottom={1} paddingLeft={6} paddingRight={6} paddingTop={3} paddingBottom={3} borderRadius={20} borderColor="black" borderWidth={1}>
+            <Text style={{fontSize: 25, textTransform: 'capitalize', fontWeight: 'bold'}} numberOfLines={1}>{data.item.name}</Text>
+            <Text style={{fontSize: 18, textTransform: 'capitalize'}} numberOfLines={1}>{data.item.description}</Text>
+          </Box>
+          <TouchableOpacity onPress={() => {redeemRow(data.item)}} disabled={data.item.type == 'points'} activeOpacity={0.8} style={{backgroundColor: 'black', width: '75%', alignSelf: 'center'}}>
+            {data.item.type == 'points' ? <Text style={{color: 'white', fontSize: 15, textAlign: 'center'}}>NOT REDEEMABLE</Text>
+            : <Text style={{color: 'white', fontSize: 15, textAlign: 'center'}}>REDEEM ({data.item.cost}) POINTS</Text>}
+          </TouchableOpacity>
+        </Box>
       )
   }
 
@@ -375,12 +395,91 @@ const CustomerScreen = () => {
           />
       )
   }
+  
+  const handleTypeChange = filter => {
 
-  const handleAddAction = () => {
+    let tmpFilter = {...filters, show: filter}
+
+    setFilters(tmpFilter)
     
-    navigation.navigate('RewardCreateScreen')
-    
+    fetchRewards('/rewards', tmpFilter)
+
   }
+
+  return (
+    <Center flex={1} backgroundColor="white">
+      <Image style={{position: 'absolute', bottom: 0, opacity: 0.30}} w="100%" h="250" resizeMode="contain" source={require('../assets/images/car-bg.png')} alt="car background"/>
+      <Center shadow={2} borderRadius={20} backgroundColor="#f6f6f6" h="90%" w="80%" opacity={0.6} >
+      <Box backgroundColor="white" w="100%" p={4}>
+        <HStack style={{alignItems: 'center'}}>
+          <VStack w="30%">
+            <Text style={styles.title}>FILTER</Text>
+          </VStack>
+          <VStack w="70%">
+            <Select
+              selectedValue={filters.show}
+              w="100%"
+              accessibilityLabel="Select type"
+              placeholder="Select type"
+              onValueChange={(itemValue) => handleTypeChange(itemValue)}
+              _selectedItem={{
+                bg: "cyan.600",
+                endIcon: <CheckIcon size={4} />,
+              }}
+              style={{fontSize: 14, paddingLeft: 10}}
+              p={0}
+            >
+              <Select.Item label="All" value="all" />
+              <Select.Item label="Eligible" value="eligible" />
+            </Select>
+          </VStack>
+        </HStack>
+      </Box>
+      <Box flex={1}>
+        {rewardList.data.data ? <SwipeListView
+            style={{padding: 5, width: '100%'}}
+            contentContainerStyle={{paddingLeft: 20, paddingRight: 20}}
+            keyExtractor={(item) => item.id.toString()}
+            data={rewardList.data.data}
+            renderItem={renderItem}
+            // renderHiddenItem={renderHiddenItem}
+            leftOpenValue={75}
+            rightOpenValue={-75}
+            disableRightSwipe
+            disableLeftSwipe
+            initialNumToRender={10}
+            onEndReachedThreshold={0.5}
+            onEndReached={() => {fetchRewards(rewardList.data.next_page_url)}}
+            // ListHeaderComponent={() => {
+            //   return <SearchBar placeholder="Type Here..." lightTheme round />;
+            // }}
+            ListFooterComponent={() => {
+              return (<View
+                      style={{
+                        paddingVertical: 20,
+                        borderTopWidth: 1,
+                        borderColor: "#CED0CE"
+                      }}
+                    >
+                      {
+                        loading ? <ActivityIndicator animating size="large" color="#0000ff" />
+                        : (rewardList.next == null ? <Text style={{color: 'black', textAlign: 'center'}}>End</Text> : null)
+                      }
+                      
+                    </View>)
+            }}
+            onRefresh={() => fetchRewards()}
+            refreshing={rewardList.loading}
+          /> : <Center flex={1}>
+          <HStack space={2}>
+            <Heading color={"gray.500"}>Loading</Heading>
+            <Spinner color={useColorModeValue("gray.500", "gray.100")} accessibilityLabel="Loading posts" />
+          </HStack></Center>
+        }
+      </Box>
+      </Center>
+    </Center>
+  )
 
   return (
     <View style={styles.container}>
@@ -443,7 +542,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     height: 'auto',
     margin: 5,
-    marginBottom: 15,
+    marginBottom: 10,
     shadowColor: '#999',
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.8,
@@ -453,9 +552,8 @@ const styles = StyleSheet.create({
   rowFrontVisible: {
     backgroundColor: '#FFF',
     borderRadius: 5,
-    height: 60,
-    padding: 10,
-    marginBottom: 15,
+    height: 70,
+    padding: 10
   },
   rowBack: {
     alignItems: 'center',
@@ -465,7 +563,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingLeft: 15,
     margin: 5,
-    marginBottom: 15,
+    marginBottom: 10,
     borderRadius: 5,
   },
   backRightBtn: {
@@ -495,9 +593,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     fontWeight: 'bold',
-    // marginBottom: 5,
-    color: '#666',
-    backgroundColor: 'white'
+    color: 'black',
   },
   details: {
     fontSize: 12,
