@@ -29,6 +29,9 @@ export const Auth = (props, data) => async dispatch => {
     await axios.post('/login', data)
     .then(res => {
 
+        console.log('success');
+        
+
         AsyncStorage.setItem('user', JSON.stringify(res.data.data));
 
         dispatch({
@@ -39,7 +42,10 @@ export const Auth = (props, data) => async dispatch => {
         return Promise.resolve();
 
     })
-    .catch(error => {        
+    .catch(error => {       
+        
+        console.log('error');
+        
         
         dispatch({
             type: "LOGIN_FAIL",
@@ -153,7 +159,7 @@ export const EditData = (data) => async dispatch => {
 
         dispatch({
             type: "USER_FAIL",
-            payload: error.response.data.data
+            payload: error.response.data
         })
 
         return Promise.reject(error)

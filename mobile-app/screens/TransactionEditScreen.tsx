@@ -8,6 +8,7 @@ import SelectBox from 'react-native-multi-selectbox'
 import axios from 'axios'
 import moment from 'moment'
 import Dialog from "react-native-dialog";
+import { Box, HStack, Image, ScrollView, VStack } from 'native-base';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -122,6 +123,80 @@ export default function TransactionEditScreen({navigation, route}) {
     })
     
   };
+
+  return (
+    <Box flex={1} backgroundColor="white">
+      <Image style={{position: 'absolute', bottom: 0, opacity: 0.30}} w="100%" h={250} resizeMode="contain" source={require('../assets/images/car-bg.png')} alt="car background"/>
+      <ScrollView p={5} w="100%" h="100%" paddingBottom={5} backgroundColor="transparent">
+        <VStack marginBottom={10} space={3}>
+          <Dialog.Container visible={visible}>
+            <Dialog.Title style={{color: 'black'}}>Are you sure?</Dialog.Title>
+            <Dialog.Description>
+                You want to mark this as {dialog.type}?
+            </Dialog.Description>
+            {
+              dialog.status == 'confirmed' &&
+              <>
+              <Dialog.Input 
+                style={{color: 'black'}}
+                placeholder='Enter reference number'
+                onChangeText={(value) => setDialog(prev => ({...prev, reference_no: value}))}
+              /> 
+              <Text style={{marginTop: -20, marginLeft: 10, marginRight: 10, color: 'red'}}>{referenceError}</Text>
+              </>
+            }
+            <Dialog.Button label="Cancel" onPress={handleCancelDialog} />
+            <Dialog.Button label="Continue" onPress={handleContinueDialog} />
+          </Dialog.Container>
+          <View style={styles.section}>
+            <SelectBox
+              label="Select type"
+              options={[
+                {
+                    'item': 'Pending',
+                    'id': 'pending'
+                }, 
+                {
+                    'item': 'Cancelled',
+                    'id': 'cancelled'
+                }, 
+                {
+                    'item': 'Confirmed',
+                    'id': 'confirmed'
+                }, 
+                {
+                    'item': 'Completed',
+                    'id': 'completed'
+                }
+            ]}
+              value={userType}
+              onChange={onStatusChange}
+              hideInputFilter={true}
+              optionsLabelStyle={{width: dimensions.screen.width}}
+            />
+          </View>
+          <HStack w="100%">
+            <Text style={{fontWeight: 'bold', fontSize: 16, width: '40%'}}>Transaction ID:</Text>
+            <Text style={{fontSize: 16, width: '60%'}}>{transaction.transaction_id}</Text>
+          </HStack>
+          <HStack w="100%">
+            <Text style={{fontWeight: 'bold', fontSize: 16, width: '40%'}}>Date:</Text>
+            <Text style={{fontSize: 16, width: '60%'}}>{moment(transaction.created_at).format('YYYY-MM-DD hh:mm a')}</Text>
+          </HStack>
+          <HStack w="100%">
+            <Text style={{fontWeight: 'bold', fontSize: 16, width: '40%'}}>Customer:</Text>
+            <Text style={{fontSize: 16, width: '60%'}}>{transaction.customer ? transaction.customer.name : '-'}</Text>
+          </HStack>
+          <HStack w="100%">
+            <Text style={{fontWeight: 'bold', fontSize: 16, width: '40%'}}>Type:</Text>
+            <Text style={{fontSize: 16, width: '60%'}}>{transaction.type}</Text>
+          </HStack>
+
+          {renderRewards()}
+        </VStack>
+      </ScrollView>
+    </Box>
+  )
 
   return (
     <View style={styles.container}>

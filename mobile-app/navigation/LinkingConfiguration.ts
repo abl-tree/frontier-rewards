@@ -29,6 +29,7 @@ export default {
           Package: {
             screens: {
               PackageScreen: 'packages',
+              PackageViewScreen: 'package-view',
               PackageEditScreen: 'package-edit',
               PackageCreateScreen: 'package-create'
             }
@@ -36,6 +37,7 @@ export default {
           User: {
             screens: {
               UserScreen: 'users',
+              UserViewScreen: 'user-view',
               UserEditScreen: 'user-edit',
               UserCreateScreen: 'user-create'
             }
@@ -51,57 +53,19 @@ export default {
               ProfileScreen: 'profile'
             }
           },
-          // TabOne: {
-          //   screens: {
-          //     TabOneScreen: 'one',
-          //   },
-          // },
-          // QrScannerTab: {
-          //   screens: {
-          //     TabTwoScreen: 'two',
-          //     UserActionScreen: 'action'
-          //   },
-          // },
-          TabThree: {
+          Setting: {
             screens: {
-              TabThreeScreen: 'three',
-            },
+              SettingScreen: 'setting'
+            }
           },
-          TabFour: {
+          Notification: {
             screens: {
-              TabFourScreen: 'four',
-              TestScreen: 'five'
-            },
+              NotificationScreen: 'notifications'
+            }
           },
           Logout: {
             screens : {
               LogoutScreen: 'logout'
-            }
-          },
-          Database: {
-            screens: {
-              DatabaseScreen: 'database'
-            }
-          },
-          FileSystem: {
-            screens: {
-              FileSystemScreen: 'filesystem'
-            }
-          },
-          Clients: {
-            screens: {
-              ClientsScreen: 'clients',
-              TabOne: {
-                screens: {
-                  TabOneScreen: 'one',
-                },
-              },
-              QrScannerTab: {
-                screens: {
-                  TabTwoScreen: 'two',
-                  UserActionScreen: 'user_action'
-                },
-              }
             }
           }
         },

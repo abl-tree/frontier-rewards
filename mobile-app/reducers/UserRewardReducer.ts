@@ -4,16 +4,16 @@ const DefaultState = {
     errorMsg: ""
 }
 
-const PackageReducer = (state = DefaultState, action) => {
+const UserRewardReducer = (state = DefaultState, action) => {
 
     switch (action.type) {
-        case "PACKAGE_REQUEST":
+        case "USER_REWARD_REQUEST":
             return {
                 ...state,
                 loading: true
             }
             
-        case "PACKAGE_SUCCESS":
+        case "USER_REWARD_FETCH":
 
             var stateData = action.payload;
 
@@ -30,53 +30,53 @@ const PackageReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "PACKAGE_ADDED":
+        case "USER_REWARD_ADD":
 
-            var newData = state.data;
-            var newPackages = [action.payload, ...state.data.data]
+            var stateData = state.data
+            var newData = [...state.data.data, action.payload]
 
-            newData.data = newPackages;
+            stateData.data = newData;
 
             return {
                 ...state,
                 loading: false,
-                data: newData,
+                data: stateData,
                 errorMsg: ""
             }
             
-        case "PACKAGE_UPDATED":
+        case "USER_REWARD_UPDATE":
 
-            var newData = state.data;
+            var stateData = state.data
             var index = state.data.data.findIndex((item) => item.id === action.payload.id)
-            var newPackages = {
+            var newData = {
                 ...state.data.data[index], 
                 ...action.payload
             }
 
-            newData.data[index] = newPackages;
+            stateData.data[index] = newData;
 
             return {
                 ...state,
                 loading: false,
-                data: newData,
+                data: stateData,
                 errorMsg: ""
             }
             
-        case "PACKAGE_DELETED":
+        case "USER_REWARD_DELETE":
 
-            var newData = state.data;
-            var newPackages = state.data.data.filter((item) => item.id !== action.payload.id)
+            var stateData = state.data
+            var newData = state.data.data.filter((item) => item.id !== action.payload.id)
 
-            newData.data = newPackages;
+            stateData.data = newData;
 
             return {
                 ...state,
                 loading: false,
-                data: newData,
+                data: stateData,
                 errorMsg: ""
             }
             
-        case "PACKAGE_FAIL":
+        case "USER_REWARD_FAIL":
             return {
                 ...state,
                 loading: false,
@@ -89,4 +89,4 @@ const PackageReducer = (state = DefaultState, action) => {
 
 }
 
-export default PackageReducer;
+export default UserRewardReducer;

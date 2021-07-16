@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Input, Text } from 'react-native-elements';
+import { Input, Text } from 'react-native-elements';
 import {useDispatch} from "react-redux";
 import { useEffect, useRef, useState } from 'react';
 import _ from 'lodash';
@@ -7,7 +7,7 @@ import {AddData} from "../actions/UserAction";
 import { Dimensions, Picker, StyleSheet, View } from 'react-native';
 import SelectBox from 'react-native-multi-selectbox'
 import axios from 'axios'
-import { ScrollView } from 'react-native-gesture-handler';
+import { Button, Center, Image, ScrollView, VStack } from 'native-base';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -155,143 +155,156 @@ export default function UserCreateScreen({navigation, route}) {
   });
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.section}>
-        <SelectBox
-          label="Select type"
-          options={[
-            {
-                'item': 'Customer',
-                'id': '3'
-            }, 
-            {
-                'item': 'Admin',
-                'id': '2'
-            }
-        ]}
-          value={userType}
-          onChange={onTypeChange}
-          hideInputFilter={true}
-          optionsLabelStyle={{width: dimensions.screen.width}}
-        />
-      </View>
-      {userType.id == 3 ? 
-        <>
-          <Input
-            label='Customer ID'
-            value={user.customer_id}
-            onChangeText={(value) => setUser(prev => ({...prev, customer_id: value}))}
-            placeholder='Enter customer ID'
-            errorStyle={{ color: 'red' }}
-            errorMessage={customerIDError}
-          />
-          <Input
-            label='First name'
-            value={user.firstname}
-            onChangeText={(value) => setUser(prev => ({...prev, firstname: value}))}
-            placeholder='Enter first name'
-            errorStyle={{ color: 'red' }}
-            errorMessage={firstnameError}
-          />
-          <Input
-            label='Middle name'
-            value={user.middlename}
-            onChangeText={(value) => setUser(prev => ({...prev, middlename: value}))}
-            placeholder='Enter middle name'
-            errorStyle={{ color: 'red' }}
-            errorMessage={middlenameError}
-          />
-          <Input
-            label='Last name'
-            value={user.lastname}
-            onChangeText={(value) => setUser(prev => ({...prev, lastname: value}))}
-            placeholder='Enter last name'
-            errorStyle={{ color: 'red' }}
-            errorMessage={lastnameError}
-          />
-          <Input
-            label='Email'
-            value={user.email}
-            onChangeText={(value) => setUser(prev => ({...prev, email: value}))}
-            placeholder='Enter email address'
-            errorStyle={{ color: 'red' }}
-            errorMessage={emailError}
-          />
-          <Input
-            label='Phone number'
-            value={user.phone_number}
-            onChangeText={(value) => setUser(prev => ({...prev, phone_number: value}))}
-            placeholder='Enter phone number'
-            errorStyle={{ color: 'red' }}
-            errorMessage={phoneNumberError}
-          />
+    <Center flex={1} backgroundColor="white">
+      <Image style={{position: 'absolute', bottom: 0, opacity: 0.30}} w="100%" h={250} resizeMode="contain" source={require('../assets/images/car-bg.png')} alt="car background"/>
+      <ScrollView flex={1} w="100%" padding={2}>
+        <VStack space={1} marginBottom={10}>
           <View style={styles.section}>
             <SelectBox
               label="Select type"
-              options={packageOptions}
-              value={selectedPackage}
-              onChange={onPackageChange}
+              options={[
+                {
+                    'item': 'Customer',
+                    'id': '3'
+                }, 
+                {
+                    'item': 'Admin',
+                    'id': '2'
+                }
+            ]}
+              value={userType}
+              onChange={onTypeChange}
               hideInputFilter={true}
               optionsLabelStyle={{width: dimensions.screen.width}}
             />
           </View>
-          <View style={styles.section}>
-          <Text style={{color: 'red', fontSize: 12}}>{packageError}</Text>
-          </View>
-        </>
-      :
-        <>
-          <Input
-            label='First name'
-            value={user.firstname}
-            onChangeText={(value) => setUser(prev => ({...prev, firstname: value}))}
-            placeholder='Enter first name'
-            errorStyle={{ color: 'red' }}
-            errorMessage={firstnameError}
-          />
-          <Input
-            label='Middle name'
-            value={user.middlename}
-            onChangeText={(value) => setUser(prev => ({...prev, middlename: value}))}
-            placeholder='Enter middle name'
-            errorStyle={{ color: 'red' }}
-            errorMessage={middlenameError}
-          />
-          <Input
-            label='Last name'
-            value={user.lastname}
-            onChangeText={(value) => setUser(prev => ({...prev, lastname: value}))}
-            placeholder='Enter last name'
-            errorStyle={{ color: 'red' }}
-            errorMessage={lastnameError}
-          />
-          <Input
-            label='Email'
-            value={user.email}
-            onChangeText={(value) => setUser(prev => ({...prev, email: value}))}
-            placeholder='Enter email address'
-            errorStyle={{ color: 'red' }}
-            errorMessage={emailError}
-          />
-        </>
-      }
-      <View style={styles.section}>
-        <View style={{width: '50%', marginTop: 10}}>
-          <Button
-            title="Cancel"
-            buttonStyle={{backgroundColor: '#bdbdbd'}}
-            onPress={handleCancel}
-          />
-        </View>
-        <View style={{width: '50%', marginTop: 10}}>
-          <Button
-            title="Save"
-            onPress={handleEditSave}
-            loading={saving}
-          />
-        </View>
-      </View>
-    </ScrollView >
+          {userType.id == 3 ? 
+            <>
+              <Input
+                label='Customer ID'
+                value={user.customer_id}
+                onChangeText={(value) => setUser(prev => ({...prev, customer_id: value}))}
+                placeholder='Enter customer ID'
+                errorStyle={{ color: 'red' }}
+                errorMessage={customerIDError}
+              />
+              <Input
+                label='First name'
+                value={user.firstname}
+                onChangeText={(value) => setUser(prev => ({...prev, firstname: value}))}
+                placeholder='Enter first name'
+                errorStyle={{ color: 'red' }}
+                errorMessage={firstnameError}
+              />
+              <Input
+                label='Middle name'
+                value={user.middlename}
+                onChangeText={(value) => setUser(prev => ({...prev, middlename: value}))}
+                placeholder='Enter middle name'
+                errorStyle={{ color: 'red' }}
+                errorMessage={middlenameError}
+              />
+              <Input
+                label='Last name'
+                value={user.lastname}
+                onChangeText={(value) => setUser(prev => ({...prev, lastname: value}))}
+                placeholder='Enter last name'
+                errorStyle={{ color: 'red' }}
+                errorMessage={lastnameError}
+              />
+              <Input
+                label='Email'
+                value={user.email}
+                onChangeText={(value) => setUser(prev => ({...prev, email: value}))}
+                placeholder='Enter email address'
+                errorStyle={{ color: 'red' }}
+                errorMessage={emailError}
+              />
+              <Input
+                label='Phone number'
+                value={user.phone_number}
+                onChangeText={(value) => setUser(prev => ({...prev, phone_number: value}))}
+                placeholder='Enter phone number'
+                errorStyle={{ color: 'red' }}
+                errorMessage={phoneNumberError}
+              />
+              <View style={styles.section}>
+                <SelectBox
+                  label="Select type"
+                  options={packageOptions}
+                  value={selectedPackage}
+                  onChange={onPackageChange}
+                  hideInputFilter={true}
+                  optionsLabelStyle={{width: dimensions.screen.width}}
+                />
+              </View>
+              <View style={styles.section}>
+              <Text style={{color: 'red', fontSize: 12}}>{packageError}</Text>
+              </View>
+            </>
+          :
+            <>
+              <Input
+                label='First name'
+                value={user.firstname}
+                onChangeText={(value) => setUser(prev => ({...prev, firstname: value}))}
+                placeholder='Enter first name'
+                errorStyle={{ color: 'red' }}
+                errorMessage={firstnameError}
+              />
+              <Input
+                label='Middle name'
+                value={user.middlename}
+                onChangeText={(value) => setUser(prev => ({...prev, middlename: value}))}
+                placeholder='Enter middle name'
+                errorStyle={{ color: 'red' }}
+                errorMessage={middlenameError}
+              />
+              <Input
+                label='Last name'
+                value={user.lastname}
+                onChangeText={(value) => setUser(prev => ({...prev, lastname: value}))}
+                placeholder='Enter last name'
+                errorStyle={{ color: 'red' }}
+                errorMessage={lastnameError}
+              />
+              <Input
+                label='Email'
+                value={user.email}
+                onChangeText={(value) => setUser(prev => ({...prev, email: value}))}
+                placeholder='Enter email address'
+                errorStyle={{ color: 'red' }}
+                errorMessage={emailError}
+              />
+            </>
+          }
+          
+          <Button.Group
+            variant="solid"
+            isAttached
+            mx={{
+              base: "auto",
+              md: 0,
+            }}
+          >
+            <Button isLoading={saving} isLoadingText="Saving" w="45%" colorScheme="teal" mr="2%" 
+            onPress={handleEditSave}>
+              Save
+            </Button>
+            <Button
+              w="45%"
+              colorScheme="danger"
+              _text={{
+                color: "white",
+              }}
+              onPress={handleCancel}
+            >
+              Cancel
+            </Button>
+          </Button.Group>
+        </VStack>
+      </ScrollView>
+    </Center>
   )
 };
 

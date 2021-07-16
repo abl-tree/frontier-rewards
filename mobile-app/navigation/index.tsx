@@ -18,13 +18,16 @@ import LinkingConfiguration from './LinkingConfiguration';
 import { getAsyncStorage } from '../actions/UserAction';
 import axios from 'axios';
 import _ from 'lodash';
+import { NativeBaseProvider } from 'native-base';
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
     <NavigationContainer
       linking={LinkingConfiguration}
       theme={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <RootNavigator />
+        <NativeBaseProvider>
+          <RootNavigator />
+        </NativeBaseProvider>
     </NavigationContainer>
   );
 }

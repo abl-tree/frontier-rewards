@@ -1,23 +1,25 @@
 import * as React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { StackHeaderLeftButtonProps } from '@react-navigation/stack';
-import { Card, FAB, ListItem, SearchBar } from 'react-native-elements';
+import { Button, Card, FAB, Icon, ListItem, SearchBar } from 'react-native-elements';
 import {useDispatch, useSelector} from "react-redux";
 import MenuIcon from '../components/MenuIcon';
 import { useEffect, useState } from 'react';
 import _ from 'lodash';
-import { DeleteData, GetData } from "../actions/RewardAction";
+import { DeleteData, GetData } from "../actions/NotificationAction";
 import { ActivityIndicator, Alert, StyleSheet, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons"
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
 import axios from 'axios'
-import { Box, Button, Center, CheckIcon, Divider, Heading, HStack, Icon, Image, ScrollView, Select, Spinner, Text, useColorModeValue, VStack } from 'native-base';
+import moment from "moment-timezone";
+import { config } from '../constants/API';
+import { Box, Center, CheckIcon, Heading, HStack, Image, ScrollView, Select, Spinner, Text, useColorModeValue, VStack } from 'native-base';
 import {Collapse,CollapseHeader, CollapseBody, AccordionList} from 'accordion-collapse-react-native';
 
 const AdminScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const rewardList = useSelector(state => state.Reward);
+  const Notifications = useSelector(state => state.Notification);
   const [loading, setLoading] = React.useState(false);
 
   useEffect(() => {
@@ -30,11 +32,11 @@ const AdminScreen = () => {
   
   React.useLayoutEffect(() => {
 
-    fetchRewards()
+    fetchNotifications()
 
   }, [navigation])
   
-  const fetchRewards = async (url = '/rewards') => {
+  const fetchNotifications = async (url = '/rewards') => {
     if(url == null || loading) return
 
     setLoading(true)
@@ -52,17 +54,26 @@ const AdminScreen = () => {
 
   }
 
-  const editRow = (item) => {
+  const editRow = (rowMap, item) => {
+    let key = item.id
+    
+    if(rowMap[key]) {
+        rowMap[key].closeRow() 
+    }
+
     navigation.navigate('RewardEditScreen', { data: item })
   }
 
-  const deleteRow = (item) => {
+  const deleteRow = (rowMap, item) => {
+    let key = item.id
+
     Alert.alert(
       "Are you sure?",
       "This action cannot be undone.",
       [
         {
           text: "Cancel",
+          onPress: () => rowMap[key].closeRow(),
           style: "cancel"
         },
         { text: "OK", onPress: () => {
@@ -87,48 +98,15 @@ const AdminScreen = () => {
       const {data} = props      
 
       return (
-        <Box padding={3} style={[styles.rowFront, {minHeight: 100}]}>
-          <Box flex={1} marginBottom={3}>
-            <VStack space={1}>
-              <Text style={{fontWeight: 'bold', fontSize: 18}}>{data.item.name}</Text>
-              <Text style={{fontSize: 16}}>{data.item.description}</Text>
-              <Text style={{marginTop: 5, fontSize: 16, color: 'gray'}}>{data.item.type == 'points' ? parseFloat(data.item.value) : parseFloat(data.item.cost)} PTS</Text>
-              <Text style={{color: 'gray', fontSize: 16, textTransform: 'uppercase'}}>{data.item.type}</Text>
-            </VStack>
-          </Box>
-          <Divider my={2} />
-          <Box style={{height: 'auto', width: '100%', borderBottomLeftRadius: 5, borderBottomRightRadius: 5}}>
-            <Button.Group
-              w="100%"
-              variant="solid"
-              isAttached
-              // space={6}
-              mx={{
-                base: "auto",
-                md: 0,
-              }}
-            >
-              <Button 
-                startIcon={<Icon as={MaterialCommunityIcons} name="pencil-outline" size={5} />}
-                variant="ghost" 
-                size="sm" 
-                width={1/2*100+'%'} 
-                colorScheme="teal"
-                onPress={() => editRow(data.item)}>
-                Edit
-              </Button>
-              <Button
-                startIcon={<Icon as={MaterialCommunityIcons} name="delete-outline" size={5} />}
-                size="sm"
-                variant="ghost"
-                width={1/2*100+'%'}
-                colorScheme="danger"
-                onPress={() => deleteRow(data.item)}>
-                Delete
-              </Button>
-            </Button.Group>
-          </Box>
-        </Box>
+          <View style={styles.rowFront}>
+            <TouchableHighlight style={styles.rowFrontVisible}>
+                <View>
+                    {/* <Text style={styles.title} numberOfLines={1}>Name: {data.item.name}</Text>
+                    <Text style={styles.title} numberOfLines={1}>Description: {data.item.description}</Text>
+                    <Text style={styles.title} numberOfLines={1}>Type: {data.item.type}</Text> */}
+                </View>
+            </TouchableHighlight>
+          </View>
       )
   }
 
@@ -171,21 +149,25 @@ const AdminScreen = () => {
     navigation.navigate('RewardCreateScreen')
     
   }
+  
 
   return (
     <Center flex={1} backgroundColor="white">
       <Image style={{position: 'absolute', bottom: 0, opacity: 0.30}} w="100%" h={250} resizeMode="contain" source={require('../assets/images/car-bg.png')} alt="car background"/>
-      {rewardList.data.data ? <SwipeListView
-          style={{padding: 5, width: '100%'}}
+      {Notifications.data.data && false ? <SwipeListView
           keyExtractor={(item) => item.id.toString()}
-          data={rewardList.data.data}
+          data={Notifications.data.data}
           renderItem={renderItem}
+          renderHiddenItem={renderHiddenItem}
           leftOpenValue={75}
           rightOpenValue={-150}
           disableRightSwipe
           initialNumToRender={10}
           onEndReachedThreshold={0.5}
-          onEndReached={() => {fetchRewards(rewardList.data.next_page_url)}}
+          onEndReached={() => {fetchNotifications(Notifications.data.next_page_url)}}
+          // ListHeaderComponent={() => {
+          //   return <SearchBar placeholder="Type Here..." lightTheme round />;
+          // }}
           ListFooterComponent={() => {
             return (<View
                     style={{
@@ -196,40 +178,22 @@ const AdminScreen = () => {
                   >
                     {
                       loading ? <ActivityIndicator animating size="large" color="#0000ff" />
-                      : (rewardList.next == null ? <Text style={{color: 'black', textAlign: 'center'}}>End</Text> : null)
+                      : (Notifications.next == null ? <Text style={{color: 'black', textAlign: 'center'}}>End</Text> : null)
                     }
                     
                   </View>)
           }}
-          onRefresh={() => fetchRewards()}
-          refreshing={rewardList.loading}
-      /> : <Center flex={1}>
-        <HStack space={2}>
-          <Heading color={"gray.500"}>Loading</Heading>
-          <Spinner color={useColorModeValue("gray.500", "gray.100")} accessibilityLabel="Loading posts" />
-        </HStack></Center>
-      }
-      <FAB 
-        color="rgb(235, 164, 0)"
-        placement="right"
-        icon={
-          <Icon
-            as={MaterialCommunityIcons}
-            name="plus"
-            size={18}
-            color="white"
-          />
-        }
-        onPress={handleAddAction}
-      />
-    </Center>
+          onRefresh={() => fetchNotifications()}
+          refreshing={Notifications.loading}
+      /> : <Text>Loading...</Text>}
+    </Center >
   )
 }
 
 const CustomerScreen = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const rewardList = useSelector(state => state.Reward);
+  const Notifications = useSelector(state => state.Notification);
   const [loading, setLoading] = React.useState(false);
   const [filters, setFilters] = useState({
     show: 'all'
@@ -245,16 +209,16 @@ const CustomerScreen = () => {
   
   React.useLayoutEffect(() => {
 
-    fetchRewards('/rewards', filters)
+    fetchNotifications()
 
   }, [navigation])
   
-  const fetchRewards = async (url = '/rewards', params = {}) => {
+  const fetchNotifications = async (url = '/notifications') => {
     if(url == null || loading) return
 
     setLoading(true)
 
-    dispatch(GetData(url, params))
+    dispatch(GetData(url))
     .then(() => {
 
       setLoading(false)
@@ -265,7 +229,7 @@ const CustomerScreen = () => {
 
     })
 
-  }
+  }  
 
   const redeemRow = (item) => {
 
@@ -357,19 +321,58 @@ const CustomerScreen = () => {
     }
   }
 
-  const VisibleItem = props => {
-      const {data} = props     
+  const timezoneConvert = (time) => {
+      var userTz = moment.tz.guess(true);
+      var time = moment.tz(time, config.url.TIMEZONE);
 
+      return time.tz(userTz);
+  }
+
+  // Calculate the day diff
+  const getDayDiff = timestamp => {
+      let a = moment();
+      let b = moment(timestamp);
+      let diff = a.diff(b, 'year');
+      if (diff === 0) {
+          diff = a.diff(b, 'month');
+          if (diff === 0) {
+              diff = a.diff(b, 'days');
+              if (diff === 0) {
+                  diff = a.diff(b, 'hour');
+                  if (diff === 0) {
+                      diff = a.diff(b, 'minute');
+                      if (diff === 0) {
+                          diff = a.diff(b, 'second');
+                          return `${diff} second(s) ago`;
+                      } else {
+                          return `${diff} minute(s) ago`;
+                      }
+                  } else {
+                      return `${diff} hour(s) ago`;
+                  }
+              } else {
+                  return `${diff} days(s) ago`;
+              }
+          } else {
+              return `${diff} month(s) ago`;
+          }
+      } else {
+          return `${diff} year(s) ago`;
+      }
+  };
+
+  const VisibleItem = props => {
+      const {data} = props
+      const title = data.item.data.title;
+      let created = timezoneConvert(data.item.created_at);
+      created = getDayDiff(created);
+      
       return (
-        <Box marginBottom={3}>
-          <Box backgroundColor="white" margin={3} marginBottom={1} paddingLeft={6} paddingRight={6} paddingTop={3} paddingBottom={3} borderRadius={20} borderColor="black" borderWidth={1}>
-            <Text style={{fontSize: 25, textTransform: 'capitalize', fontWeight: 'bold'}} numberOfLines={1}>{data.item.name}</Text>
-            <Text style={{fontSize: 18, textTransform: 'capitalize'}} numberOfLines={1}>{data.item.description}</Text>
-          </Box>
-          <TouchableOpacity onPress={() => {redeemRow(data.item)}} disabled={data.item.type == 'points'} activeOpacity={0.8} style={{backgroundColor: 'black', width: '75%', alignSelf: 'center'}}>
-            {data.item.type == 'points' ? <Text style={{color: 'white', fontSize: 15, textAlign: 'center'}}>NOT REDEEMABLE</Text>
-            : <Text style={{color: 'white', fontSize: 15, textAlign: 'center'}}>REDEEM ({data.item.cost}) POINTS</Text>}
-          </TouchableOpacity>
+        <Box shadow={2} backgroundColor="white" margin={3} marginBottom={1} paddingLeft={6} paddingRight={6} paddingTop={3} paddingBottom={3} borderRadius={10}>
+          <VStack space={2}>
+            <Text fontSize="lg" style={{color: 'black', textTransform: 'capitalize', fontWeight: 'bold'}} numberOfLines={1}>{title}</Text>
+            <Text alignSelf="flex-end" fontSize="sm" style={{color: 'gray'}} numberOfLines={1}>{created}</Text>
+          </VStack>
         </Box>
       )
   }
@@ -411,45 +414,19 @@ const CustomerScreen = () => {
 
     setFilters(tmpFilter)
     
-    fetchRewards('/rewards', tmpFilter)
+    fetchNotifications('/rewards', tmpFilter)
 
   }
 
   return (
     <Center flex={1} backgroundColor="white">
       <Image style={{position: 'absolute', bottom: 0, opacity: 0.30}} w="100%" h="250" resizeMode="contain" source={require('../assets/images/car-bg.png')} alt="car background"/>
-      <Center shadow={2} borderRadius={20} backgroundColor="#f6f6f6" h="90%" w="80%" opacity={0.6} >
-      <Box backgroundColor="white" w="100%" p={4}>
-        <HStack style={{alignItems: 'center'}}>
-          <VStack w="30%">
-            <Text style={styles.title}>FILTER</Text>
-          </VStack>
-          <VStack w="70%">
-            <Select
-              selectedValue={filters.show}
-              w="100%"
-              accessibilityLabel="Select type"
-              placeholder="Select type"
-              onValueChange={(itemValue) => handleTypeChange(itemValue)}
-              _selectedItem={{
-                bg: "cyan.600",
-                endIcon: <CheckIcon size={4} />,
-              }}
-              style={{fontSize: 14, paddingLeft: 10}}
-              p={0}
-            >
-              <Select.Item label="All" value="all" />
-              <Select.Item label="Eligible" value="eligible" />
-            </Select>
-          </VStack>
-        </HStack>
-      </Box>
-      <Box flex={1}>
-        {rewardList.data.data ? <SwipeListView
+      {/* <Center shadow={2} borderRadius={20} backgroundColor="#f6f6f6" h="90%" w="80%" opacity={0.6} > */}
+      <Box flex={1} w="100%">
+        {Notifications.data.data ? <SwipeListView
             style={{padding: 5, width: '100%'}}
-            contentContainerStyle={{paddingLeft: 20, paddingRight: 20}}
             keyExtractor={(item) => item.id.toString()}
-            data={rewardList.data.data}
+            data={Notifications.data.data}
             renderItem={renderItem}
             // renderHiddenItem={renderHiddenItem}
             leftOpenValue={75}
@@ -458,10 +435,10 @@ const CustomerScreen = () => {
             disableLeftSwipe
             initialNumToRender={10}
             onEndReachedThreshold={0.5}
-            onEndReached={() => {fetchRewards(rewardList.data.next_page_url)}}
-            // ListHeaderComponent={() => {
-            //   return <SearchBar placeholder="Type Here..." lightTheme round />;
-            // }}
+            onEndReached={() => {fetchNotifications(Notifications.data.next_page_url)}}
+            ListEmptyComponent={() => {
+              return <Text style={{color: 'black', textAlign: 'center'}}>No notifications</Text>
+            }}
             ListFooterComponent={() => {
               return (<View
                       style={{
@@ -472,13 +449,13 @@ const CustomerScreen = () => {
                     >
                       {
                         loading ? <ActivityIndicator animating size="large" color="#0000ff" />
-                        : (rewardList.next == null ? <Text style={{color: 'black', textAlign: 'center'}}>End</Text> : null)
+                        : (Notifications.next == null ? <Text style={{color: 'black', textAlign: 'center'}}>End</Text> : null)
                       }
                       
                     </View>)
             }}
-            onRefresh={() => fetchRewards()}
-            refreshing={rewardList.loading}
+            onRefresh={() => fetchNotifications()}
+            refreshing={Notifications.loading}
           /> : <Center flex={1}>
           <HStack space={2}>
             <Heading color={"gray.500"}>Loading</Heading>
@@ -486,55 +463,17 @@ const CustomerScreen = () => {
           </HStack></Center>
         }
       </Box>
-      </Center>
+      {/* </Center> */}
     </Center>
   )
 
-  return (
-    <View style={styles.container}>
-      {rewardList.data.data ? <SwipeListView
-          keyExtractor={(item) => item.id.toString()}
-          data={rewardList.data.data}
-          renderItem={renderItem}
-          renderHiddenItem={renderHiddenItem}
-          leftOpenValue={75}
-          rightOpenValue={-75}
-          disableRightSwipe
-          initialNumToRender={10}
-          onEndReachedThreshold={0.5}
-          onEndReached={() => {fetchRewards(rewardList.data.next_page_url)}}
-          // ListHeaderComponent={() => {
-          //   return <SearchBar placeholder="Type Here..." lightTheme round />;
-          // }}
-          ListFooterComponent={() => {
-            return (<View
-                    style={{
-                      paddingVertical: 20,
-                      borderTopWidth: 1,
-                      borderColor: "#CED0CE"
-                    }}
-                  >
-                    {
-                      loading ? <ActivityIndicator animating size="large" color="#0000ff" />
-                      : (rewardList.next == null ? <Text style={{color: 'black', textAlign: 'center'}}>End</Text> : null)
-                    }
-                    
-                  </View>)
-          }}
-          onRefresh={() => fetchRewards()}
-          refreshing={rewardList.loading}
-      /> : <Text style={{color: 'black'}}>Loading...</Text>}
-    </View >
-  )
 }
 
-export default function RewardScreen() {
+export default function NotificationScreen() {
 
   const Auth = useSelector(state => state.Auth);
-
-  if(Auth.user.type == 1 || Auth.user.type == 2) {
-    return AdminScreen();
-  } else return CustomerScreen();
+  
+  return CustomerScreen();
 
 };
 
@@ -551,7 +490,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     height: 'auto',
     margin: 5,
-    marginBottom: 10,
+    marginBottom: 15,
     shadowColor: '#999',
     shadowOffset: {width: 0, height: 1},
     shadowOpacity: 0.8,
@@ -561,8 +500,9 @@ const styles = StyleSheet.create({
   rowFrontVisible: {
     backgroundColor: '#FFF',
     borderRadius: 5,
-    height: 70,
-    padding: 10
+    height: 60,
+    padding: 10,
+    marginBottom: 15,
   },
   rowBack: {
     alignItems: 'center',
@@ -572,7 +512,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingLeft: 15,
     margin: 5,
-    marginBottom: 10,
+    marginBottom: 15,
     borderRadius: 5,
   },
   backRightBtn: {

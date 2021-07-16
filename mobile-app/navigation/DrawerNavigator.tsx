@@ -9,7 +9,7 @@ import DatabaseScreen from '../screens/DatabaseScreen';
 import FileSystemScreen from '../screens/FileSystemScreen';
 import ClientsScreen from '../screens/ClientsScreen';
 import BottomTabNavigator from './BottomTabNavigator';
-import { DrawerParamList, ActionParamList, DatabaseParamList, FileSystemParamList, ClientsParamList, RewardParamList, PackageParamList, UserParamList, TransactionParamList } from '../types';
+import { DrawerParamList, ActionParamList, DatabaseParamList, FileSystemParamList, ClientsParamList, RewardParamList, PackageParamList, UserParamList, TransactionParamList, SettingParamList, NotificationParamList } from '../types';
 import RewardScreen from '../screens/RewardScreen';
 import RewardEditScreen from '../screens/RewardEditScreen';
 import RewardCreateScreen from '../screens/RewardCreateScreen';
@@ -24,58 +24,135 @@ import { useSelector } from 'react-redux';
 import TransactionScreen from '../screens/TransactionScreen';
 import TransactionEditScreen from '../screens/TransactionEditScreen';
 import ProfileScreen from '../screens/ProfileScreen';
+import {config} from '../constants/API';
+import { Image } from 'native-base';
+import SettingScreen from '../screens/SettingScreen';
+import NotificationScreen from '../screens/NotificationScreen';
+import { TouchableOpacity, View } from 'react-native';
+import PackageViewScreen from '../screens/PackageViewScreen';
+import UserViewScreen from '../screens/UserViewScreen';
 
 const Drawer = createDrawerNavigator<DrawerParamList>();
 
 export default function DrawerNavigator() {
+  const Auth = useSelector(state => state.Auth);
+
   return (
     <Drawer.Navigator
+      drawerStyle={{borderTopRightRadius: 30, borderBottomRightRadius: 30, backgroundColor: 'white'}}
       drawerContent={(props) => <CustomSidebarMenu {...props} />}
     >
       <Drawer.Screen
         name="Dashboard"
         component={BottomTabNavigator}
         options={{
-          title: 'Dashboard'
+          title: 'Dashboard',
+          drawerIcon: ({tintColor}) => (
+            <Image alt="Dashboard icon" w={6} h={6} resizeMode="contain" source={{uri: config.url.BASE_URL + '/icons/dashboard-icon.png'}} />
+          ),
         }}
       />
       <Drawer.Screen
         name="Action"
-        component={ActionNavigator}/>
+        component={ActionNavigator}
+        options={{
+          headerTitle: 'Action',
+          drawerIcon: ({tintColor}) => (
+            <Image alt="Action icon" w={6} h={6} resizeMode="contain" source={{uri: config.url.BASE_URL + '/icons/actions-icon.png'}} />
+          )
+        }}
+      />
       <Drawer.Screen
         name="Reward"
-        component={RewardNavigator}/>
+        component={RewardNavigator}
+        options={{
+          drawerIcon: ({tintColor}) => (
+            <Image alt="Reward icon" w={6} h={6} resizeMode="contain" source={{uri: config.url.BASE_URL + '/icons/reward-icon.png'}} />
+          )
+        }}
+      />
       <Drawer.Screen
         name="Package"
-        component={PackageNavigator}/>
-      <Drawer.Screen
+        component={PackageNavigator}
+        options={{
+          drawerIcon: ({tintColor}) => (
+            <Image alt="Package icon" w={6} h={6} resizeMode="contain" source={{uri: config.url.BASE_URL + '/icons/package-icon.png'}} />
+          )
+        }}
+      />
+      {(Auth.user.type == 1 || Auth.user.type == 2) && <Drawer.Screen
         name="User"
-        component={UserNavigator}/>
+        component={UserNavigator}
+        options={{
+          drawerIcon: ({tintColor}) => (
+            <Image alt="User icon" w={6} h={6} resizeMode="contain" source={{uri: config.url.BASE_URL + '/icons/profile-icon.png'}} />
+          )
+        }}
+      />}
       <Drawer.Screen
         name="Transaction"
-        component={TransactionNavigator}/>
-        <Drawer.Screen
-          name="Profile"
-          component={ProfileNavigator}/>
+        component={TransactionNavigator}
+        options={{
+          drawerIcon: ({tintColor}) => (
+            <Image alt="Transaction icon" w={6} h={6} resizeMode="contain" source={{uri: config.url.BASE_URL + '/icons/transaction-icon.png'}} />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="Profile"
+        component={ProfileNavigator}
+        options={{
+          drawerIcon: ({tintColor}) => (
+            <Image alt="Profile icon" w={6} h={6} resizeMode="contain" source={{uri: config.url.BASE_URL + '/icons/profile-icon.png'}} />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="Settings"
+        component={SettingNavigator}
+        options={{
+          drawerIcon: ({tintColor}) => (
+            <Image alt="Settings icon" w={6} h={6} resizeMode="contain" source={{uri: config.url.BASE_URL + '/icons/settings-icon.png'}} />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="Notifications"
+        component={NotificationNavigator}
+        options={{
+          drawerIcon: ({tintColor}) => (
+            <Image alt="Notification icon" w={6} h={6} resizeMode="contain" source={{uri: config.url.BASE_URL + '/icons/notification-icon.png'}} />
+          )
+        }}
+      />
     </Drawer.Navigator>
   );
 }
 
 const ActionStack = createStackNavigator<ActionParamList>();
 
-function ActionNavigator() {
+function ActionNavigator({navigation}) {
   return (
     <ActionStack.Navigator>
       <ActionStack.Screen
         name="ActionScreen"
+        options={{
+          title: 'Actions'
+        }}
         component={ActionScreen}
       />
       <ActionStack.Screen
         name="ActionEditScreen"
+        options={{
+          title: 'Update Action'
+        }}
         component={ActionEditScreen}
       />
       <ActionStack.Screen
         name="ActionCreateScreen"
+        options={{
+          title: 'Create Action'
+        }}
         component={ActionCreateScreen}
       />
     </ActionStack.Navigator>
@@ -93,14 +170,23 @@ function RewardNavigator() {
         <RewardStack.Screen
           name="RewardScreen"
           component={RewardScreen}
+          options={{
+            title: 'Rewards'
+          }}
         />
         <RewardStack.Screen
           name="RewardEditScreen"
           component={RewardEditScreen}
+          options={{
+            title: 'Update Reward'
+          }}
         />
         <RewardStack.Screen
           name="RewardCreateScreen"
           component={RewardCreateScreen}
+          options={{
+            title: 'Create Reward'
+          }}
         />
       </RewardStack.Navigator>
     )
@@ -110,6 +196,9 @@ function RewardNavigator() {
         <RewardStack.Screen
           name="RewardScreen"
           component={RewardScreen}
+          options={{
+            title: 'Rewards'
+          }}
         />
       </RewardStack.Navigator>
     )
@@ -124,14 +213,30 @@ function PackageNavigator() {
       <PackageStack.Screen
         name="PackageScreen"
         component={PackageScreen}
+        options={{
+          title: 'Packages'
+        }}
+      />
+      <PackageStack.Screen
+        name="PackageViewScreen"
+        component={PackageViewScreen}
+        options={{
+          title: 'View Package'
+        }}
       />
       <PackageStack.Screen
         name="PackageEditScreen"
         component={PackageEditScreen}
+        options={{
+          title: 'Update Package'
+        }}
       />
       <PackageStack.Screen
         name="PackageCreateScreen"
         component={PackageCreateScreen}
+        options={{
+          title: 'Create Package'
+        }}
       />
     </PackageStack.Navigator>
   )
@@ -145,14 +250,30 @@ function UserNavigator() {
       <UserStack.Screen
         name="UserScreen"
         component={UserScreen}
+        options={{
+          title: 'Users'
+        }}
+      />
+      <UserStack.Screen
+        name="UserViewScreen"
+        component={UserViewScreen}
+        options={{
+          title: 'View User'
+        }}
       />
       <UserStack.Screen
         name="UserEditScreen"
         component={UserEditScreen}
+        options={{
+          title: 'Update User'
+        }}
       />
       <UserStack.Screen
         name="UserCreateScreen"
         component={UserCreateScreen}
+        options={{
+          title: 'Create User'
+        }}
       />
     </UserStack.Navigator>
   )
@@ -169,10 +290,16 @@ function TransactionNavigator() {
         <TransactionStack.Screen
           name="TransactionScreen"
           component={TransactionScreen}
+          options={{
+            title: 'Transactions'
+          }}
         />
         <TransactionStack.Screen
           name="TransactionEditScreen"
           component={TransactionEditScreen}
+          options={{
+            title: 'Update Transaction'
+          }}
         />
       </TransactionStack.Navigator>
     )
@@ -182,6 +309,9 @@ function TransactionNavigator() {
         <TransactionStack.Screen
           name="TransactionScreen"
           component={TransactionScreen}
+          options={{
+            title: 'Transactions'
+          }}
         />
       </TransactionStack.Navigator>
     )
@@ -197,47 +327,47 @@ function ProfileNavigator() {
       <ProfileStack.Screen
         name="ProfileScreen"
         component={ProfileScreen}
+        options={{
+          title: 'Profile'
+        }}
       />
     </ProfileStack.Navigator>
   )
   
 }
 
-const DatabaseStack = createStackNavigator<DatabaseParamList>();
+const SettingStack = createStackNavigator<SettingParamList>();
 
-function DatabaseNavigator() {
+function SettingNavigator() {
+
   return (
-    <DatabaseStack.Navigator>
-      <DatabaseStack.Screen
-        name="DatabaseScreen"
-        component={DatabaseScreen}
+    <SettingStack.Navigator>
+      <SettingStack.Screen
+        name="SettingScreen"
+        component={SettingScreen}
+        options={{
+          title: 'Settings'
+        }}
       />
-    </DatabaseStack.Navigator>
+    </SettingStack.Navigator>
   )
+  
 }
 
-const FileSystemStack = createStackNavigator<FileSystemParamList>();
+const NotificationStack = createStackNavigator<NotificationParamList>();
 
-function FileSystemNavigator() {
+function NotificationNavigator() {
+
   return (
-    <FileSystemStack.Navigator>
-      <FileSystemStack.Screen
-        name="FileSystemScreen"
-        component={FileSystemScreen}
+    <NotificationStack.Navigator>
+      <NotificationStack.Screen
+        name="NotificationScreen"
+        component={NotificationScreen}
+        options={{
+          title: 'Notifications'
+        }}
       />
-    </FileSystemStack.Navigator>
+    </NotificationStack.Navigator>
   )
-}
-
-const ClientsStack = createStackNavigator<ClientsParamList>();
-
-function ClientsNavigator() {
-  return (
-    <ClientsStack.Navigator>
-      <ClientsStack.Screen
-        name="ClientsScreen"
-        component={ClientsScreen}
-      />
-    </ClientsStack.Navigator>
-  )
+  
 }

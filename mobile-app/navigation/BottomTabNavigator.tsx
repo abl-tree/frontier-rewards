@@ -16,6 +16,7 @@ import TabTwoScreen from '../screens/TabTwoScreen';
 import UserActionScreen from '../screens/UserActionScreen';
 import { BottomTabParamList, TabOneParamList, TabTwoParamList, TabThreeParamList, TabFourParamList } from '../types';
 import TabFourScreen from '../screens/TabFourScreen';
+import { Image, TouchableOpacity, View } from 'react-native';
 
 const BottomTab = createBottomTabNavigator<BottomTabParamList>();
 
@@ -23,37 +24,29 @@ export default function BottomTabNavigator() {
   const colorScheme = useColorScheme();
 
   return (
-    <BottomTab.Navigator>
+    <BottomTab.Navigator
+      tabBarOptions={{
+        labelPosition: 'beside-icon',
+        labelStyle: {
+          fontSize: 20,
+          textTransform: 'uppercase'
+        }
+      }}
+    >
       <BottomTab.Screen
         name="TabOne"
         component={TabOneNavigator}
         options={{
-          title: 'Dashboard',
-          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
+          title: 'Dashboard'
         }}
       />
       <BottomTab.Screen
         name="QrScannerTab"
         component={QrScannerTabNavigator}
         options={{
-          title: 'QR Scanner',
-          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
+          tabBarLabel: "QR",
         }}
       />
-      {/* <BottomTab.Screen
-        name="TabThree"
-        component={TabThreeNavigator}
-        options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
-        }}
-      /> */}
-      {/* <BottomTab.Screen
-        name="TabFour"
-        component={TabFourNavigator}
-        options={{
-          tabBarIcon: ({ color }) => <TabBarIcon name="ios-code" color={color} />,
-        }}
-      /> */}
     </BottomTab.Navigator>
   );
 }
@@ -68,14 +61,14 @@ function TabBarIcon(props: { name: React.ComponentProps<typeof Ionicons>['name']
 // https://reactnavigation.org/docs/tab-based-navigation#a-stack-navigator-for-each-tab
 const TabOneStack = createStackNavigator<TabOneParamList>();
 
-function TabOneNavigator() {
+function TabOneNavigator({navigation}) {  
   return (
     <TabOneStack.Navigator>
       <TabOneStack.Screen
         name="TabOneScreen"
         component={TabOneScreen}
         options={{ 
-          headerTitle: 'Dashboard'
+          headerTitle: 'Dashboard',
         }}
       />
     </TabOneStack.Navigator>
@@ -98,38 +91,5 @@ function QrScannerTabNavigator() {
         options={{ headerTitle: 'User Actions' }}
       />
     </TabTwoStack.Navigator>
-  );
-}
-
-// const TabThreeStack = createStackNavigator<TabThreeParamList>();
-
-// function TabThreeNavigator() {
-//   return (
-//     <TabThreeStack.Navigator>
-//       <TabThreeStack.Screen
-//         name="TabThreeScreen"
-//         component={TabThreeScreen}
-//         options={{ headerTitle: 'Tab Three Title' }}
-//       />
-//     </TabThreeStack.Navigator>
-//   );
-// }
-
-const TabFourStack = createStackNavigator<TabFourParamList>();
-
-function TabFourNavigator() {
-  return (
-    <TabFourStack.Navigator>
-      <TabFourStack.Screen
-        name="TabFourScreen"
-        component={TabFourScreen}
-        options={{ headerTitle: 'Tab Four Title' }}
-      />
-      <TabFourStack.Screen
-        name="TestScreen"
-        component={TabFourScreen}
-        options={{ headerTitle: 'Tab Five Title' }}
-      />
-    </TabFourStack.Navigator>
   );
 }

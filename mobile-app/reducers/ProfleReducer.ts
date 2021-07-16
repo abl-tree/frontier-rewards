@@ -4,24 +4,20 @@ const DefaultState = {
     errorMsg: ""
 }
 
-const PackageReducer = (state = DefaultState, action) => {
+const ProfileReducer = (state = DefaultState, action) => {
+
+    var stateData = state.data, newData
 
     switch (action.type) {
-        case "PACKAGE_REQUEST":
+        case "USER_PROFILE_REQUEST":
             return {
                 ...state,
                 loading: true
             }
             
-        case "PACKAGE_SUCCESS":
+        case "USER_PROFILE_FETCH":
 
             var stateData = action.payload;
-
-            if(stateData.current_page > 1 && state.data && state.data.data) {
-                var newData = [...state.data.data, ...action.payload.data];
-    
-                stateData.data = newData;
-            }
 
             return {
                 ...state,
@@ -30,53 +26,50 @@ const PackageReducer = (state = DefaultState, action) => {
                 errorMsg: ""
             }
             
-        case "PACKAGE_ADDED":
+        case "USER_ADD":
 
-            var newData = state.data;
-            var newPackages = [action.payload, ...state.data.data]
+            newData = [action.payload, ...state.data.data]
 
-            newData.data = newPackages;
+            stateData.data = newData;
 
             return {
                 ...state,
                 loading: false,
-                data: newData,
+                data: stateData,
                 errorMsg: ""
             }
             
-        case "PACKAGE_UPDATED":
+        case "USER_UPDATE":
 
-            var newData = state.data;
             var index = state.data.data.findIndex((item) => item.id === action.payload.id)
-            var newPackages = {
+            newData = {
                 ...state.data.data[index], 
                 ...action.payload
             }
 
-            newData.data[index] = newPackages;
+            stateData.data[index] = newData;
 
             return {
                 ...state,
                 loading: false,
-                data: newData,
+                data: stateData,
                 errorMsg: ""
             }
             
-        case "PACKAGE_DELETED":
+        case "USER_DELETE":
 
-            var newData = state.data;
-            var newPackages = state.data.data.filter((item) => item.id !== action.payload.id)
+            newData = state.data.data.filter((item) => item.id !== action.payload.id)
 
-            newData.data = newPackages;
+            stateData.data = newData;
 
             return {
                 ...state,
                 loading: false,
-                data: newData,
+                data: stateData,
                 errorMsg: ""
             }
             
-        case "PACKAGE_FAIL":
+        case "USER_PROFILE_FAIL":
             return {
                 ...state,
                 loading: false,
@@ -89,4 +82,4 @@ const PackageReducer = (state = DefaultState, action) => {
 
 }
 
-export default PackageReducer;
+export default ProfileReducer;

@@ -6,6 +6,7 @@ import axios from 'axios';
 import _ from 'lodash';
 import SelectBox from 'react-native-multi-selectbox'
 import { xorBy } from 'lodash'
+import { Box, Image, ScrollView, VStack } from 'native-base';
 
 const window = Dimensions.get("window");
 const screen = Dimensions.get("screen");
@@ -186,6 +187,58 @@ export default function UserActionScreen({navigation, route}) {
 
     return [...rewards, ...tmpSelected];
   }
+
+  return (
+    <Box flex={1} backgroundColor="white">
+      <Image style={{position: 'absolute', bottom: 0, opacity: 0.30}} w="100%" h={250} resizeMode="contain" source={require('../assets/images/car-bg.png')} alt="car background"/>
+      <ScrollView p={5} w="100%" h="100%" paddingBottom={5} backgroundColor="transparent">
+        <Box backgroundColor="white" shadow={5} p={5} paddingBottom={10} w="100%" borderRadius={20}>
+          <VStack>
+            <Text style={styles.title}>Name: {user.name}</Text>
+            <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+            <View style={styles.section}>
+              <SelectBox
+                label="Select campaign"
+                options={campaigns}
+                value={selectedCampaign}
+                onChange={onCampaignChange}
+                hideInputFilter={true}
+                optionsLabelStyle={{width: dimensions.screen.width}}
+              />
+            </View>
+            <View style={styles.section}>
+              <SelectBox
+                label="Select action"
+                options={actions}
+                value={selectedAction}
+                onChange={onActionChange}
+                hideInputFilter={true}
+                optionsLabelStyle={{width: dimensions.screen.width}}
+              />
+            </View>
+            <View style={styles.section}>
+              <SelectBox
+                label="Select rewards"
+                options={rewardOptions()}
+                selectedValues={selectedReward}
+                onMultiSelect={onRewardChange()}
+                onTapClose={onRewardChange()}
+                isMulti
+              />
+            </View>
+            {!_.isUndefined(data.campaign_id) && !_.isUndefined(data.action_id) && !_.isUndefined(data.rewards) ?
+              <Button
+                onPress={addAction}
+                title="Submit"
+                color="#841584"
+                accessibilityLabel="Add Action"
+              /> :  <Text></Text>
+            }
+          </VStack>
+        </Box>
+      </ScrollView>
+    </Box>
+  )
 
   return (
     <View style={styles.container}>

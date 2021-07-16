@@ -13,6 +13,8 @@ import Constants from 'expo-constants';
 import * as Notifications from 'expo-notifications';
 import { useRef, useState } from 'react';
 import { Platform } from 'react-native';
+import { Box, Center, NativeBaseProvider, Text } from 'native-base';
+import { NavigationContainer } from '@react-navigation/native';
 
 axios.defaults.baseURL = config.url.API_URL
 axios.defaults.headers = {
@@ -21,13 +23,13 @@ axios.defaults.headers = {
     "Content-Type": "application/json"
 }
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
+// Notifications.setNotificationHandler({
+//   handleNotification: async () => ({
+//     shouldShowAlert: true,
+//     shouldPlaySound: false,
+//     shouldSetBadge: false,
+//   }),
+// });
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -51,23 +53,23 @@ export default function App() {
 
     bootstrapAsync()
 
-    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+    // registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
 
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      setNotification(notification);
+    // notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+    //   setNotification(notification);
 
-      console.log('notif', notification);
+    //   console.log('notif', notification);
       
-    });
+    // });
 
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    });
+    // responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+    //   console.log(response);
+    // });
 
-    return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
-      Notifications.removeNotificationSubscription(responseListener.current);
-    };
+    // return () => {
+    //   Notifications.removeNotificationSubscription(notificationListener.current);
+    //   Notifications.removeNotificationSubscription(responseListener.current);
+    // };
 
   })
 
@@ -77,7 +79,13 @@ export default function App() {
     return (
       <Provider store={Store}>
         <Navigation colorScheme={colorScheme} />
-        <StatusBar />
+          {/* <StatusBar /> */}
+      </Provider>
+    );
+    return (
+      <Provider store={Store}>
+          <Navigation colorScheme={colorScheme} />
+          <StatusBar />
       </Provider>
     );
   }
@@ -121,11 +129,11 @@ async function registerForPushNotificationsAsync() {
     //   lightColor: '#FF231F7C',
     // }); 
 
-    Notifications.createChannelAndroidAsync('reminders', {
-      name: 'Reminders',
-      priority: 'max',
-      vibrate: [0, 100, 250, 250],
-    });
+    // Notifications.createChannelAndroidAsync('reminders', {
+    //   name: 'Reminders',
+    //   priority: 'max',
+    //   vibrate: [0, 100, 250, 250],
+    // });
   }
 
   return token;

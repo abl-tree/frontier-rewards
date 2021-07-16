@@ -6,8 +6,6 @@ import {
   SafeAreaView,
   View,
   StyleSheet,
-  Image,
-  Text,
   Linking,
 } from 'react-native';
 
@@ -18,6 +16,22 @@ import {
 } from '@react-navigation/drawer';
 import { Logout } from '../actions/UserAction';
 import { useDispatch } from 'react-redux';
+import {config} from '../constants/API';
+import {
+  NativeBaseProvider,
+  Button,
+  Box,
+  HamburgerIcon,
+  Image,
+  Pressable,
+  Heading,
+  VStack,
+  Text,
+  Center,
+  HStack,
+  Divider,
+  Icon
+} from 'native-base';
 
 const CustomSidebarMenu = (props) => {
   const BASE_PATH =
@@ -30,41 +44,29 @@ const CustomSidebarMenu = (props) => {
     dispatch(Logout())
     
   }
+  
 
   return (
     <SafeAreaView style={{flex: 1}}>
-      {/*Top Large Image */}
-      {/* <Image
-        source={{uri: BASE_PATH + proileImage}}
-        style={styles.sideMenuProfileIcon}
-      /> */}
-      <DrawerContentScrollView {...props}>
-        <DrawerItemList {...props} />
-        <DrawerItem
-          label="Logout"
-          onPress={() => onLogout()}
-        />
-        {/* <View style={styles.customItem}>
-          <Text
-            onPress={() => {
-              Linking.openURL('https://aboutreact.com/');
-            }}>
-            Rate Us
-          </Text>
+      <VStack>
+        <Center>
           <Image
-            source={{uri: BASE_PATH + 'star_filled.png'}}
-            style={styles.iconStyle}
+            size="sm"
+            w="70%"
+            alt="Logo"
+            resizeMode="contain"
+            source={{uri: config.url.BASE_URL + '/icons/logo.png'}}
           />
-        </View> */}
+        </Center>
+      </VStack>
+      <DrawerContentScrollView {...props} safeArea>
+        <DrawerItemList {...props} itemStyle={{width: '90%', alignSelf: 'center'}} labelStyle={{textTransform: 'uppercase', color: 'black'}} />
       </DrawerContentScrollView>
-      <Text
-        style={{
-          fontSize: 16,
-          textAlign: 'center',
-          color: 'grey'
-        }}>
-        www.pointsandperks.ca
-      </Text>
+      <DrawerItem
+        labelStyle={{color: 'black'}}
+        label="Logout"
+        onPress={() => onLogout()}
+      />
     </SafeAreaView>
   );
 };
@@ -72,8 +74,9 @@ const CustomSidebarMenu = (props) => {
 const styles = StyleSheet.create({
   sideMenuProfileIcon: {
     resizeMode: 'center',
-    width: 100,
-    height: 100,
+    width: 200,
+    height: 200,
+    backgroundColor: 'red',
     borderRadius: 100 / 2,
     alignSelf: 'center',
   },

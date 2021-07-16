@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { StackHeaderLeftButtonProps } from '@react-navigation/stack';
-import { Button, FAB, Icon, ListItem, SearchBar } from 'react-native-elements';
+import { FAB, ListItem, SearchBar } from 'react-native-elements';
 import {useDispatch, useSelector} from "react-redux";
 import MenuIcon from '../components/MenuIcon';
 import { useEffect } from 'react';
@@ -9,8 +9,8 @@ import _ from 'lodash';
 import { DeleteData, GetData } from "../actions/ActionAction";
 import { ActivityIndicator, Alert, StyleSheet, TouchableHighlight, TouchableOpacity, View } from 'react-native';
 import { SwipeListView } from 'react-native-swipe-list-view';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
-import { Box, Center, Heading, HStack, Image, Spinner, Text, useColorModeValue } from 'native-base';
+import { MaterialCommunityIcons, Ionicons } from "@expo/vector-icons"
+import { Box, Button, Center, Divider, Heading, HStack, Icon, Image, Spinner, Text, useColorModeValue, VStack } from 'native-base';
 
 const AdminScreen = () => {
   const navigation = useNavigation();
@@ -50,26 +50,19 @@ const AdminScreen = () => {
 
   }
 
-  const editRow = (rowMap, item) => {
-    let key = item.id
-    
-    if(rowMap[key]) {
-        rowMap[key].closeRow() 
-    }
+  const editRow = (item) => {
 
     navigation.navigate('ActionEditScreen', { data: item })
+
   }
 
-  const deleteRow = (rowMap, item) => {
-    let key = item.id
-
+  const deleteRow = (item) => {
     Alert.alert(
       "Are you sure?",
       "This action cannot be undone.",
       [
         {
           text: "Cancel",
-          onPress: () => rowMap[key].closeRow(),
           style: "cancel"
         },
         { text: "OK", onPress: () => {
@@ -94,14 +87,46 @@ const AdminScreen = () => {
       const {data} = props
 
       return (
-          <View style={styles.rowFront}>
-            <TouchableHighlight style={styles.rowFrontVisible}>
-                <View>
-                    <Text style={styles.title} numberOfLines={1}>{data.item.name}</Text>
-                    <Text style={styles.title} numberOfLines={1}>{data.item.description}</Text>
-                </View>
-            </TouchableHighlight>
-          </View>
+        <Box padding={3} style={[styles.rowFront, {minHeight: 100}]}>
+          <Box flex={1} marginBottom={3}>
+            <VStack space={1}>
+              <Text style={{fontWeight: 'bold', fontSize: 18}}>{data.item.name}</Text>
+              <Text style={{fontSize: 16}}>{data.item.description}</Text>
+            </VStack>
+          </Box>
+          <Divider my={2} />
+          <Box style={{height: 'auto', width: '100%', borderBottomLeftRadius: 5, borderBottomRightRadius: 5}}>
+            <Button.Group
+              w="100%"
+              variant="solid"
+              isAttached
+              // space={6}
+              mx={{
+                base: "auto",
+                md: 0,
+              }}
+            >
+              <Button 
+                startIcon={<Icon as={MaterialCommunityIcons} name="pencil-outline" size={5} />}
+                variant="ghost" 
+                size="sm" 
+                width={1/2*100+'%'} 
+                colorScheme="teal"
+                onPress={() => editRow(data.item)}>
+                Edit
+              </Button>
+              <Button
+                startIcon={<Icon as={MaterialCommunityIcons} name="delete-outline" size={5} />}
+                size="sm"
+                variant="ghost"
+                width={1/2*100+'%'}
+                colorScheme="danger"
+                onPress={() => deleteRow(data.item)}>
+                Delete
+              </Button>
+            </Button.Group>
+          </Box>
+        </Box>
       )
   }
 
@@ -154,16 +179,13 @@ const AdminScreen = () => {
           style={{padding: 5, width: '100%'}}
           data={actionList.data.data}
           renderItem={renderItem}
-          renderHiddenItem={renderHiddenItem}
+          // renderHiddenItem={renderHiddenItem}
           leftOpenValue={75}
           rightOpenValue={-150}
           disableRightSwipe
           initialNumToRender={10}
           onEndReachedThreshold={0.5}
           onEndReached={() => {fetchActions(actionList.data.next_page_url)}}
-          // ListHeaderComponent={() => {
-          //   return <SearchBar placeholder="Type Here..." lightTheme round />;
-          // }}
           ListFooterComponent={() => {
             return (<View
                     style={{
@@ -193,8 +215,9 @@ const AdminScreen = () => {
         placement="right"
         icon={
           <Icon
-            name="add"
-            size={15}
+            as={MaterialCommunityIcons}
+            name="plus"
+            size={18}
             color="white"
           />
         }
@@ -393,7 +416,7 @@ const styles = StyleSheet.create({
   rowFront: {
     backgroundColor: '#FFF',
     borderRadius: 5,
-    height: 60,
+    height: 'auto',
     margin: 5,
     marginBottom: 15,
     shadowColor: '#999',

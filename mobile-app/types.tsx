@@ -66,14 +66,16 @@ export type RewardParamList = {
 
 export type PackageParamList = {
   PackageScreen: undefined;
+  PackageViewEdit: undefined;
   PackageScreenEdit: undefined;
   PackageCreateEdit: undefined;
 };
 
 export type UserParamList = {
   UserScreen: undefined;
-  UserScreenEdit: undefined;
-  UserCreateEdit: undefined;
+  UserViewScreen: undefined;
+  UserEditScreen: undefined;
+  UserCreateScreen: undefined;
 };
 
 export type TransactionParamList = {
@@ -85,16 +87,12 @@ export type ProfileParamList = {
   ProfileScreen: undefined;
 };
 
-export type DatabaseParamList = {
-  DatabaseScreen: undefined;
+export type SettingParamList = {
+  SettingScreen: undefined;
 };
 
-export type FileSystemParamList = {
-  FileSystemScreen: undefined;
-};
-
-export type ClientsParamList = {
-  ClientsScreen: undefined;
+export type NotificationParamList = {
+  NotificationScreen: undefined;
 };
 
 export type onPressFunc = (event: GestureResponderEvent) => void;
