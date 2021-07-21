@@ -6,11 +6,14 @@ import RootReducer from "./reducers/RootReducer";
 
 const myLogger = (store) => next => action => {
 
+    let result = next(action)
+
     // console.log("middleware run", store.getState());
-    return next(action);
+
+    return result;
 
 }
 
-const Store = createStore(RootReducer, composeWithDevTools(applyMiddleware(myLogger, thunk)));
+const Store = createStore(RootReducer, {}, composeWithDevTools(applyMiddleware(myLogger, thunk)));
 
 export default Store
