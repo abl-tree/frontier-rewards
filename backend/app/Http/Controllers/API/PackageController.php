@@ -22,7 +22,7 @@ class PackageController extends BaseController
     {
         $input = $request->all();
 
-        if(@$input['search']) $packages = Package::with('rewards.reward')->whereRaw("MATCH(`name`) AGAINST(? IN BOOLEAN MODE)", array($input['search']))->latest()->paginate(10)->withQueryString();
+        if(@$input['search']) $packages = Package::with('rewards.reward')->search($input['search'])->paginate(10)->withQueryString();
         else $packages = Package::with('rewards.reward')->latest()->paginate(10)->withQueryString();
         
         return $this->sendResponse($packages, 'Packages retrieved successfully.');
@@ -51,7 +51,7 @@ class PackageController extends BaseController
         $validator = Validator::make($input, [
             'name' => 'required',
             'description' => 'required',
-            'multiplier' => 'required|numeric',
+            'multiplier' => 'required|numeric|min:0',
             'rewards.*.value' => 'numeric|exists:rewards,id'
         ]);
    
@@ -115,7 +115,7 @@ class PackageController extends BaseController
         $validator = Validator::make($input, [
             'name' => 'required',
             'description' => 'required',
-            'multiplier' => 'required|numeric',
+            'multiplier' => 'required|numeric|min:0',
             'rewards.*.value' => 'numeric|exists:rewards,id'
         ]);
    

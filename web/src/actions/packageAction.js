@@ -18,7 +18,7 @@ export const GetPackages = (props, url = '/packages') => async dispatch => {
 
         dispatch({
             type: "PACKAGE_FAIL",
-            payload: error.response.data.data
+            payload: error.response.data
         })
         
     }
@@ -44,7 +44,7 @@ export const AddPackage = (props, data) => async dispatch => {
 
         dispatch({
             type: "PACKAGE_FAIL",
-            payload: error.response.data.data
+            payload: error.response.data
         })
 
         return Promise.reject(error);
@@ -72,7 +72,7 @@ export const EditPackage = (props, data) => async dispatch => {
 
         dispatch({
             type: "PACKAGE_FAIL",
-            payload: error.response.data.data
+            payload: error.response.data
         })
 
         return Promise.reject(error);
@@ -98,7 +98,7 @@ export const DeletePackage = (props, id) => async dispatch => {
 
         dispatch({
             type: "PACKAGE_FAIL",
-            payload: error.response.data.data
+            payload: error.response.data
         })
         
     }

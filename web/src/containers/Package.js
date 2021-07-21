@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Button, ButtonGroup, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
-import _ from "lodash";
+import { Button, ButtonGroup, Col, Form, Modal, Pagination, Row, Spinner, Table } from 'react-bootstrap';
+import _, { map } from "lodash";
 import axios from "axios";
 import {AddPackage, DeletePackage, EditPackage, GetPackages} from "../actions/packageAction";
 import AsyncSelect from 'react-select/async';
@@ -16,7 +16,9 @@ const Package = (props) => {
     const [validated, setValidated] = useState(false);
     const [data, setData] = useState({});
     const [reward, setReward] = useState({});
-    const fields = [
+    const [errors, setErrors] = useState({})
+    const [saving, setSaving] = useState(false)
+    const [fields, setFields] = useState([
         {
             'key': 'id',
             'title': 'Name',
@@ -29,31 +31,33 @@ const Package = (props) => {
             'key': 'name',
             'title': 'Name',
             'type': 'text',
+            'isInvalid': false,
             'placeholder': 'Enter package name',
             'control_id': 'formPackageName',
-            'errorMsg': 'Please provide package name.',
-            'required': true
+            'errorMsg': ['The name field is required.'],
+            'required': false
         },
         {
             'key': 'description',
             'title': 'Description',
             'type': 'text',
+            'isInvalid': false,
             'placeholder': 'Enter package description',
             'control_id': 'formPackageDescription',
-            'errorMsg': 'Please provide package description.',
-            'required': true
+            'errorMsg': ['The description field is required.'],
+            'required': false
         },
         {
             'key': 'multiplier',
             'title': 'Multiplier',
-            'type': 'number',
+            'type': 'text',
+            'isInvalid': false,
             'placeholder': 'Enter package multiplier',
             'control_id': 'formPackageMultiplier',
-            'errorMsg': 'Please provide package multiplier.',
-            'min': 0,
-            'required': true
+            'errorMsg': ['The multiplier field is required.'],
+            'required': false
         }
-    ];
+    ])
 
     const productName = props.match.params.product;
 
@@ -68,6 +72,8 @@ const Package = (props) => {
 
     }
     const handleEditShow = (packageData) => {
+
+        clearFieldErrors()
 
         packageData.rewards.map((reward, i) => {
             reward['value'] = reward.reward_id
@@ -87,10 +93,42 @@ const Package = (props) => {
 
     const fetchData = (url = '/packages') => {
 
-        console.log(process.env.NODE_ENV);
-
         dispatch(GetPackages(props, url));
 
+    }
+
+    const clearFieldErrors = () => {
+        let tmpFields = fields;
+
+        setValidated(false)
+
+        tmpFields = tmpFields.map((item, i) => {
+            return ({...item, isInvalid: false})
+        })
+
+        setFields(tmpFields)
+
+        return tmpFields
+    }
+
+    const fieldErrors = (tmpFields, errorData) => {
+        for (const key in errorData) {
+
+            if (Object.hasOwnProperty.call(errorData, key)) {
+
+                const fieldError = errorData[key];
+                var index = fields.findIndex((item) => item.key === key)
+
+                tmpFields[index]['errorMsg'] = fieldError
+                tmpFields[index]['isInvalid'] = true
+                
+            }
+            
+        }
+
+        setFields(tmpFields)
+
+        setValidated(true)
     }
 
     const addPackage = (e) => {
@@ -99,8 +137,9 @@ const Package = (props) => {
         e.stopPropagation();
 
         const form = e.currentTarget;
+        const tmpFields = clearFieldErrors();
 
-        setValidated(true);
+        setSaving(true)
 
         if(form.checkValidity() !== false) {
 
@@ -108,11 +147,19 @@ const Package = (props) => {
                 dispatch(EditPackage(props, data))
                 .then(() => {
                     setShow(false)
+                    setSaving(false)
 
                     toast.success("Package updated successfully", {
                         position: toast.POSITION.BOTTOM_RIGHT
                     });
                 }).catch((error) => {
+                    setSaving(false)
+
+                    if(typeof error.response.data.data != undefined) {
+                        var errorData = error.response.data.data
+
+                        fieldErrors(tmpFields, errorData)
+                    }
         
                     toast.error(error.response.data.message, {
                         position: toast.POSITION.BOTTOM_RIGHT
@@ -124,11 +171,19 @@ const Package = (props) => {
                 dispatch(AddPackage(props, data))
                 .then(() => {
                     setShow(false)
+                    setSaving(false)
 
                     toast.success("Package added successfully", {
                         position: toast.POSITION.BOTTOM_RIGHT
                     });
                 }).catch((error) => {
+                    setSaving(false)
+
+                    if(typeof error.response.data.data != undefined) {
+                        var errorData = error.response.data.data
+
+                        fieldErrors(tmpFields, errorData)
+                    }
         
                     toast.error(error.response.data.message, {
                         position: toast.POSITION.BOTTOM_RIGHT
@@ -141,9 +196,21 @@ const Package = (props) => {
 
     }
 
-    const fetchRewards = async () => {
+    let cancelTokenSource;
+    const fetchRewards = async (search) => {
 
-        const res = await axios.get('/rewards')
+        if(typeof cancelTokenSource != typeof undefined) {
+            cancelTokenSource.cancel("Operation canceled due to new request.")
+        }
+
+        cancelTokenSource = axios.CancelToken.source();
+
+        const res = await axios.get('/rewards', {
+            cancelToken: cancelTokenSource.token,
+            params: {
+                search: search
+            }
+        })
 
         var results = res.data.data
 
@@ -225,51 +292,49 @@ const Package = (props) => {
 
     }
 
-    const showTmp = () => {
-        console.log(data);
-    }
-
     return (
         <>
-            {showTmp()}
             <Row>
                 <Col md={12}>
                     <Button variant="primary" onClick={handleShow}>
-                        Add Package
+                        Add Packages
                     </Button>
                 </Col>
         
                 <Modal show={show} onHide={handleClose}>
                     <Form noValidate validated={validated} onSubmit={addPackage}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Add Package</Modal.Title>
+                            <Modal.Title>{data.id ? 'Update Package' : 'Add Packages'}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             {fields.map((field, i) => {
                                 return <Form.Group hidden={field.hidden} key={i} as={Row} controlId={field.control_id}>
                                     <Form.Label column sm={3}>{field.title}</Form.Label>
                                     <Col sm={9}>
-                                        {field.type == 'number' ?                                        
+                                        {field.type === 'number' ?                                        
                                             <Form.Control 
                                                 required={field.required}
+                                                isInvalid={field.isInvalid}
                                                 type={field.type} 
-                                                min={field.min} 
                                                 placeholder={field.placeholder}
                                                 value={data[field.key]}
-                                                onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
+                                                min={field.min}
+                                                onChange={ (e) => setData(prev => ({...prev, [field.key] : parseFloat(e.target.value)})) }
                                             />
                                         :
                                             <Form.Control 
                                                 required={field.required}
+                                                isInvalid={field.isInvalid}
                                                 type={field.type} 
                                                 placeholder={field.placeholder}
                                                 value={data[field.key]}
                                                 onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }
                                             />
                                         }
-                                        <Form.Control.Feedback type="invalid">
+                                        
+                                        {field.isInvalid && <Form.Control.Feedback type="invalid">
                                           {field.errorMsg}
-                                        </Form.Control.Feedback>
+                                        </Form.Control.Feedback>}
                                     </Col>
                                 </Form.Group>
                             })}
@@ -280,7 +345,12 @@ const Package = (props) => {
                             Close
                             </Button>
                             <Button variant="primary" type="submit">
-                            Save Changes
+                                {saving && <Spinner 
+                                as="span"
+                                animation="border" 
+                                size="sm"
+                                role="status"
+                                aria-hidden="true" />} Save Changes
                             </Button>
                         </Modal.Footer>
                     </Form>
