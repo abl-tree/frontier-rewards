@@ -25,7 +25,7 @@ const RewardReducer = (state = DefaultState, action) => {
         case "REWARD_ADD":
 
             var stateData = state.data
-            var newData = [...state.data.data, action.payload]
+            var newData = [action.payload, ...state.data.data]
 
             stateData.data = newData;
 

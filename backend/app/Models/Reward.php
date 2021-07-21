@@ -4,10 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Nicolaslopezj\Searchable\SearchableTrait;
 
 class Reward extends Model
 {
-    use HasFactory;
+    use HasFactory, SearchableTrait;
+
+    protected $searchable = [
+        'columns' => [
+            'rewards.name'  => 10,
+            'rewards.description'  => 10,
+        ]
+    ];
     
     protected $fillable = [
         'name', 'description', 'type', 'value', 'cost'
@@ -15,6 +23,28 @@ class Reward extends Model
 
     protected $casts = [
         'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s',
+        'updated_at' => 'datetime:Y-m-d H:i:s'
     ];
+
+    public function setValueAttribute($value)
+    {
+        $value = ($this->attributes['type'] == 'points' || $this->attributes['type'] == 'discount') ? $value : 0;
+        $this->attributes['value'] = 10;
+    }
+
+    public function getValueAttribute($value)
+    {
+        return is_null($value) ? 0 : $value;
+    }
+
+    public function setCostAttribute($value)
+    {
+        $value = ($this->attributes['type'] != 'points') ? $value : 0;
+        $this->attributes['cost'] = $value;
+    }
+
+    public function getCostAttribute($value)
+    {
+        return is_null($value) ? 0 : $value;
+    }
 }

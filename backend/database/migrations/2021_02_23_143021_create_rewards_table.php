@@ -17,7 +17,7 @@ class CreateRewardsTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
-            $table->enum('type', ['item', 'discound', 'points']);
+            $table->enum('type', ['item', 'discount', 'points']);
             $table->timestamps();
         });
     }

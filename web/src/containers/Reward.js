@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Spinner, Table } from 'react-bootstrap';
 import _ from "lodash";
 import {AddData, DeleteData, EditData, GetData} from "../actions/rewardAction";
 import axios from "axios";
@@ -15,7 +15,9 @@ const AdminReward = (props) => {
     const dataList = useSelector(state => state.Reward);
     const [validated, setValidated] = useState(false);
     const [data, setData] = useState({});
-    const fields = [
+    const [saving, setSaving] = useState(false)
+    const [deleting, setDeleting] = useState(false)
+    const [fields, setFields] = useState([
         {
             'key': 'id',
             'title': 'Name',
@@ -29,7 +31,7 @@ const AdminReward = (props) => {
             'title': 'Type',
             'type': 'select',
             'placeholder': 'Enter action type',
-            'errorMsg': 'Please select type.',
+            'errorMsg': ['Please select type.'],
             'options': [
                 {
                     'label': 'Item',
@@ -44,8 +46,7 @@ const AdminReward = (props) => {
                     'key': 'points'
                 }
             ],
-            'control_id': 'formActionType',
-            'required': true
+            'control_id': 'formActionType'
         },
         {
             'key': 'value',
@@ -53,9 +54,8 @@ const AdminReward = (props) => {
             'type': 'number',
             'min': 0,
             'placeholder': 'Enter reward value',
-            'errorMsg': 'Please provide reward value.',
-            'control_id': 'formValue',
-            'required': true
+            'errorMsg': ['Please provide reward value.'],
+            'control_id': 'formValue'
         },
         {
             'key': 'cost',
@@ -63,46 +63,43 @@ const AdminReward = (props) => {
             'type': 'number',
             'min': 0,
             'placeholder': 'Enter reward cost',
-            'errorMsg': 'Please provide reward cost.',
-            'control_id': 'formCost',
-            'required': true
+            'errorMsg': ['Please provide reward cost.'],
+            'control_id': 'formCost'
         },
         {
             'key': 'name',
             'title': 'Name',
             'type': 'text',
             'placeholder': 'Enter reward name',
-            'errorMsg': 'Please provide reward name.',
-            'control_id': 'formActionName',
-            'required': true
+            'errorMsg': ['Please provide reward name.'],
+            'control_id': 'formActionName'
         },
         {
             'key': 'description',
             'title': 'Description',
             'type': 'text',
             'placeholder': 'Enter reward description',
-            'errorMsg': 'Please provide reward description.',
-            'control_id': 'formActionDescription',
-            'required': true
+            'errorMsg': ['Please provide reward description.'],
+            'control_id': 'formActionDescription'
         }
-    ];
+    ])
 
     const [show, setShow] = useState(false);
   
     const handleClose = () => setShow(false);
     const handleShow = () => {
 
+        clearFieldErrors()
         setData({
             'type': 'item'
         })
-
         setShow(true);
 
     }
     const handleEditShow = (val) => {
 
+        clearFieldErrors()
         setData(val)
-
         setShow(true);
 
     }
@@ -117,14 +114,51 @@ const AdminReward = (props) => {
 
     }
 
+    const clearFieldErrors = () => {
+        let tmpFields = fields;
+
+        setValidated(false)
+
+        tmpFields = tmpFields.map((item, i) => {
+            return ({...item, isInvalid: false})
+        })
+
+        setFields(tmpFields)
+
+        return tmpFields
+    }
+
+    const fieldErrors = (tmpFields, errorData) => {
+        for (const key in errorData) {
+
+            if (Object.hasOwnProperty.call(errorData, key)) {
+
+                const fieldError = errorData[key];
+                var index = fields.findIndex((item) => item.key === key)
+
+                tmpFields[index]['errorMsg'] = fieldError
+                tmpFields[index]['isInvalid'] = true
+                
+            }
+            
+        }
+
+        setFields(tmpFields)
+
+        console.log(tmpFields);
+
+        setValidated(true)
+    }
+
     const handleSubmit = (e) => {
 
         e.preventDefault();
         e.stopPropagation();
 
         const form = e.currentTarget;
+        const tmpFields = clearFieldErrors()
 
-        setValidated(true);
+        setSaving(true);
 
         if(form.checkValidity() !== false) {
 
@@ -132,12 +166,20 @@ const AdminReward = (props) => {
                 dispatch(EditData(props, data))
                 .then(() => {
                     setShow(false)
+                    setSaving(false)
 
                     toast.success("Reward edited successfully", {
                         position: toast.POSITION.BOTTOM_RIGHT
                     });
                 })
                 .catch(error => {
+                    setSaving(false)
+
+                    if(typeof error.response.data.data != undefined) {
+                        var errorData = error.response.data.data
+
+                        fieldErrors(tmpFields, errorData)
+                    }
         
                     toast.error(error.response.data.message, {
                         position: toast.POSITION.BOTTOM_RIGHT
@@ -149,12 +191,20 @@ const AdminReward = (props) => {
                 dispatch(AddData(props, data))
                 .then(() => {
                     setShow(false)
+                    setSaving(false)
 
-                    toast.success("Reward added successfully", {
+                    toast.success("Reward has been added successfully", {
                         position: toast.POSITION.BOTTOM_RIGHT
                     });
                 })
                 .catch((error) => {
+                    setSaving(false)
+
+                    if(typeof error.response.data.data != undefined) {
+                        var errorData = error.response.data.data
+
+                        fieldErrors(tmpFields, errorData)
+                    }
         
                     toast.error(error.response.data.message, {
                         position: toast.POSITION.BOTTOM_RIGHT
@@ -169,7 +219,24 @@ const AdminReward = (props) => {
 
     const handleDelete = id => {
     
+        // setDeleting(true)
+
         dispatch(DeleteData(props, id))
+        .then(() => {
+            setDeleting(false)
+
+            toast.success("Reward has been deleted successfully", {
+                position: toast.POSITION.BOTTOM_RIGHT
+            });
+        })
+        .catch((error) => {
+            setDeleting(false)
+
+            toast.error(error.response.data.message, {
+                position: toast.POSITION.BOTTOM_RIGHT
+            });
+
+        })
 
     }
     const showPagination = () => {
@@ -197,11 +264,13 @@ const AdminReward = (props) => {
                     <td>{el.name}</td>
                     <td>{el.description}</td>
                     <td>{el.type}</td>
+                    <td>{parseFloat(el.value)}</td>
+                    <td>{parseFloat(el.cost)}</td>
                     <td>{timezoneConvert(el.created_at)}</td>
                     <td>{timezoneConvert(el.updated_at)}</td>
                     <td>
                         <ButtonGroup size="sm">
-                            <Button variant="danger" onClick={() => {handleDelete(el.id)}}>Delete</Button>
+                            <Button variant="danger" onClick={() => {handleDelete(el.id)}}>{deleting ? 'Deleting...' : 'Delete'}</Button>
                             <Button onClick={e => handleEditShow(el)}>Edit</Button>
                         </ButtonGroup>
                     </td>
@@ -238,7 +307,7 @@ const AdminReward = (props) => {
                 <Modal show={show} onHide={handleClose}>
                     <Form noValidate validated={validated} onSubmit={handleSubmit}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Add Reward</Modal.Title>
+                            <Modal.Title>{data.id ? 'Update Reward' : 'Add Reward'}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             {fields.map((field, i) => {
@@ -248,6 +317,7 @@ const AdminReward = (props) => {
                                         <Col sm={9}>
                                             <Form.Control 
                                                 required={field.required}
+                                                isInvalid={field.isInvalid}
                                                 type={field.type} 
                                                 placeholder={field.placeholder}
                                                 value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
@@ -260,10 +330,11 @@ const AdminReward = (props) => {
                                     </Form.Group>
                                 } else if(field.type === 'number' && field.key != 'cost' && data.type != 'item') {
                                     return <Form.Group hidden={field.hidden} key={i} as={Row} controlId={field.control_id}>
-                                        <Form.Label column sm={3}>{field.title}</Form.Label>
+                                        <Form.Label column sm={3}>{data.type == 'discount' ? 'Percentage' : 'Points'}</Form.Label>
                                         <Col sm={9}>
                                             <Form.Control 
                                                 required={field.required}
+                                                isInvalid={field.isInvalid}
                                                 type={field.type} 
                                                 placeholder={field.placeholder}
                                                 value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
@@ -275,12 +346,13 @@ const AdminReward = (props) => {
                                             </Form.Control.Feedback>
                                         </Col>
                                     </Form.Group>
-                                } else if(field.type === 'number' && field.key === 'cost' && data.type == 'item') {
+                                } else if(field.type === 'number' && field.key === 'cost' && (data.type == 'item' || data.type == 'discount')) {
                                     return <Form.Group hidden={field.hidden} key={i} as={Row} controlId={field.control_id}>
                                         <Form.Label column sm={3}>{field.title}</Form.Label>
                                         <Col sm={9}>
                                             <Form.Control 
                                                 required={field.required}
+                                                isInvalid={field.isInvalid}
                                                 type={field.type} 
                                                 placeholder={field.placeholder}
                                                 value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
@@ -299,6 +371,7 @@ const AdminReward = (props) => {
                                             <Form.Control 
                                                 size="sm"
                                                 required={field.required}
+                                                isInvalid={field.isInvalid}
                                                 as={field.type} 
                                                 placeholder={field.placeholder}
                                                 value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
@@ -322,7 +395,12 @@ const AdminReward = (props) => {
                             Close
                             </Button>
                             <Button variant="primary" type="submit">
-                            Save Changes
+                                {saving && <Spinner 
+                                as="span"
+                                animation="border" 
+                                size="sm"
+                                role="status"
+                                aria-hidden="true" />} Save Changes
                             </Button>
                         </Modal.Footer>
                     </Form>
@@ -337,6 +415,8 @@ const AdminReward = (props) => {
                                 <th>Name</th>
                                 <th>Description</th>
                                 <th>Type</th>
+                                <th>Value</th>
+                                <th>Cost</th>
                                 <th>Created</th>
                                 <th>Updated</th>
                                 <th>Actions</th>

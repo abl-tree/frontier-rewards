@@ -15,6 +15,8 @@ export const GetData = (props, url = apiRoute) => async dispatch => {
             type: "REWARD_FETCH",
             payload: res.data.data
         })
+
+        return Promise.resolve();
         
     } catch (error) {
 
@@ -22,6 +24,8 @@ export const GetData = (props, url = apiRoute) => async dispatch => {
             type: "REWARD_FAIL",
             payload: error.response.data
         })
+
+        return Promise.reject(error);
         
     }
 }
@@ -95,13 +99,17 @@ export const DeleteData = (props, id) => async dispatch => {
             type: "REWARD_DELETE",
             payload: res.data.data
         })
+
+        return Promise.resolve();
         
     } catch (error) {
 
         dispatch({
             type: "REWARD_FAIL",
-            payload: error.response.data.message
+            payload: error.response.data
         })
+
+        return Promise.reject(error);
         
     }
 }

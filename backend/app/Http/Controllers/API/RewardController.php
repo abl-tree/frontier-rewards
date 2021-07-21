@@ -19,20 +19,23 @@ class RewardController extends BaseController
     public function index(Request $request)
     {
         $input = $request->all();
-        $validation = [];
 
-        if(isset($input['type'])) {
-            $validation = array_merge($validation, [
-                'show' => 'required|in:all,eligible'
-            ]);
+        if(@$input['search']) {
+            $rewards = Reward::search($input['search'])
+                    ->when((isset($input['show']) && $input['show'] == 'eligible'), function($query) use ($request) {
+                        $query->where('type', '!=', 'points');
+                        $query->where('cost', '<=', $request->user()->points);
+                    })
+                    ->paginate(10);
+
+        } else {
+            $rewards = Reward::latest()
+                    ->when((isset($input['show']) && $input['show'] == 'eligible'), function($query) use ($request) {
+                        $query->where('type', '!=', 'points');
+                        $query->where('cost', '<=', $request->user()->points);
+                    })
+                    ->paginate(10);
         }
-
-        $rewards = Reward::latest()
-                ->when((isset($input['show']) && $input['show'] == 'eligible'), function($query) use ($request) {
-                    $query->where('type', '!=', 'points');
-                    $query->where('cost', '<=', $request->user()->points);
-                })
-                ->paginate(10);
     
         return $this->sendResponse($rewards, 'Rewards retrieved successfully.');
     }
@@ -60,7 +63,9 @@ class RewardController extends BaseController
         $validator = Validator::make($input, [
             'name' => 'required',
             'description' => 'required',
-            'type' => 'required'
+            'type' => 'required|in:item,discount,points',
+            'cost' => 'exclude_if:type,points|required_if:type,item,discount|numeric',
+            'value' => 'exclude_if:type,item|required_if:type,discount,points|numeric',
         ]);
    
         if($validator->fails()){
@@ -116,7 +121,9 @@ class RewardController extends BaseController
         $validator = Validator::make($input, [
             'name' => 'required',
             'description' => 'required',
-            'type' => 'required'
+            'type' => 'required|in:item,discount,points',
+            'cost' => 'exclude_if:type,points|required_if:type,item,discount|numeric',
+            'value' => 'exclude_if:type,item|required_if:type,discount,points|numeric',
         ]);
    
         if($validator->fails()){
