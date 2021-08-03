@@ -26,12 +26,6 @@ class Reward extends Model
         'updated_at' => 'datetime:Y-m-d H:i:s'
     ];
 
-    public function setValueAttribute($value)
-    {
-        $value = ($this->attributes['type'] == 'points' || $this->attributes['type'] == 'discount') ? $value : 0;
-        $this->attributes['value'] = 10;
-    }
-
     public function getValueAttribute($value)
     {
         return is_null($value) ? 0 : $value;

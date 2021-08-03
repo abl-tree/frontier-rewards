@@ -10,12 +10,14 @@ use App\Models\Package;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use App\Models\UserReward;
+use App\Models\UserVehicle;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\UserRegistration;
 use App\Events\UserRegistered;
 use App\Http\Resources\User as UserResource;
+use Illuminate\Validation\Rule;
    
 class RegisterController extends BaseController
 {
@@ -26,17 +28,37 @@ class RegisterController extends BaseController
      */
     public function register(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $input = $request->all();
+        $validator = Validator::make($input, [
+            'user_type_id' => 'required|in:3,2|exists:user_types,code',
             'firstname' => 'required',
             'lastname' => 'required',
             'email' => 'required|email|unique:users',
-            'user_type_id' => 'required|exists:user_types,code',
             'package_id.value' => 'required_if:user_type_id,3|exists:packages,id',
-            'customer_id' => 'required_if:user_type_id,3|unique:user_infos'
+            'customer_id' => 'required_if:user_type_id,3|unique:user_infos',
+            'vehicles' => 'required|array|min:1',
+            'vehicles.*' => 'required_if:user_type_id,3',
+            'vehicles.*.vehicle_id' => 'required_if:user_type_id,3|distinct|unique:user_vehicles,vehicle_id',
+            'vehicles.*.year' => 'required_if:user_type_id,3',
+            'vehicles.*.make' => 'required_if:user_type_id,3',
+            'vehicles.*.model' => 'required_if:user_type_id,3',
+            'vehicles.*.trim' => 'required_if:user_type_id,3',
+            'vehicles.*.color' => 'required_if:user_type_id,3',
+            'vehicles.*.vin_no' => 'required_if:user_type_id,3',
+        ], [
+            'customer_id.required_if' => 'The customer id field is required when user type is Customer.',
+            'package_id.value.required_if' => 'The package field is required when user type is Customer.',
+            'vehicles.*.vehicle_id.required_if' => 'The vehicle ID field is required.',
+            'vehicles.*.year.required_if' => 'The vehicle year field is required.',
+            'vehicles.*.make.required_if' => 'The vehicle make field is required.',
+            'vehicles.*.model.required_if' => 'The vehicle model field is required.',
+            'vehicles.*.trim.required_if' => 'The vehicle trim field is required.',
+            'vehicles.*.color.required_if' => 'The vehicle color field is required.',
+            'vehicles.*.vin_no.required_if' => 'The vehicle vin no field is required.',
         ]);
    
         if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
+            return $this->sendError('Validation Error.', $validator->errors());
         }
    
         $input = $request->all();
@@ -58,8 +80,16 @@ class RegisterController extends BaseController
                 'customer_id' => $input['customer_id'],
                 'salesperson_id' => $request->user()->id
             ]);
+            
+            foreach ($input['vehicles'] as $key => $vehicle) {
+                $vehicleInfo = UserVehicle::updateOrCreate(
+                    ['user_id' => $user->id, 'vehicle_id' => $vehicle['vehicle_id']],
+                    ['vehicle_info' => $vehicle]
+                );
+            }
 
-            $rewards = Package::find($input['package_id'])->rewards()->with('reward')->get();
+            $package = Package::find($input['package_id']);
+            $rewards = $package->rewards()->with('reward')->get();
 
             $total = 0;
 
@@ -84,7 +114,8 @@ class RegisterController extends BaseController
                         'reward_id' => $reward->id,
                         'reward_name' => $reward->name,
                         'reward_type' => $reward->type,
-                        'reward_qty' => $reward->value
+                        'reward_qty' => ($reward->type != 'points' || $reward->type != 'discount' ? 1 : $reward->value),
+                        'multiplier' => 1
                     ]);
                 }
            
@@ -98,9 +129,8 @@ class RegisterController extends BaseController
         }
 
         $user = User::with('info.package')->find($user->id);
-        $user->tmpPass = $tmpPass;
 
-        event(new UserRegistered($user));
+        event(new UserRegistered($user, $tmpPass));
    
         return $this->sendResponse(new UserResource($user), 'User register successfully.');
     }

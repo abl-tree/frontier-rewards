@@ -21,7 +21,7 @@ class ActionController extends BaseController
     {
         $input = $request->all();
 
-        if(@$input['search']) $actions = Action::whereRaw("MATCH(`name`) AGAINST(? IN BOOLEAN MODE)", array($input['search']))->latest()->paginate(10)->withQueryString();
+        if(@$input['search']) $actions = Action::search($input['search'])->paginate(10)->withQueryString();
         else $actions = Action::latest()->paginate(10)->withQueryString();
     
         return $this->sendResponse($actions, 'Actions retrieved successfully.');

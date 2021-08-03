@@ -10,6 +10,7 @@ use App\Models\Package;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use App\Models\UserReward;
+use App\Models\UserVehicle;
 use Validator;
 use App\Http\Resources\User as UserResource;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,9 +31,9 @@ class UserController extends BaseController
     {
         $input = $request->all();
 
-        $users = User::with('info.package')
+        $users = User::with('info.package', 'vehicles')
                 ->when(@$input['search'], function($query) use ($input) {
-                    $query->where("name", "LIKE", "%".$input['search']."%");
+                    $query->search($input['search']);
                 })
                 ->when((isset($input['type']) && $input['type'] != 'all'), function($query) use ($input) {
                     $query->where('user_type_id', $input['type']);
@@ -45,7 +46,9 @@ class UserController extends BaseController
                         $query->where('customer_id', 'LIKE', '%' . $input['customer_id'] . '%');
                     });
                 })
-                ->latest()
+                ->when(!isset($input['search']), function($query) use ($input) {
+                    $query->latest();
+                })
                 ->paginate(10)
                 ->withQueryString();
     
@@ -111,12 +114,34 @@ class UserController extends BaseController
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
+            'user_type_id' => 'required|in:3,2|exists:user_types,code',
             'firstname' => 'required',
             'lastname' => 'required',
             'email' => 'required|email|unique:users,email,'.$id.',id',
             'user_type_id' => 'required|exists:user_types,code',
             'package_id.value' => 'required_if:user_type_id,3|exists:packages,id',
-            'customer_id' => 'required_if:user_type_id,3|unique:user_infos,customer_id,'.$id.',user_id'
+            'customer_id' => 'required_if:user_type_id,3|unique:user_infos,customer_id,'.$id.',user_id',
+            'vehicles' => 'required|array|min:1',
+            'vehicles.*' => 'required_if:user_type_id,3',
+            'vehicles.*.vehicle_id' => 'required_if:user_type_id,3|distinct|unique:user_vehicles,vehicle_id,'.$id.',user_id',
+            'vehicles.*.year' => 'required_if:user_type_id,3',
+            'vehicles.*.make' => 'required_if:user_type_id,3',
+            'vehicles.*.model' => 'required_if:user_type_id,3',
+            'vehicles.*.trim' => 'required_if:user_type_id,3',
+            'vehicles.*.color' => 'required_if:user_type_id,3',
+            'vehicles.*.vin_no' => 'required_if:user_type_id,3',
+        ], [
+            'customer_id.required_if' => 'The customer id field is required when user type is Customer.',
+            'package_id.value.required_if' => 'The package field is required when user type is Customer.',
+            'vehicles.*.vehicle_id.required_if' => 'The vehicle ID field is required.',
+            'vehicles.*.vehicle_id.distinct' => 'The vehicle ID field has a duplicate value.',
+            'vehicles.*.vehicle_id.unique' => 'The vehicle ID field is already assigned to other customer.',
+            'vehicles.*.year.required_if' => 'The vehicle year field is required.',
+            'vehicles.*.make.required_if' => 'The vehicle make field is required.',
+            'vehicles.*.model.required_if' => 'The vehicle model field is required.',
+            'vehicles.*.trim.required_if' => 'The vehicle trim field is required.',
+            'vehicles.*.color.required_if' => 'The vehicle color field is required.',
+            'vehicles.*.vin_no.required_if' => 'The vehicle vin no field is required.',
         ]);
 
         if($validator->fails()){
@@ -124,17 +149,18 @@ class UserController extends BaseController
         }
    
         $input = $request->all();
+
         $input['package_id'] = $input['package_id']['value'];
         $name = $input['firstname'] . ' ' . (@$input['middlename'] ? $input['middlename'] : '') . ' ' . $input['lastname'];
 
         $input['points'] = !isset($input['points']) ? 0 : $input['points'];
 
-        $user = User::with('info.package')->find($id);
+        $user = User::with('info.package', 'vehicles')->find($id);
         $user->firstname = $input['firstname'];
         $user->middlename = @$input['middlename'];
         $user->lastname = $input['lastname'];
         $user->email = $input['email'];
-        $user->phone_number = $input['phone_number'];
+        if(@$input['phone_number']) $user->phone_number = $input['phone_number'];
         $user->user_type_id = $input['user_type_id'];
         $user->name = $name;
         $user->save();
@@ -179,6 +205,34 @@ class UserController extends BaseController
 
         if($input['user_type_id'] == 3) {
             $info = $user->info()->first();
+
+            //Delete vehicles
+            $existingVehiclesId = [];
+            foreach ($input['vehicles'] as $key => $vehicle) {
+                if(isset($vehicle['id'])) {
+                    array_push($existingVehiclesId, $vehicle['id']);
+                }
+            }
+            if(!empty($existingVehiclesId)) {
+                UserVehicle::where('user_id', $user->id)->whereNotIn('id', $existingVehiclesId)->delete();
+            } else {
+                UserVehicle::where('user_id', $user->id)->delete();
+            }
+
+            foreach ($input['vehicles'] as $key => $vehicle) {
+                if(isset($vehicle['id'])) {
+                    $vehicleInfo = UserVehicle::find($vehicle['id']);
+                    $vehicleInfo->vehicle_id = $vehicle['vehicle_id'];
+                    $vehicleInfo->vehicle_info = $vehicle;
+                    $vehicleInfo->save();
+                } else {
+                    $vehicleInfo = new UserVehicle;
+                    $vehicleInfo->user_id = $user->id;
+                    $vehicleInfo->vehicle_id = $vehicle['vehicle_id'];
+                    $vehicleInfo->vehicle_info = $vehicle;
+                    $vehicleInfo->save();
+                }
+            }
 
             if($info->package_id != $input['package_id']) {    
                 $transaction = $user->transactions()->whereHas('item', function(Builder $query) {
@@ -236,6 +290,8 @@ class UserController extends BaseController
 
             $info->save();
         }
+
+        $user = User::with('info.package', 'vehicles')->find($id);
 
         return $this->sendResponse(new UserResource($user), 'User retrieved successfully.');
     }
@@ -328,5 +384,9 @@ class UserController extends BaseController
 
     public function export(Request $request) {
         return (new UsersExport)->download('users.xlsx');
+    }
+
+    public function check(Request $request) {
+        return $this->sendResponse($request->user(), 'Authenticated.');
     }
 }

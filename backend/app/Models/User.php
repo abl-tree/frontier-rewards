@@ -8,10 +8,20 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Nicolaslopezj\Searchable\SearchableTrait;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, SearchableTrait;
+
+    protected $searchable = [
+        'columns' => [
+            'users.name'  => 10,
+            'users.firstname'  => 10,
+            'users.middlename'  => 10,
+            'users.lastname'  => 10,
+        ]
+    ];
 
     /**
      * The attributes that are mass assignable.
@@ -25,6 +35,7 @@ class User extends Authenticatable
         'lastname',
         'email',
         'password',
+        'points',
         'phone_number',
         'user_type_id'
     ];
@@ -81,5 +92,9 @@ class User extends Authenticatable
 
     public function transactions() {
         return $this->hasMany(Transaction::class, 'user_id', 'id');
+    }
+
+    public function vehicles() {
+        return $this->hasMany(UserVehicle::class, 'user_id', 'id');
     }
 }

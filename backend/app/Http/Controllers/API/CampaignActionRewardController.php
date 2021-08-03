@@ -45,7 +45,8 @@ class CampaignActionRewardController extends BaseController
         $validator = Validator::make($input, [
             'campaign_id' => 'required',
             'action_id' => 'required',
-            'reward_id' => 'required'
+            'reward_id' => 'required',
+            'quantity' => 'required|numeric'
         ]);
    
         if($validator->fails()){

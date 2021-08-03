@@ -6,10 +6,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Nicolaslopezj\Searchable\SearchableTrait;
 
 class Campaign extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, SearchableTrait;
+
+    protected $searchable = [
+        'columns' => [
+            'campaigns.name'  => 10,
+            'campaigns.description'  => 10,
+        ]
+    ];
 
     protected $fillable = [
         'name', 'description', 'start_date', 'end_date'
@@ -32,7 +40,7 @@ class Campaign extends Model
     ];
 
     public function getIsExpiredAttribute($value) {
-        return Carbon::parse($this->end_date)->lt(Carbon::now());
+        return Carbon::parse($this->end_date)->addDay()->lt(Carbon::now());
     }
 
     public function getEndDateAttribute($value) {

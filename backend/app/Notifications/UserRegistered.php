@@ -14,15 +14,17 @@ class UserRegistered extends Notification
     use Queueable;
 
     public $user;
+    public $password;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($user)
+    public function __construct($user, $password)
     {
         $this->user = $user;
+        $this->password = $password;
     }
 
     /**
@@ -46,13 +48,13 @@ class UserRegistered extends Notification
     {
         return (new MailMessage)
                     ->subject('User registration')
-                    ->markdown('mail.user.registered', ['password' => $this->user->tmpPass]);
+                    ->markdown('mail.user.registered', ['password' => $this->password]);
     }
 
     public function toTwilio($notifiable)
     {
         return (new TwilioSmsMessage())
-            ->content("Welcome!\n\nYour password is $password.\n\nYou can now earn and collect points from your purchase and get a chance to win awesome rewards! Be updated with our new deals and win these awesome prizes! Visit ".config('app.url')." for more info.");
+            ->content("Welcome!\n\nYour password is {$this->password}.\n\nYou can now earn and collect points from your purchase and get a chance to win awesome rewards! Be updated with our new deals and win these awesome prizes! Visit ".config('app.url')." for more info.");
     }
 
     /**
@@ -65,7 +67,7 @@ class UserRegistered extends Notification
     {
         return [
             'title' => 'Points and Perks Registration.',
-            'data' => $this->user
+            'data' => $this->password,
         ];
     }
 }

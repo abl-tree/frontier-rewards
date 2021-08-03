@@ -18,6 +18,8 @@ class UserReward extends Model
         'reward_type',
         'reward_qty',
         'claimed_qty',
+        'o_reward_qty',
+        'multiplier',
         'status'
     ];
 
@@ -27,10 +29,11 @@ class UserReward extends Model
 
         static::creating(function ($model) {
             $user = User::with('info.package')->find($model->user_id);
-            $isSignupReward = false;
 
-            if(!$isSignupReward && $model->reward_type == 'points') {
-                $multiplier = $user->info->package->multiplier;
+            $model->o_reward_quantity = $model->reward_qty;
+
+            if($model->reward_type == 'points') {
+                $multiplier = isset($model->multiplier) ? $model->multiplier : $user->info->package->multiplier;
                 $model->reward_qty = $model->reward_qty * $multiplier;
             }
 

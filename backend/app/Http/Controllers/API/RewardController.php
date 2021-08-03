@@ -64,8 +64,8 @@ class RewardController extends BaseController
             'name' => 'required',
             'description' => 'required',
             'type' => 'required|in:item,discount,points',
-            'cost' => 'exclude_if:type,points|required_if:type,item,discount|numeric',
-            'value' => 'exclude_if:type,item|required_if:type,discount,points|numeric',
+            'cost' => 'exclude_if:type,points|required_if:type,item,discount|numeric|min:1',
+            'value' => 'required|numeric|min:1',
         ]);
    
         if($validator->fails()){
@@ -122,8 +122,8 @@ class RewardController extends BaseController
             'name' => 'required',
             'description' => 'required',
             'type' => 'required|in:item,discount,points',
-            'cost' => 'exclude_if:type,points|required_if:type,item,discount|numeric',
-            'value' => 'exclude_if:type,item|required_if:type,discount,points|numeric',
+            'cost' => 'exclude_if:type,points|required_if:type,item,discount|numeric|min:1',
+            'value' => 'required|numeric|min:1',
         ]);
    
         if($validator->fails()){
@@ -133,7 +133,7 @@ class RewardController extends BaseController
         $reward->name = $input['name'];
         $reward->description = $input['description'];
         $reward->type = $input['type'];
-        $reward->value = @$input['value'];
+        $reward->value = $input['value'];
         $reward->cost = @$input['cost'];
         $reward->save();
    

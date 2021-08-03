@@ -4,10 +4,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Nicolaslopezj\Searchable\SearchableTrait;
 
 class Action extends Model
 {
-    use HasFactory;
+    use HasFactory, SearchableTrait;
+
+    protected $searchable = [
+        'columns' => [
+            'actions.name'  => 10,
+            'actions.description'  => 10,
+        ]
+    ];
 
     protected $fillable = [
         'name', 'description'

@@ -11,7 +11,7 @@ class CampaignActionReward extends Model
     use HasFactory, SoftDeletes;
     
     protected $fillable = [
-        'campaign_id', 'action_id', 'reward_id', 'deleted_at'
+        'campaign_id', 'action_id', 'reward_id', 'quantity', 'deleted_at'
     ];
 
     protected $dates = ['deleted_at'];

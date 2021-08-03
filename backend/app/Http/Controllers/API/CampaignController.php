@@ -22,11 +22,23 @@ class CampaignController extends BaseController
     {
         $input = $request->all();
 
-        $campaigns = Campaign::when($request->user()->type->code == 3, function($query) {
-            $query->whereDate('end_date', '>=', Carbon::now());
-        })->when(@$input['activity'] == true, function($query) {
-            $query->whereDate('end_date', '>=', Carbon::now());
-        })->latest()->paginate(10);
+        if(@$input['search'])  {
+
+            $campaigns = Campaign::search($input['search'])->when($request->user()->type->code == 3, function($query) {
+                $query->whereDate('end_date', '>=', Carbon::now());
+            })->when(@$input['activity'] == true, function($query) {
+                $query->whereDate('end_date', '>=', Carbon::now());
+            })->paginate(10)->withQueryString();
+
+        } else {
+
+            $campaigns = Campaign::when($request->user()->type->code == 3, function($query) {
+                $query->whereDate('end_date', '>=', Carbon::now());
+            })->when(@$input['activity'] == true, function($query) {
+                $query->whereDate('end_date', '>=', Carbon::now());
+            })->latest()->paginate(10);
+            
+        }
     
         return $this->sendResponse($campaigns, 'Campaigns retrieved successfully.');
     }

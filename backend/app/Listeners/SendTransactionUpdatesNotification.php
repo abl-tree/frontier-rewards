@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\TransactionStatusUpdated as TransactionStatusUpdatedNotification;
 
-class SendTransactionUpdatesNotification
+class SendTransactionUpdatesNotification implements ShouldQueue
 {
     /**
      * Create the event listener.

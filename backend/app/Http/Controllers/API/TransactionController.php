@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use Validator;
+use App\Models\CampaignActionReward;
 use App\Models\UserReward;
 use App\Models\Reward;
 use App\Models\Transaction;
@@ -109,15 +110,29 @@ class TransactionController extends BaseController
             'type' => 'required|in:earn',
             'action_id' => 'required',
             'campaign_id' => 'required',
+            'rewards' => 'required|array|min:1',
             'rewards.*.value' => 'required|numeric|exists:rewards,id',
             'user_id' => 'required|numeric|exists:users,id'
         ]);
+        
+        $validator->after(function ($validator) use ($input) {
+            if (@$input['rewards'] && @$input['campaign_id'] && @$input['action_id']) {
+                $reward_ids = array_column($input['rewards'], 'value');
+                $rewards = Reward::whereIn('id', $reward_ids)->get();
+
+                foreach ($rewards as $key => $reward) {
+                    if(!CampaignActionReward::where('campaign_id', $input['campaign_id'])->where('action_id', $input['action_id'])->where('reward_id', $reward->id)->where('quantity', '>', 0)->count()) {
+                        $validator->errors()->add(
+                            'rewards', "{$reward->name} is not available."
+                        );
+                    }
+                }
+            }
+        });
    
         if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());       
+            return $this->sendError('Validation Error.', $validator->errors());
         }
-
-        $user = User::find($input['user_id']);
 
         $item = TransactionItem::create([
             'action_id' => $input['action_id'],
@@ -129,7 +144,6 @@ class TransactionController extends BaseController
 
         if($item) {
             $reward_ids = array_column($input['rewards'], 'value');
-    
             $rewards = Reward::whereIn('id', $reward_ids)->get();
 
             foreach ($rewards as $key => $reward) {
@@ -139,10 +153,12 @@ class TransactionController extends BaseController
                     'reward_id' => $reward->id,
                     'reward_name' => $reward->name,
                     'reward_type' => $reward->type,
-                    'reward_qty' => $reward->value
+                    'reward_qty' => ($reward->type != 'points' || $reward->type != 'discount' ? 1 : $reward->value)
                 ]);
 
                 if($tmpReward->reward_type == 'points') $item->increment('total', $tmpReward->reward_qty);
+
+                CampaignActionReward::where('campaign_id', $input['campaign_id'])->where('action_id', $input['action_id'])->where('reward_id', $reward->id)->where('quantity', '>', 0)->first()->decrement('quantity');
             }
        
             $transaction = Transaction::create([

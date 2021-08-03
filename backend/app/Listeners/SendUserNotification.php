@@ -9,8 +9,12 @@ use App\Models\User;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\UserRegistered as UserRegisteredNotification;
 
-class SendUserNotification
+class SendUserNotification implements ShouldQueue
 {
+    use InteractsWithQueue;
+    
+    public $afterCommit = true;
+
     /**
      * Create the event listener.
      *
@@ -31,6 +35,6 @@ class SendUserNotification
     {
         $recipient = User::find($event->user->id);
 
-        Notification::send($recipient, new UserRegisteredNotification($event->user));
+        Notification::send($recipient, new UserRegisteredNotification($event->user, $event->password));
     }
 }

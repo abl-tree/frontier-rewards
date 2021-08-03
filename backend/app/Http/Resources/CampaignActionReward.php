@@ -20,6 +20,7 @@ class CampaignActionReward extends JsonResource
             'campaign_id' => $this->campaign_id,
             'action_id' => $this->action_id,
             'reward_id' => $this->reward_id,
+            'quantity' => $this->quantity,
             'action' => $this->action,
             'reward' => $this->reward
         ];

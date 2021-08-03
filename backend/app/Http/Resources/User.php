@@ -27,6 +27,7 @@ class User extends JsonResource
             'rewards' => $this->rewards,
             'phone_number' => $this->phone_number,
             'type_name' => $this->type_name,
+            'vehicles' => $this->vehicles,
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
