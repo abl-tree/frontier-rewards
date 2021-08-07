@@ -153,14 +153,37 @@ class CampaignController extends BaseController
         return $this->sendResponse($campaign, 'Campaign deleted successfully.');
     }
 
-    public function actions($id) {
-        $campaigns = Campaign::find($id)->campaigns()->with('action')->groupBy('action_id')->paginate(10);
+    public function actions(Request $request, $id) {
+        $input = $request->all();
+        
+        $campaigns = Campaign::find($id)->campaigns()->with('action')
+                ->when(@$input['search'], function($q) use ($input) {
+                    $q->whereHas('action', function($q) use ($input) {
+                        $q->where('name', 'like', '%'.$input['search'].'%');
+                        $q->orWhere('name', 'like', $input['search'].'%');
+                        $q->orWhere('name', 'like', '%'.$input['search']);
+                    });
+                })
+                ->groupBy('action_id')
+                ->paginate(10);
    
         return $this->sendResponse($campaigns, 'Actions retrieved successfully.');
     }
 
-    public function rewards($campaign_id, $action_id) {
-        $rewards = CampaignActionReward::with('reward')->where(['campaign_id' => $campaign_id, 'action_id' => $action_id])->paginate(10);
+    public function rewards(Request $request, $campaign_id, $action_id) {
+        $input = $request->all();
+
+        $rewards = CampaignActionReward::with('reward')
+                ->when(@$input['search'], function($q) use ($input) {
+                    $q->whereHas('reward', function($q) use ($input) {
+                        $q->where('name', 'like', '%'.$input['search'].'%');
+                        $q->orWhere('name', 'like', $input['search'].'%');
+                        $q->orWhere('name', 'like', '%'.$input['search']);
+                    });
+                })
+                ->where(['campaign_id' => $campaign_id, 'action_id' => $action_id])
+                ->where('quantity', '>', 0)
+                ->paginate(10);
    
         return $this->sendResponse($rewards, 'Rewards retrieved successfully.');
     }

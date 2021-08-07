@@ -67,7 +67,7 @@ class UserRegistered extends Notification
     {
         return [
             'title' => 'Points and Perks Registration.',
-            'data' => $this->password,
+            'data' => $this->user,
         ];
     }
 }

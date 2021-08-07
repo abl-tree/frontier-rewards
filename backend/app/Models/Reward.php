@@ -21,11 +21,6 @@ class Reward extends Model
         'name', 'description', 'type', 'value', 'cost'
     ];
 
-    protected $casts = [
-        'created_at' => 'datetime:Y-m-d H:i:s',
-        'updated_at' => 'datetime:Y-m-d H:i:s'
-    ];
-
     public function getValueAttribute($value)
     {
         return is_null($value) ? 0 : $value;

@@ -153,7 +153,7 @@ class TransactionController extends BaseController
                     'reward_id' => $reward->id,
                     'reward_name' => $reward->name,
                     'reward_type' => $reward->type,
-                    'reward_qty' => ($reward->type != 'points' || $reward->type != 'discount' ? 1 : $reward->value)
+                    'reward_qty' => ($reward->type === 'item' || $reward->type === 'discount' ? 1 : $reward->value)
                 ]);
 
                 if($tmpReward->reward_type == 'points') $item->increment('total', $tmpReward->reward_qty);

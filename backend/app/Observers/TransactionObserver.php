@@ -23,7 +23,7 @@ class TransactionObserver
      */
     public function created(Transaction $transaction)
     {
-        event(new UserPointsUpdated($transaction));
+        if($transaction->type === 'earn') event(new UserPointsUpdated($transaction));
     }
 
     /**

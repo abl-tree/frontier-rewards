@@ -67,7 +67,7 @@ class RegisterController extends BaseController
         $name = $input['firstname'] . ' ' . (@$input['middlename'] ? $input['middlename'] : '') . ' ' . $input['lastname'];
         $input['name'] = $name;
         $tmpPass = $this->generateRandomString();
-        $input['password'] = bcrypt($tmpPass);
+        $input['password'] = $tmpPass;
 
         $user = User::create($input);
         $success['token'] =  $user->createToken('MyApp')->accessToken;

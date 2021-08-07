@@ -33,7 +33,7 @@ class UserPointsNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', TwilioChannel::class];
+        return ['broadcast', 'database', 'mail', TwilioChannel::class];
     }
 
     /**
@@ -74,7 +74,8 @@ class UserPointsNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+            'title' => 'Points update',
+            'data' => $this->transaction
         ];
     }
 }
