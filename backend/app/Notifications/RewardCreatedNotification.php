@@ -11,7 +11,7 @@ use NotificationChannels\ExpoPushNotifications\ExpoMessage;
 use NotificationChannels\Twilio\TwilioChannel;
 use NotificationChannels\Twilio\TwilioSmsMessage;
 
-class RewardCreatedNotification extends Notification
+class RewardCreatedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 

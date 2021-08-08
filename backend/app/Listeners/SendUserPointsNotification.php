@@ -9,7 +9,7 @@ use App\Notifications\UserPointsNotification;
 use Illuminate\Support\Facades\Notification;
 use App\Models\User;
 
-class SendUserPointsNotification implements ShouldQueue
+class SendUserPointsNotification
 {
     /**
      * Create the event listener.

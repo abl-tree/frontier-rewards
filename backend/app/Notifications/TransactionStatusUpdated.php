@@ -10,7 +10,7 @@ use NotificationChannels\Twilio\TwilioChannel;
 use NotificationChannels\Twilio\TwilioSmsMessage;
 use App\Models\User;
 
-class TransactionStatusUpdated extends Notification
+class TransactionStatusUpdated extends Notification implements ShouldQueue
 {
     use Queueable;
 

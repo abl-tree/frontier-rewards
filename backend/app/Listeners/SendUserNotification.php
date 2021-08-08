@@ -9,7 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\UserRegistered as UserRegisteredNotification;
 
-class SendUserNotification implements ShouldQueue
+class SendUserNotification
 {
     use InteractsWithQueue;
     

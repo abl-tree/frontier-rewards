@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notification;
 use NotificationChannels\Twilio\TwilioChannel;
 use NotificationChannels\Twilio\TwilioSmsMessage;
 
-class UserRegistered extends Notification
+class UserRegistered extends Notification implements ShouldQueue
 {
     use Queueable;
 

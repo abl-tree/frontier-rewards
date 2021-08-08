@@ -22,6 +22,15 @@ class UserNotificationController extends BaseController
         $user = $request->user();
         $notifications = $user->notifications()->paginate();
 
+    	$response = [
+            'success' => true,
+            'data'    => $notifications,
+            'count' => $user->unreadNotifications->count(),
+            'message' => 'Notifications retrieved successfully.',
+        ];
+
+
+        return response()->json($response, 200);
         return $this->sendResponse($notifications, 'Notifications retrieved successfully.');
     }
 

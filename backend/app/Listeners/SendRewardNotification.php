@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\RewardCreatedNotification;
 use App\Models\User;
 
-class SendRewardNotification implements ShouldQueue
+class SendRewardNotification
 {
     /**
      * Create the event listener.
