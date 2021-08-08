@@ -1,12 +1,15 @@
 import React, {useState} from "react";
-import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Spinner, Table } from 'react-bootstrap';
 import _ from "lodash";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
 
 const Setting = (props) => {
     
     const [user, setUser] = useState({})
     const [validated, setValidated] = useState(false);
+    const [errors, setErrors] = useState({})
+    const [saving, setSaving] = useState(false)
 
     React.useEffect(() => {
         fetchProfile(1)
@@ -24,10 +27,27 @@ const Setting = (props) => {
 
     const handleSettingSubmit = async (e) => {
         e.preventDefault()
+        setSaving(true)
 
-        const res = await axios.post('/settings', user)
+        try {
+            const res = await axios.post('/settings', user)
+            
+            setErrors({});
 
-        console.log(user);
+            toast.success("Settings has been updated successfully.", {
+                position: toast.POSITION.BOTTOM_RIGHT
+            });
+
+            setSaving(false)
+        } catch (error) {
+            setErrors(error.response.data.data);
+        
+            toast.error(error.response.data.message, {
+                position: toast.POSITION.BOTTOM_RIGHT
+            });
+
+            setSaving(false)
+        }
     }
 
     return (
@@ -72,19 +92,31 @@ const Setting = (props) => {
                             <Form.Label>Email</Form.Label>
                             <Form.Control placeholder="Email"
                             value={user.email}
-                            onChange={ (e) => setUser(prev => ({...prev, email : e.target.value})) } />
+                            onChange={ (e) => setUser(prev => ({...prev, email : e.target.value})) } 
+                            isInvalid={errors.email} />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.email}
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="formGridPassword">
                             <Form.Label>Password</Form.Label>
                             <Form.Control placeholder="Password"
                             type="password"
-                            onChange={ (e) => setUser(prev => ({...prev, password : e.target.value})) } />
+                            onChange={ (e) => setUser(prev => ({...prev, password : e.target.value})) } 
+                            isInvalid={errors.password}/>
+                            <Form.Control.Feedback type="invalid">
+                                {errors.password}
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="formGridNewPassword">
                             <Form.Label>New Password</Form.Label>
                             <Form.Control placeholder="New Password"
                             type="password"
-                            onChange={ (e) => setUser(prev => ({...prev, new_password : e.target.value})) } />
+                            onChange={ (e) => setUser(prev => ({...prev, new_password : e.target.value})) }
+                            isInvalid={errors.new_password} />
+                            <Form.Control.Feedback type="invalid">
+                                {errors.new_password}
+                            </Form.Control.Feedback>
                         </Form.Group>
                         <Form.Group controlId="formGridConfirmPassword">
                             <Form.Label>Confirm Password</Form.Label>
@@ -93,12 +125,18 @@ const Setting = (props) => {
                             onChange={ (e) => setUser(prev => ({...prev, new_password_confirmation : e.target.value})) } />
                         </Form.Group>
                         <Button variant="primary" type="submit">
-                            Update
+                            {saving && <Spinner 
+                            as="span"
+                            animation="border" 
+                            size="sm"
+                            role="status"
+                            aria-hidden="true" />} Update
                         </Button>
                     </Card.Text>
                 </Card.Body>
             </Form>
         </Card>
+        <ToastContainer />
         </>
     )
 

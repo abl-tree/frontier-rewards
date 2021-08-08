@@ -1,5 +1,5 @@
-import React, {useState, useRef} from 'react';
-import {useSelector} from "react-redux";
+import React, {useEffect, useState, useRef} from 'react';
+import {useDispatch, useSelector} from "react-redux";
 import { Link, Route, Redirect } from "react-router-dom";
 import { Button, Container, Nav, Navbar, NavDropdown, Overlay, Popover } from "react-bootstrap";
 import axios from 'axios';
@@ -9,28 +9,56 @@ import NotifyMe from 'react-notification-timeline';
 import moment from 'moment-timezone';
 import { config } from '../utils/Constants';
 import { Bell, BellOff, BookOpen, AlertTriangle } from 'react-feather';
+import {AddData, DeleteData, EditData, GetData, MarkAsRead} from "../actions/notificationAction";
 
 const NotificationMenu = (props) => {
 
     // State variabls
+    const dispatch = useDispatch();
     const [showCount, setShowCount] = useState(false);
     const [messageCount, setMessageCount] = useState(0);
     const [show, setShow] = useState(false);
     const [target, setTarget] = useState(null);
+    const [listen, setListen] = useState(false)
 
     // Useref for the overlay
     const ref = useRef(null);
 
-    const [notifications, setNotifications] = useState({
-        loading: false,
-        data: []
-    })
+    // const [notifications, setNotifications] = useState({
+    //     loading: false,
+    //     data: []
+    // })
     const auth = useSelector(state => state.Auth);
+    const notifications = useSelector(state => state.Notification);
 
-    React.useEffect(() => {
-        fetchNotification()
-        initEcho()
+    useEffect(() => {
+        fetchData()
     }, [])
+
+    useEffect(() => {
+
+        processNotification()
+        
+    }, [notifications])
+
+    const fetchData = (url = '/notifications') => {
+
+        dispatch(GetData(props, url));
+
+    }
+
+    console.log('notification', notifications);
+
+    const processNotification = async () => {
+        if(notifications.data && notifications.data.data) {
+            let data = notifications.data.data;
+    
+            setMessageCount(notifications.count);
+            setShowCount(notifications.count);
+            
+            if(!listen) initEcho()
+        }
+    }
 
     // Start Laravel Echo
 
@@ -42,37 +70,38 @@ const NotificationMenu = (props) => {
                     'data': notification.data,
                     'title': notification.title
                 },
-                'created_at': moment()
+                'created_at': moment().format()
             }
 
-            setNotifications(prev => ({...prev, data: [...prev.data, newNotification]}))
+            dispatch({
+                type: "NOTIFICATION_ADD",
+                payload: newNotification
+            })
+            // console.log('notifications', {...notifications.data, data: [newNotification, ...notifications.data.data]});
+            // setNotification(notification)
+            // console.log('notif', notification);
+    
+            // let data = [...notification.data, newNotification];
+    
+            // setNotifications(prev => ({...prev, data: data}))
         });
+
+        setListen(true);
     }
 
     // End Laravel Echo
 
-    const fetchNotification = async () => {
-        const res = await axios.get('notifications');
+    // const seeMoreNotification = async (link) => {
+    //     setNotifications(prev => ({...prev, loading: true}))
 
-        let data = res.data.data;
+    //     const res = await axios.get(link);
 
-        setNotifications(prev => ({...prev, data: data, loading: false}));
+    //     let data = res.data.data;
 
-        setMessageCount(data.data.filter((notification) => {return notification.read_at == null}).length);
-        setShowCount(data.data.filter((notification) => {return notification.read_at == null}).length);
-    }
+    //     data.data = [...notifications.data.data, ...data.data];
 
-    const seeMoreNotification = async (link) => {
-        setNotifications(prev => ({...prev, loading: true}))
-
-        const res = await axios.get(link);
-
-        let data = res.data.data;
-
-        data.data = [...notifications.data.data, ...data.data];
-
-        setNotifications(prev => ({...prev, data: data, loading: false}));
-    }
+    //     setNotifications(prev => ({...prev, data: data, loading: false}));
+    // }
 
     const hide = () => {
         setShow(false);
@@ -145,14 +174,7 @@ const NotificationMenu = (props) => {
     };
 
     const markAsRead = async (event) => {
-        const res = await axios.post('notifications/read');
-
-        setNotifications(prev => ({...prev, data: notifications.data.data.map((el, key) => {
-            return {...el, read_at: moment().format()}
-        })}));
-
-        setShowCount(false);
-        setMessageCount(0);
+        dispatch(MarkAsRead())
     }
 
     return (
@@ -207,12 +229,9 @@ const NotificationMenu = (props) => {
                             }
                         </ul>
                     </Popover.Content>
-                    {
-                        notifications.data && notifications.data.next_page_url && 
-                        <Popover.Title className="text-center">
-                            <Button variant="link" disabled={notifications.loading} onClick={() => seeMoreNotification(notifications.data.next_page_url)}>{notifications.loading ? 'Loading…' : 'See more'}</Button>
-                        </Popover.Title>
-                    }
+                    <Popover.Title className="text-center">
+                        <Link to="/notifications">View All Notifications</Link>
+                    </Popover.Title>
                 </Popover>
             </Overlay>
         </div>

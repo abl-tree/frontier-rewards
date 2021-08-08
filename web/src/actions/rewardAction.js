@@ -2,14 +2,16 @@ import axios from "axios";
 
 const apiRoute = '/rewards'
 
-export const GetData = (props, url = apiRoute) => async dispatch => {
+export const GetData = (params, url = apiRoute) => async dispatch => {
     try {
 
         dispatch({
             type: "REWARD_REQUEST"
         })
 
-        const res = await axios.get(url)
+        const res = await axios.get(url, {
+            params: params
+        })
 
         dispatch({
             type: "REWARD_FETCH",

@@ -39,7 +39,7 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
             return Promise.reject(error);
           });
 
-        const initEchoB = () => { // own websockets
+        const initEchoB = () => { // local websockets
 
             window.Echo = new Echo({
                 broadcaster: 'pusher',
@@ -68,17 +68,17 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
                 },
             });
             
-            window.Echo.private(`notification`)
-            .listen('UserRegistered', (e) => {
-                console.log('channel', e);
-            });
+            // window.Echo.private(`notification`)
+            // .listen('UserRegistered', (e) => {
+            //     console.log('channel', e);
+            // });
         }
 
         const initEcho = () => {
 
             window.Echo = new Echo({
                 broadcaster: 'pusher',
-                key: '658ad8bb2f982c7fa645',
+                key: config.url.BROADCAST_KEY,
                 cluster: 'ap1',
                 wsHost: config.url.BROADCAST_URL,
                 wsPort: 6001,
@@ -114,10 +114,10 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
                 },
             });
             
-            window.Echo.private(`notification`)
-            .listen('UserRegistered', (e) => {
-                console.log('channel', e);
-            });
+            // window.Echo.private(`notification`)
+            // .listen('UserRegistered', (e) => {
+            //     console.log('channel', e);
+            // });
         }
 
         initEcho();

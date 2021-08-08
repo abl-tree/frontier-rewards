@@ -172,6 +172,41 @@ const CustomerProfile = (props) => {
         }
     }
 
+    const vehicleInfos = () => {
+        if(user.vehicles) return user.vehicles.map((vehicle, i) => {
+            return <Card.Text style={{borderTop: '1px solid #dee2e6', paddingTop: '10px'}}>
+                <Row>
+                    <Col md="3" className="font-weight-bold">ID</Col>
+                    <Col md="9">{!_.isEmpty(vehicle.vehicle_id) ? vehicle.vehicle_id : '' }</Col>
+                </Row>
+                <Row>
+                    <Col md="3" className="font-weight-bold">Year</Col>
+                    <Col md="9">{!_.isEmpty(vehicle.vehicle_info) && !_.isNull(vehicle.vehicle_info.year) ? vehicle.vehicle_info.year : '' }</Col>
+                </Row>
+                <Row>
+                    <Col md="3" className="font-weight-bold">Make</Col>
+                    <Col md="9">{!_.isEmpty(vehicle.vehicle_info) && !_.isNull(vehicle.vehicle_info.make) ? vehicle.vehicle_info.make : '' }</Col>
+                </Row>
+                <Row>
+                    <Col md="3" className="font-weight-bold">Model</Col>
+                    <Col md="9">{!_.isEmpty(vehicle.vehicle_info) && !_.isNull(vehicle.vehicle_info.model) ? vehicle.vehicle_info.model : '' }</Col>
+                </Row>
+                <Row>
+                    <Col md="3" className="font-weight-bold">Trim</Col>
+                    <Col md="9">{!_.isEmpty(vehicle.vehicle_info) && !_.isNull(vehicle.vehicle_info.trim) ? vehicle.vehicle_info.trim : '' }</Col>
+                </Row>
+                <Row>
+                    <Col md="3" className="font-weight-bold">Color</Col>
+                    <Col md="9">{!_.isEmpty(vehicle.vehicle_info) && !_.isNull(vehicle.vehicle_info.color) ? vehicle.vehicle_info.color : '' }</Col>
+                </Row>
+                <Row>
+                    <Col md="3" className="font-weight-bold">Vin No.</Col>
+                    <Col md="9">{!_.isEmpty(vehicle.vehicle_info) && !_.isNull(vehicle.vehicle_info.vin_no) ? vehicle.vehicle_info.vin_no : '' }</Col>
+                </Row>
+            </Card.Text>
+        })
+    }
+
     return (
         <>
             <Row>
@@ -219,32 +254,7 @@ const CustomerProfile = (props) => {
                         </Card.Body>
                         <Card.Body>
                             <Card.Title>Vehicle Info</Card.Title>
-                            <Card.Text>
-                                <Row>
-                                    <Col md="3" className="font-weight-bold">Year</Col>
-                                    <Col md="9">{!_.isEmpty(user.info) && !_.isNull(user.info.vehicle_year) ? user.info.vehicle_year : '' }</Col>
-                                </Row>
-                                <Row>
-                                    <Col md="3" className="font-weight-bold">Make</Col>
-                                    <Col md="9">{!_.isEmpty(user.info) && !_.isNull(user.info.vehicle_make) ? user.info.vehicle_make : '' }</Col>
-                                </Row>
-                                <Row>
-                                    <Col md="3" className="font-weight-bold">Model</Col>
-                                    <Col md="9">{!_.isEmpty(user.info) && !_.isNull(user.info.vehicle_model) ? user.info.vehicle_model : '' }</Col>
-                                </Row>
-                                <Row>
-                                    <Col md="3" className="font-weight-bold">Trim</Col>
-                                    <Col md="9">{!_.isEmpty(user.info) && !_.isNull(user.info.vehicle_trim) ? user.info.vehicle_trim : '' }</Col>
-                                </Row>
-                                <Row>
-                                    <Col md="3" className="font-weight-bold">Color</Col>
-                                    <Col md="9">{!_.isEmpty(user.info) && !_.isNull(user.info.vehicle_color) ? user.info.vehicle_color : '' }</Col>
-                                </Row>
-                                <Row>
-                                    <Col md="3" className="font-weight-bold">Vin No.</Col>
-                                    <Col md="9">{!_.isEmpty(user.info) && !_.isNull(user.info.vehicle_vin_no) ? user.info.vehicle_vin_no : '' }</Col>
-                                </Row>
-                            </Card.Text>
+                            {vehicleInfos()}
                         </Card.Body>
                     </Card>
                 </Col>

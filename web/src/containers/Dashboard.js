@@ -133,7 +133,7 @@ const Dashboard = (props) => {
                                     </Card.Body>
                                 </Card>
                             </Col>
-                            <Col md={6} className="mb-3">
+                            {auth.user.type != 3 && <Col md={6} className="mb-3">
                                 <Card>
                                     <Card.Body>
                                         <Card.Text>
@@ -142,7 +142,7 @@ const Dashboard = (props) => {
                                         </Card.Text>
                                     </Card.Body>
                                 </Card>
-                            </Col>
+                            </Col>}
                             <Col md={6} className="mb-3">
                                 <Card>
                                     <Card.Body>

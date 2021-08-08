@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Spinner, Table } from 'react-bootstrap';
 import _ from "lodash";
 import {AddData, DeleteData, EditData, GetData} from "../actions/actionAction";
 import { ToastContainer, toast } from 'react-toastify';
@@ -13,6 +13,7 @@ const AdminAction = (props) => {
     const actionList = useSelector(state => state.Action);
     const [validated, setValidated] = useState(false);
     const [data, setData] = useState({});
+    const [saving, setSaving] = useState(false)
     const fields = [
         {
             'key': 'id',
@@ -76,16 +77,19 @@ const AdminAction = (props) => {
         setValidated(true);
 
         if(form.checkValidity() !== false) {
+            setSaving(true)
 
             if(data.id) {
                 dispatch(EditData(props, data))
                 .then(() => {
+                    setSaving(false)
                     setShow(false)
 
                     toast.success("Action updated successfully", {
                         position: toast.POSITION.BOTTOM_RIGHT
                     });
                 }).catch((error) => {
+                    setSaving(false)
         
                     toast.error(error.response.data.message, {
                         position: toast.POSITION.BOTTOM_RIGHT
@@ -95,12 +99,14 @@ const AdminAction = (props) => {
             } else {
                 dispatch(AddData(props, data))
                 .then(() => {
+                    setSaving(false)
                     setShow(false)
 
                     toast.success("Action added successfully", {
                         position: toast.POSITION.BOTTOM_RIGHT
                     });
                 }).catch((error) => {
+                    setSaving(false)
         
                     toast.error(error.response.data.message, {
                         position: toast.POSITION.BOTTOM_RIGHT
@@ -188,7 +194,7 @@ const AdminAction = (props) => {
                 <Modal show={show} onHide={handleClose}>
                     <Form noValidate validated={validated} onSubmit={handleSubmit}>
                         <Modal.Header closeButton>
-                            <Modal.Title>Add Action</Modal.Title>
+                            <Modal.Title>{data.id ? 'Update Action' : 'Add Action'}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             {fields.map((field, i) => {
@@ -214,7 +220,12 @@ const AdminAction = (props) => {
                             Close
                             </Button>
                             <Button variant="primary" type="submit">
-                            Save Changes
+                            {saving && <Spinner 
+                                as="span"
+                                animation="border" 
+                                size="sm"
+                                role="status"
+                                aria-hidden="true" />} Save Changes
                             </Button>
                         </Modal.Footer>
                     </Form>

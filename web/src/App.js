@@ -6,6 +6,7 @@ import Product from './containers/Product';
 import User from './containers/User';
 import UserProfile from './containers/UserProfile';
 import MyProfile from './containers/MyProfile';
+import Notification from './containers/Notification';
 import Setting from './containers/Setting';
 import Package from './containers/Package';
 import Action from './containers/Action';
@@ -29,6 +30,7 @@ function App() {
             <ProtectedRoute path={"/user/:user"} exact component={UserProfile} allowed={[1,2]}/>
             <ProtectedRoute path={"/profile"} exact component={MyProfile} allowed={[2,3]}/>
             <ProtectedRoute path={"/settings"} exact component={Setting} allowed={[1,2,3]}/>
+            <ProtectedRoute path={"/notifications"} exact component={Notification} allowed={[1,2,3]}/>
             <ProtectedRoute path={"/packages"} exact component={Package} allowed={[1,2]}/>
             <ProtectedRoute path={"/actions"} exact component={Action} allowed={[1,2]}/>
             <ProtectedRoute path={"/rewards"} exact component={Reward} allowed={[1,2,3]}/>

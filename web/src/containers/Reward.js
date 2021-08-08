@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Spinner, Table } from 'react-bootstrap';
+import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Spinner, Table, ToggleButton } from 'react-bootstrap';
 import _ from "lodash";
 import {AddData, DeleteData, EditData, GetData} from "../actions/rewardAction";
 import axios from "axios";
@@ -328,9 +328,9 @@ const AdminReward = (props) => {
                                             </Form.Control.Feedback>
                                         </Col>
                                     </Form.Group>
-                                } else if(field.type === 'number' && field.key != 'cost' && data.type != 'item') {
+                                } else if(field.type === 'number' && field.key != 'cost') {
                                     return <Form.Group hidden={field.hidden} key={i} as={Row} controlId={field.control_id}>
-                                        <Form.Label column sm={3}>{data.type == 'discount' ? 'Percentage' : 'Points'}</Form.Label>
+                                        <Form.Label column sm={3}>{data.type === 'discount' ? 'Percentage' : (data.type === 'item' ? 'Quantity' : 'Points')}</Form.Label>
                                         <Col sm={9}>
                                             <Form.Control 
                                                 required={field.required}
@@ -415,7 +415,7 @@ const AdminReward = (props) => {
                                 <th>Name</th>
                                 <th>Description</th>
                                 <th>Type</th>
-                                <th>Value</th>
+                                <th>Value/Qty.</th>
                                 <th>Cost</th>
                                 <th>Created</th>
                                 <th>Updated</th>
@@ -508,10 +508,22 @@ const UserReward = (props) => {
         })
     }
 
-    const fetchData = (url = '/rewards') => {
+    const fetchData = (url = '/rewards', params = {}) => {
 
-        dispatch(GetData(props, url));
+        dispatch(GetData(params, url));
 
+    }
+
+    const [radioValue, setRadioValue] = useState('all');
+    const radios = [
+      { name: 'All', value: 'all' },
+      { name: 'Eligible', value: 'eligible' }
+    ];
+
+    const onFilterChange = (params) => {
+        fetchData('/rewards', params)
+
+        setRadioValue(params.show)
     }
 
     React.useEffect(() => {
@@ -523,18 +535,40 @@ const UserReward = (props) => {
     return (
         <>
             <Row className="pt-3">
-                <Card className="reward-container ml-5 mr-5">
-                    <Card.Body className="row">
-                        {showData()}
-                    </Card.Body>
-                    <Card.Body className="row">
-                        <Col md={12}>
-                            <Pagination size="sm" className="float-right">                    
-                                {showPagination()}
-                            </Pagination>
-                        </Col>
-                    </Card.Body>
-                </Card>
+                <Col md="12">
+                    <Card className="reward-container ml-5 mr-5">
+                        <Card.Body className="row">
+                            <Col md="12">
+                                <ButtonGroup toggle>
+                                    {radios.map((radio, idx) => (
+                                    <ToggleButton
+                                        key={idx}
+                                        id={`radio-${idx}`}
+                                        type="radio"
+                                        variant="outline-warning"
+                                        name="radio"
+                                        value={radio.value}
+                                        checked={radioValue === radio.value}
+                                        onChange={(e) => onFilterChange({show: e.currentTarget.value})}
+                                    >
+                                        {radio.name}
+                                    </ToggleButton>
+                                    ))}
+                                </ButtonGroup>
+                            </Col>
+                        </Card.Body>
+                        <Card.Body className="row">
+                            {showData()}
+                        </Card.Body>
+                        <Card.Body className="row">
+                            <Col md={12}>
+                                <Pagination size="sm" className="float-right">                    
+                                    {showPagination()}
+                                </Pagination>
+                            </Col>
+                        </Card.Body>
+                    </Card>
+                </Col>
             </Row>
             <ToastContainer />
         </>

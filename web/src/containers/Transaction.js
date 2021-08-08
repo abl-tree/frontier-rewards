@@ -302,7 +302,7 @@ const AdminTransaction = (props) => {
                                 <th>Type</th>
                                 <th>Reference No.</th>
                                 <th>Running Balance</th>
-                                <th>Cost</th>
+                                <th>Total</th>
                                 <th>Customer</th>
                                 <th>Salesperson</th>
                                 <th>Created</th>
@@ -535,7 +535,7 @@ const CustomerTransaction = (props) => {
                             <th>Type</th>
                             <th>Reference No.</th>
                             <th>Running Balance</th>
-                            <th>Cost</th>
+                            <th>Total</th>
                             <th>Customer</th>
                             <th>Salesperson</th>
                             <th>Created</th>

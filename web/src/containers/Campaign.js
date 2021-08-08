@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Table } from 'react-bootstrap';
+import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Spinner, Table } from 'react-bootstrap';
 import _ from "lodash";
 import axios from "axios";
 import {AddData, DeleteData, EditData, GetData} from "../actions/campaignAction";
@@ -26,6 +26,7 @@ const AdminCampaign = (props) => {
     const [reward, setReward] = useState({});
     const [showAddCampaign, setShowAddCampaign] = useState(false);
     const [showAddReward, setShowAddReward] = useState(false);
+    const [saving, setSaving] = useState(false)
     const fields = [
         {
             'key': 'id',
@@ -130,9 +131,21 @@ const AdminCampaign = (props) => {
 
     }
 
+    let cancelActionTokenSource;
     const fetchActions = async (search) => {
 
-        const res = await axios.get('/actions?search=' + search)
+        if(typeof cancelActionTokenSource != typeof undefined) {
+            cancelActionTokenSource.cancel("Operation canceled due to new request.")
+        }
+
+        cancelActionTokenSource = axios.CancelToken.source();
+
+        const res = await axios.get('/actions', {
+            cancelToken: cancelActionTokenSource.token,
+            params: {
+                search: search
+            }
+        })
 
         var results = res.data.data
 
@@ -154,9 +167,21 @@ const AdminCampaign = (props) => {
         }, 1000);
     });
 
-    const fetchRewards = async () => {
+    let cancelRewardTokenSource;
+    const fetchRewards = async (search) => {
 
-        const res = await axios.get('/rewards')
+        if(typeof cancelRewardTokenSource != typeof undefined) {
+            cancelRewardTokenSource.cancel("Operation canceled due to new request.")
+        }
+
+        cancelRewardTokenSource = axios.CancelToken.source();
+
+        const res = await axios.get('/rewards', {
+            cancelToken: cancelRewardTokenSource.token,
+            params: {
+                search: search
+            }
+        })
 
         var results = res.data.data
 
@@ -189,10 +214,12 @@ const AdminCampaign = (props) => {
         setValidated(true);
 
         if(form.checkValidity() !== false) {
+            setSaving(true);
 
             if(data.id) {
                 dispatch(EditData(props, data))
                 .then(() => {
+                    setSaving(false);
                     setShowAddCampaign(false)
                     
                     toast.success("Campaign added successfully", {
@@ -200,6 +227,7 @@ const AdminCampaign = (props) => {
                     });
                 })
                 .catch((error) => {
+                    setSaving(false);
         
                     toast.error(error.response.data.message, {
                         position: toast.POSITION.BOTTOM_RIGHT
@@ -210,6 +238,7 @@ const AdminCampaign = (props) => {
             else {
                 dispatch(AddData(props, data))
                 .then(() => {
+                    setSaving(false);
                     setShowAddCampaign(false)
                     
                     toast.success("Campaign added successfully", {
@@ -217,6 +246,7 @@ const AdminCampaign = (props) => {
                     });
                 })
                 .catch((error) => {
+                    setSaving(false);
         
                     toast.error(error.response.data.message, {
                         position: toast.POSITION.BOTTOM_RIGHT
@@ -232,11 +262,11 @@ const AdminCampaign = (props) => {
     const addReward = async () => {
         const data = {...reward, campaign_id: campaignList.data.id}
 
+        setSaving(true);
         const res = await axios.post('/campaign_rewards', data)
-
         const newCampaign = res.data.data;
-
         const tmp = campaignList
+        setSaving(false)
 
         tmp.data.campaigns.data = [newCampaign, ...tmp.data.campaigns.data];
 
@@ -359,6 +389,7 @@ const AdminCampaign = (props) => {
                 return <tr key={key}>
                     <td>{el.reward.name}</td>
                     <td>{el.action.name}</td>
+                    <td>{el.quantity}</td>
                     <td>
                         <ButtonGroup size="sm">
                             <Button variant="danger" onClick={() => {handleDelete(el.id, 'campaign')}}>Delete</Button>
@@ -425,7 +456,7 @@ const AdminCampaign = (props) => {
             <Modal show={showAddCampaign} onHide={handleCloseAddCampaign}>
                 <Form noValidate validated={validated} onSubmit={handleSubmit}>
                     <Modal.Header closeButton>
-                        <Modal.Title>{!_.isUndefined(data.id) ? 'Edit Campaign' : 'Add Campaign'}</Modal.Title>
+                        <Modal.Title>{!_.isUndefined(data.id) ? 'Update Campaign' : 'Add Campaign'}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         {fields.map((field, i) => {
@@ -485,7 +516,12 @@ const AdminCampaign = (props) => {
                         Close
                         </Button>
                         <Button variant="primary" type="submit">
-                        Save Changes
+                            {saving && <Spinner 
+                            as="span"
+                            animation="border" 
+                            size="sm"
+                            role="status"
+                            aria-hidden="true" />} Save Changes
                         </Button>
                     </Modal.Footer>
                 </Form>
@@ -496,30 +532,39 @@ const AdminCampaign = (props) => {
                     <Modal.Title>Rewards</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Row>
-                        <Col md="12">
-                            Action:
-                        </Col>
-                        <Col md="12">
+                    <Form>
+                        <Form.Group className="mb-2" controlId="formAction">
+                            <Form.Label>Action</Form.Label>
                             <AsyncSelect cacheOptions defaultOptions loadOptions={promiseActionOptions} onChange={value => setReward(prev => ({...prev, 'action_id' : value.value}))} />
-                        </Col>
-                        <Col md="12">
-                            Reward:
-                        </Col>
-                        <Col md="12">
+                            <Form.Text className="text-muted">
+                            Choose action first.
+                            </Form.Text>
+                        </Form.Group>
+                        <Form.Group className="mb-2" controlId="formReward">
+                            <Form.Label>Reward</Form.Label>
                             <AsyncSelect cacheOptions defaultOptions loadOptions={promiseRewardOptions} onChange={value => setReward(prev => ({...prev, 'reward_id' : value.value}))} />
-                        </Col>
-                        <Col md="12">
-                            <Button onClick={addReward}>Add</Button>
-                        </Col>
-                    </Row>
-                    <Row>     
+                        </Form.Group>
+                        <Form.Group className="mb-2" controlId="formQuantity">
+                            <Form.Label>Quantity</Form.Label>
+                            <Form.Control type="number" placeholder="Enter qty" onChange={e => setReward(prev => ({...prev, 'quantity' : e.target.value}))} />
+                        </Form.Group>
+                        <Button onClick={addReward}>
+                        {saving && <Spinner 
+                            as="span"
+                            animation="border" 
+                            size="sm"
+                            role="status"
+                            aria-hidden="true" />} Add
+                        </Button>
+                    </Form>
+                    <Row className="mt-2">     
                         <Col md="12">
                             <Table responsive striped bordered hover size="sm">
                                 <thead>
                                     <tr>
                                         <th>Reward</th>
                                         <th>Action</th>
+                                        <th>Qty</th>
                                     </tr>
                                 </thead>
                                 <tbody>

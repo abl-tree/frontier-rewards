@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector} from "react-redux";
 import { Link } from "react-router-dom";
-import { Button, ButtonGroup, Col, Form, Row, Modal, Pagination, Table } from 'react-bootstrap';
-import _ from "lodash";
+import { Button, ButtonGroup, CloseButton, Col, Form, Row, Modal, Pagination, Spinner, Table } from 'react-bootstrap';
+import _, { isUndefined } from "lodash";
 import axios from "axios";
 import AsyncSelect from 'react-select/async';
 import { Register, GetData, EditData, DeleteData } from "../actions/userAction";
@@ -22,7 +22,8 @@ const User = (props) => {
         baseURL: 'https://stage.apigw.cdkapps.eu',
         headers: {"Access-Control-Allow-Origin": "http://localhost:3000"}
     });
-    const fields = [
+    const [saving, setSaving] = useState(false)
+    const adminFields = [
         {
             'key': 'user_type_id',
             'title': 'Type',
@@ -41,7 +42,7 @@ const User = (props) => {
             'default': 2,
             'control_id': 'formActionType',
             'errorMsg': 'Please select type.',
-            'required': true
+            'required': false
         },
         {
             'key': 'firstname',
@@ -50,7 +51,7 @@ const User = (props) => {
             'placeholder': 'Enter first name',
             'control_id': 'formFirstName',
             'errorMsg': 'Please provide first name.',
-            'required': true
+            'required': false
         },
         {
             'key': 'middlename',
@@ -66,7 +67,7 @@ const User = (props) => {
             'placeholder': 'Enter last name',
             'control_id': 'formLastName',
             'errorMsg': 'Please provide last name.',
-            'required': true
+            'required': false
         },
         {
             'key': 'email',
@@ -75,7 +76,7 @@ const User = (props) => {
             'placeholder': 'Enter email',
             'control_id': 'formEmail',
             'errorMsg': 'Please provide email address.',
-            'required': true
+            'required': false
         },
         {
             'key': 'phone_number',
@@ -84,7 +85,7 @@ const User = (props) => {
             'placeholder': 'Enter phone number',
             'control_id': 'formPhone',
             'errorMsg': 'Please provide phone number.',
-            'required': true
+            'required': false
         }
     ];
     const customerFields = [
@@ -105,8 +106,9 @@ const User = (props) => {
             ],
             'default': 2,
             'control_id': 'formActionType',
-            'errorMsg': 'Please select type.',
-            'required': true
+            'errorMsg': ['Please select type.'],
+            'required': false,
+            'isInvalid': false
         },
         {
             'key': 'customer_id',
@@ -114,8 +116,9 @@ const User = (props) => {
             'type': 'text',
             'placeholder': 'Enter customer ID',
             'control_id': 'formCustomerId',
-            'errorMsg': 'Please provide customer ID.',
-            'required': true
+            'errorMsg': ['Please provide customer ID.'],
+            'required': false,
+            'isInvalid': false
         },
         {
             'key': 'firstname',
@@ -123,8 +126,9 @@ const User = (props) => {
             'type': 'text',
             'placeholder': 'Enter first name',
             'control_id': 'formFirstName',
-            'errorMsg': 'Please provide first name.',
-            'required': true
+            'errorMsg': ['Please provide first name.'],
+            'required': false,
+            'isInvalid': false
         },
         {
             'key': 'middlename',
@@ -139,8 +143,9 @@ const User = (props) => {
             'type': 'text',
             'placeholder': 'Enter last name',
             'control_id': 'formLastName',
-            'errorMsg': 'Please provide last name.',
-            'required': true
+            'errorMsg': ['Please provide last name.'],
+            'required': false,
+            'isInvalid': false
         },
         {
             'key': 'email',
@@ -148,8 +153,9 @@ const User = (props) => {
             'type': 'email',
             'placeholder': 'Enter email',
             'control_id': 'formEmail',
-            'errorMsg': 'Please provide email address.',
-            'required': true
+            'errorMsg': ['Please provide email address.'],
+            'required': false,
+            'isInvalid': false
         },
         {
             'key': 'phone_number',
@@ -157,8 +163,9 @@ const User = (props) => {
             'type': 'text',
             'placeholder': 'Enter phone number',
             'control_id': 'formPhone',
-            'errorMsg': 'Please provide phone number.',
-            'required': true
+            'errorMsg': ['Please provide phone number.'],
+            'required': false,
+            'isInvalid': false
         },
         {
             'key': 'points',
@@ -166,27 +173,209 @@ const User = (props) => {
             'type': 'number',
             'placeholder': 'Enter points',
             'control_id': 'formPoints',
-            'required': false
+            'errorMsg': [],
+            'required': false,
+            'isInvalid': false
         },
         {
             'key': 'package_id',
-            'title': 'Search name',
+            'title': 'Package',
             'type': 'asyncselect',
             'placeholder': 'Enter name',
             'control_id': 'formName',
-            'errorMsg': 'Please add package.',
-            'required': true
+            'errorMsg': ['Please add package.'],
+            'required': false,
+            'isInvalid': false
+        },
+        {
+            'key': 'vehicles',
+            'fields': [
+                [
+                    {
+                        'key': 'vehicle_id',
+                        'title': 'ID',
+                        'type': 'text',
+                        'placeholder': 'Enter vehicle ID',
+                        'control_id': 'formVehicleID'
+                    },
+                    {
+                        'key': 'year',
+                        'title': 'Year',
+                        'type': 'text',
+                        'placeholder': 'Enter vehicle year',
+                        'control_id': 'formVehicleYear'
+                    },
+                    {
+                        'key': 'make',
+                        'title': 'Make',
+                        'type': 'text',
+                        'placeholder': 'Enter vehicle make',
+                        'control_id': 'formVehicleMake'
+                    },
+                    {
+                        'key': 'model',
+                        'title': 'Model',
+                        'type': 'text',
+                        'placeholder': 'Enter vehicle model',
+                        'control_id': 'formVehicleModel'
+                    },
+                    {
+                        'key': 'trim',
+                        'title': 'Trim',
+                        'type': 'text',
+                        'placeholder': 'Enter vehicle trim',
+                        'control_id': 'formVehicleTrim'
+                    },
+                    {
+                        'key': 'color',
+                        'title': 'Color',
+                        'type': 'text',
+                        'placeholder': 'Enter vehicle color',
+                        'control_id': 'formVehicleColor'
+                    },
+                    {
+                        'key': 'vin_no',
+                        'title': 'Vin No.',
+                        'type': 'text',
+                        'placeholder': 'Enter vehicle number',
+                        'control_id': 'formVehicleVinNo'
+                    }
+                ]
+            ]
         }
     ];
-    
+    const [fields, setFields] = useState(customerFields);
+    const vehicleFields = [
+        {
+            'key': 'vehicle_id',
+            'title': 'ID',
+            'type': 'text',
+            'placeholder': 'Enter vehicle ID',
+            'control_id': 'formVehicleID'
+        },
+        {
+            'key': 'year',
+            'title': 'Year',
+            'type': 'text',
+            'placeholder': 'Enter vehicle year',
+            'control_id': 'formVehicleYear'
+        },
+        {
+            'key': 'make',
+            'title': 'Make',
+            'type': 'text',
+            'placeholder': 'Enter vehicle make',
+            'control_id': 'formVehicleMake'
+        },
+        {
+            'key': 'model',
+            'title': 'Model',
+            'type': 'text',
+            'placeholder': 'Enter vehicle model',
+            'control_id': 'formVehicleModel'
+        },
+        {
+            'key': 'trim',
+            'title': 'Trim',
+            'type': 'text',
+            'placeholder': 'Enter vehicle trim',
+            'control_id': 'formVehicleTrim'
+        },
+        {
+            'key': 'color',
+            'title': 'Color',
+            'type': 'text',
+            'placeholder': 'Enter vehicle color',
+            'control_id': 'formVehicleColor'
+        },
+        {
+            'key': 'vin_no',
+            'title': 'Vin No.',
+            'type': 'text',
+            'placeholder': 'Enter vehicle number',
+            'control_id': 'formVehicleVinNo'
+        }
+    ]
 
     const handleClose = () => setShow(false);
     const handleShow = () => {
 
-        setData({user_type_id: 3})
+        setData({
+            user_type_id: 3,
+            vehicles: [{}]
+        })
+
+        setValidated(false)
+
+        setFields(customerFields)
 
         setShow(true);
 
+    }
+
+    const clearFieldErrors = () => {
+        let tmpFields = fields;
+
+        setValidated(false)
+
+        tmpFields = tmpFields.map((item, i) => {
+            return ({...item, isInvalid: false})
+        })
+
+        const index = tmpFields.findIndex((item) => item.key === 'vehicles');
+
+        if(!isUndefined(tmpFields[index])) {
+            tmpFields[index].fields = tmpFields[index].fields.map((vehicle, i) => {
+                return vehicle.map((item, i) => {
+                    return ({...item, isInvalid: false})
+                })
+            })
+
+        }
+
+        setFields(tmpFields)
+
+        return tmpFields
+    }
+
+    const fieldErrors = (tmpFields, errorData) => {
+        for (let key in errorData) {
+
+            if (Object.hasOwnProperty.call(errorData, key)) {
+
+                const fieldError = errorData[key];
+
+                const split = key.split('.');
+                if(split[0] === 'vehicles') {
+                    if(split.length === 3) {
+                        key = split[0];
+                        var index = fields.findIndex((item) => item.key === key)
+                        var fieldIndex = tmpFields[index]['fields'][split[1]].findIndex((item) => item.key === split[2])
+        
+                        tmpFields[index]['fields'][split[1]][fieldIndex]['errorMsg'] = fieldError
+                        tmpFields[index]['fields'][split[1]][fieldIndex]['isInvalid'] = true
+                    } else {
+                        key = split[0];
+                        var index = fields.findIndex((item) => item.key === key)
+        
+                        tmpFields[index]['errorMsg'] = fieldError
+                        tmpFields[index]['isInvalid'] = true
+                    }
+                } else {
+                    key = (key === 'package_id.value') ? 'package_id' : key;
+                    var index = fields.findIndex((item) => item.key === key)
+    
+                    tmpFields[index]['errorMsg'] = fieldError
+                    tmpFields[index]['isInvalid'] = true
+                }
+                
+            }
+            
+        }
+
+        setFields(tmpFields)
+
+        setValidated(true)
     }
 
     const addUser = (e) => {
@@ -195,8 +384,9 @@ const User = (props) => {
         e.stopPropagation();
 
         const form = e.currentTarget;
+        const tmpFields = clearFieldErrors();
 
-        setValidated(true);
+        setSaving(true);
 
         if(form.checkValidity() !== false) {
     
@@ -204,12 +394,20 @@ const User = (props) => {
                 dispatch(EditData(props, data))
                 .then(() => {
                     setShow(false)
+                    setSaving(false)
 
-                    toast.success("User updated successfully", {
+                    toast.success("User has been updated successfully", {
                         position: toast.POSITION.BOTTOM_RIGHT
                     });
                 })
                 .catch((error) => {
+                    setSaving(false)
+
+                    if(typeof error.response.data.data != undefined) {
+                        var errorData = error.response.data.data
+
+                        fieldErrors(tmpFields, errorData)
+                    }
         
                     toast.error(error.response.data.message, {
                         position: toast.POSITION.BOTTOM_RIGHT
@@ -220,12 +418,20 @@ const User = (props) => {
                 dispatch(Register(props, data))
                 .then(() => {
                     setShow(false);
+                    setSaving(false)
 
-                    toast.success("User added successfully", {
+                    toast.success("User has been added successfully", {
                         position: toast.POSITION.BOTTOM_RIGHT
                     });
                 })
                 .catch((error) => {
+                    setSaving(false)
+
+                    if(typeof error.response.data.data != undefined) {
+                        var errorData = error.response.data.data
+
+                        fieldErrors(tmpFields, errorData)
+                    }
         
                     toast.error(error.response.data.message, {
                         position: toast.POSITION.BOTTOM_RIGHT
@@ -302,14 +508,24 @@ const User = (props) => {
     }
 
     const handleEditShow = (val) => {
+        let dataVal = {...val};
+        const key = 'vehicles';
+        let vFields = [...customerFields];
+        const index = vFields.findIndex((item) => item.key === key);
 
-        val.customer_id = val.info ? val.info.customer_id : ''
-        val.package_id = val.info ? {'value' : val.info.package.id, 'label' : val.info.package.name} : ''
+        dataVal.customer_id = dataVal.info ? dataVal.info.customer_id : ''
+        dataVal.package_id = dataVal.info ? {'value' : dataVal.info.package.id, 'label' : dataVal.info.package.name} : ''
+        dataVal.vehicles = dataVal.vehicles.map((item, i) => {
+            if(i > 0) {vFields[index]['fields'] = [...vFields[index]['fields'], vehicleFields]}
 
-        setData(val)
+            return ({...item.vehicle_info, id: item.id})
+        });
+
+        setFields(vFields);
+
+        setData(dataVal)
 
         setShow(true);
-
     }
 
     const handleDelete = id => {
@@ -358,15 +574,17 @@ const User = (props) => {
     const userForm = () => {
         let form = fields
 
-        if(data.user_type_id == 3) form = customerFields
-
         return form.map((field, i) => {
-            if(field.type === 'text' || field.type === 'email' || field.type === 'number') {
+            if(field.key == 'vehicles') {
+                return vehicleForm(field.fields, field.key)
+            } else if(field.type === 'text' || field.type === 'email' || field.type === 'number') {
                 return <Form.Group as={Row} key={i} controlId={field.control_id}>
                     <Form.Label column sm={3}>{field.title}</Form.Label>
                     <Col sm={9}>
-                        <Form.Control 
+                        <Form.Control
+                            size="sm"
                             required={field.required}
+                            isInvalid={field.isInvalid}
                             type={field.type} 
                             placeholder={field.placeholder}
                             value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
@@ -385,10 +603,23 @@ const User = (props) => {
                         <Form.Control 
                             size="sm"
                             required={field.required}
+                            isInvalid={field.isInvalid}
                             as={field.type} 
                             placeholder={field.placeholder}
                             value={!_.isUndefined(data[field.key]) ? data[field.key] : ''}
-                            onChange={ (e) => setData(prev => ({...prev, [field.key] : e.target.value})) }>
+                            onChange={ (e) => {
+                                setValidated(false)
+
+                                if(field.key == 'user_type_id') {
+                                    if(e.target.value == 2) {
+                                        setFields(adminFields)
+                                    } else {
+                                        setFields(customerFields)
+                                    }
+                                }
+
+                                setData(prev => ({...prev, [field.key] : e.target.value}))
+                            }}>
 
                             {field.options.map((option, i) => {
                                 return <option key={i} value={option.key}>{option.label}</option>
@@ -402,10 +633,91 @@ const User = (props) => {
                 </Form.Group>
             } else if(field.type === 'asyncselect') {
                 if(field.key == 'package_id') {
-                    return <AsyncSelect defaultOptions defaultValue={!_.isUndefined(data[field.key]) ? data[field.key] : ''} loadOptions={promisePackagesOptions} onChange={value => setData(prev => ({...prev, [field.key] : value}))} /> 
+                    return <Form.Group key={i} as={Row}>
+                        <Form.Label column sm={3}>{field.title}</Form.Label>
+                        <Col sm={9}>
+                            <AsyncSelect size="sm" className={field.isInvalid ? 'is-invalid' : ''} styles={{
+                                control: (provided, state) => ({
+                                    ...provided,
+                                    borderColor: field.isInvalid ? (state.isSelected ? 'red' : 'red') : '#ced4da'
+                                }),
+                            }} defaultOptions defaultValue={!_.isUndefined(data[field.key]) ? data[field.key] : ''} loadOptions={promisePackagesOptions} onChange={value => setData(prev => ({...prev, [field.key] : value}))} />
+                            
+                            {field.isInvalid && <Form.Control.Feedback type="invalid">
+                                {field.errorMsg}
+                            </Form.Control.Feedback>}
+                        </Col>
+                    </Form.Group>
                 }
             }
         })
+    }
+
+    const vehicleForm = (vFields, vKey) => {
+        return vFields.map((fields, i) => {
+            const vIndex = i;
+            return (
+                <>
+                    <p>Vehicle #{vIndex + 1} {vIndex !== 0 && <CloseButton onClick={() => removeVehicle(vIndex)} />}</p>
+                    <hr/>
+                    {
+                        fields.map((field, i) => {
+                            return <Form.Group as={Row} key={i} controlId={field.control_id}>
+                                <Form.Label column sm={3}>{field.title}</Form.Label>
+                                <Col sm={9}>
+                                    <Form.Control 
+                                        size="sm"
+                                        required={field.required}
+                                        isInvalid={field.isInvalid}
+                                        type={field.type} 
+                                        placeholder={field.placeholder}
+                                        value={!_.isUndefined(data[vKey]) && !_.isUndefined(data[vKey][vIndex]) && !_.isUndefined(data[vKey][vIndex][field.key]) ? data[vKey][vIndex][field.key] : ''}
+                                        defaultValue={!_.isUndefined(data[vKey]) && !_.isUndefined(data[vKey][vIndex]) && !_.isUndefined(data[vKey][vIndex][field.key]) ? data[vKey][vIndex][field.key] : ''}
+                                        onChange={ e => {
+                                            let finalData = data[vKey];
+                                            let tmpData = finalData[vIndex];
+                                            tmpData = {...tmpData, [field.key]: e.target.value};
+                                            finalData[vIndex] = tmpData;
+                                            
+                                            setData(prev => ({...prev, [vKey] : finalData}))
+                                        } }
+                                    />
+                                    <Form.Control.Feedback type="invalid">
+                                        {field.errorMsg}
+                                    </Form.Control.Feedback>
+                                </Col>
+                            </Form.Group>
+                        })
+                    }
+                </>
+            )
+        })
+    }
+
+    const addVehicle = () => {
+        const key = 'vehicles';
+        let vFields = [...fields];
+        const index = vFields.findIndex((item) => item.key === key);
+        vFields[index]['fields'] = [...vFields[index]['fields'], vehicleFields]
+        setFields(vFields);
+
+        let vData = {...data}
+        vData['vehicles'] = [...vData['vehicles'], {}]
+        setData(vData)
+    }
+
+    const removeVehicle = (i) => {
+        const key = 'vehicles';
+        let vFields = [...fields];
+        const index = vFields.findIndex((item) => item.key === key);
+        let vFieldsTmp = vFields[index].fields;
+        let newVFields = vFieldsTmp.filter((item, index) => index != i);
+        vFields[index]['fields'] = newVFields
+        setFields(vFields);
+
+        let vData = {...data};
+        vData['vehicles'] = vData['vehicles'].filter((item, index) => index != i);
+        setData(vData);
     }
 
     const handleTypeChange = (val) => {
@@ -443,23 +755,26 @@ const User = (props) => {
                     </Button>
                 </Col>
         
-                <Modal show={show} onHide={handleClose}>
+                <Modal show={show} onHide={handleClose} backdrop="static">
                     <Form noValidate validated={validated} onSubmit={addUser}>
                         <Modal.Header closeButton>
                             <Modal.Title>{!_.isUndefined(data.id) ? 'Edit User' : 'Add User'}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>                            
                             {userForm()}
-                            {/* <AsyncSelect cacheOptions defaultOptions loadOptions={promisePackagesOptions} onChange={value => setData(prev => ({...prev, 'test' : value.value}))} /> */}
-
-                            {/* <AsyncSelect loadOptions={promiseCustomersOptions} onChange={value => searchCustomer(value.value)} />     */}
+                            {data.user_type_id == 3 && <Button variant="primary" onClick={(e) => {addVehicle()}}>Add Vehicle</Button>}
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="secondary" onClick={handleClose}>
                             Close
                             </Button>
                             <Button variant="primary" type="submit">
-                            Save Changes
+                            {saving && <Spinner 
+                                as="span"
+                                animation="border" 
+                                size="sm"
+                                role="status"
+                                aria-hidden="true" />} Save Changes
                             </Button>
                         </Modal.Footer>
                     </Form>
