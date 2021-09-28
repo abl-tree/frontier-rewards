@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { Navbar } from "react-bootstrap";
 import _ from 'lodash';
 import { config } from '../utils/Constants';
@@ -43,18 +43,18 @@ export const AdminSidebar = (props) => {
             <div className="sidebar-sticky pt-3">
                 <ul className="nav flex-column">
                     <li className="nav-item">
-                        <Link className="nav-link" to="/">
+                        <NavLink className="nav-link" to="/">
                             <img
                                 alt="Dashboard"
                                 src={config.url.BASE_URL+'/icons/dashboard-icon.png'}
                                 width="26"
                                 className="d-inline-block align-top"
                             />
-                            Dashboard <span className="sr-only">(current)</span>
-                        </Link>
+                            Dashboard
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/actions">
+                        <NavLink className="nav-link" to="/actions">
                             <img
                                 alt="Dashboard"
                                 src={config.url.BASE_URL+'/icons/actions-icon.png'}
@@ -62,10 +62,10 @@ export const AdminSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Actions
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/packages">
+                        <NavLink className="nav-link" to="/packages">
                             <img
                                 alt="Dashboard"
                                 src={config.url.BASE_URL+'/icons/package-icon.png'}
@@ -73,10 +73,10 @@ export const AdminSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Packages
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/rewards">
+                        <NavLink className="nav-link" to="/rewards">
                             <img
                                 alt="Rewards"
                                 src={config.url.BASE_URL+'/icons/reward-icon.png'}
@@ -84,10 +84,10 @@ export const AdminSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Rewards
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/campaigns">
+                        <NavLink className="nav-link" to="/campaigns">
                             <img
                                 alt="Campaigns"
                                 src={config.url.BASE_URL+'/icons/campaign-icon.png'}
@@ -95,10 +95,10 @@ export const AdminSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Campaigns
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/users">
+                        <NavLink className="nav-link" to="/users">
                             <img
                                 alt="Profile"
                                 src={config.url.BASE_URL+'/icons/profile-icon.png'}
@@ -106,10 +106,10 @@ export const AdminSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Users
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/transactions">
+                        <NavLink className="nav-link" to="/transactions">
                             <img
                                 alt="Transactions"
                                 src={config.url.BASE_URL+'/icons/transaction-icon.png'}
@@ -117,10 +117,10 @@ export const AdminSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Transactions
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/profile">
+                        <NavLink className="nav-link" to="/profile">
                             <img
                                 alt="Profile"
                                 src={config.url.BASE_URL+'/icons/profile-icon.png'}
@@ -128,7 +128,7 @@ export const AdminSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Profile
-                        </Link>
+                        </NavLink>
                     </li>
                     {/* <li className="nav-item">
                         <Link className="nav-link" to="/transactions">

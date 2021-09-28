@@ -28,8 +28,8 @@ export const ProtectedRoute = ({ component: Component, ...rest }) => {
             // Any status code that lie within the range of 2xx cause this function to trigger
             // Do something with response data
             return response;
-          }, function (error) {
-                if(typeof error.response.statusText !== 'undefined' && error.response.statusText === 'Unauthorized') {
+          }, function (error) { 
+                if(typeof error.response.data !== 'undefined' && error.response.data.error === 'Unauthenticated.') {
                     dispatch({
                         type: "LOGOUT_SUCCESS"
                     })

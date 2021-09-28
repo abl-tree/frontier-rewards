@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useRef} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import { Badge, Button, ButtonGroup, Card, Col, Form, Modal, Pagination, Row, Spinner, Table } from 'react-bootstrap';
 import _ from "lodash";
@@ -14,7 +14,9 @@ import {config} from '../utils/Constants'
 
 const AdminCampaign = (props) => {
     
-    const dispatch = useDispatch();
+    const dispatch = useDispatch();    
+    const asyncSelReward = useRef(null);
+    const asyncSelAction = useRef(null);
     const dataList = useSelector(state => state.Campaign);
     const [campaignList, setCampaignList] = useState({
         loading: false,
@@ -268,6 +270,10 @@ const AdminCampaign = (props) => {
         const tmp = campaignList
         setSaving(false)
 
+        setReward({});
+        asyncSelReward.current.select.select.clearValue();
+        asyncSelAction.current.select.select.clearValue();
+        
         tmp.data.campaigns.data = [newCampaign, ...tmp.data.campaigns.data];
 
         setCampaignList({...campaignList, ...tmp});
@@ -535,18 +541,18 @@ const AdminCampaign = (props) => {
                     <Form>
                         <Form.Group className="mb-2" controlId="formAction">
                             <Form.Label>Action</Form.Label>
-                            <AsyncSelect cacheOptions defaultOptions loadOptions={promiseActionOptions} onChange={value => setReward(prev => ({...prev, 'action_id' : value.value}))} />
+                            <AsyncSelect ref={asyncSelReward} defaultOptions loadOptions={promiseActionOptions} onChange={value => {(value != null) ? setReward(prev => ({...prev, 'action_id' : value.value})) : setReward(prev => ({}))}} />
                             <Form.Text className="text-muted">
                             Choose action first.
                             </Form.Text>
                         </Form.Group>
                         <Form.Group className="mb-2" controlId="formReward">
                             <Form.Label>Reward</Form.Label>
-                            <AsyncSelect cacheOptions defaultOptions loadOptions={promiseRewardOptions} onChange={value => setReward(prev => ({...prev, 'reward_id' : value.value}))} />
+                            <AsyncSelect ref={asyncSelAction} defaultOptions loadOptions={promiseRewardOptions} onChange={value => {(value != null) ? setReward(prev => ({...prev, 'reward_id' : value.value})) : setReward(prev => ({}))} } />
                         </Form.Group>
                         <Form.Group className="mb-2" controlId="formQuantity">
                             <Form.Label>Quantity</Form.Label>
-                            <Form.Control type="number" placeholder="Enter qty" onChange={e => setReward(prev => ({...prev, 'quantity' : e.target.value}))} />
+                            <Form.Control type="number" placeholder="Enter qty" onChange={e => setReward(prev => ({...prev, 'quantity' : e.target.value}))} value={!_.isUndefined(reward.quantity) ? reward.quantity : ''} />
                         </Form.Group>
                         <Button onClick={addReward}>
                         {saving && <Spinner 

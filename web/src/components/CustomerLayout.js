@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { Navbar } from "react-bootstrap";
 import _ from 'lodash';
 import '../css/notifications.css'
@@ -44,18 +44,18 @@ export const CustomerSidebar = (props) => {
             <div className="sidebar-sticky pt-3">
                 <ul className="nav flex-column">
                     <li className="nav-item">
-                        <Link className="nav-link" to="/">
+                        <NavLink className="nav-link" to="/">
                             <img
                                 alt="Dashboard"
                                 src={config.url.BASE_URL+'/icons/dashboard-icon.png'}
                                 width="26"
                                 className="d-inline-block align-top"
                             />
-                            Dashboard <span className="sr-only">(current)</span>
-                        </Link>
+                            Dashboard
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/rewards">
+                        <NavLink className="nav-link" to="/rewards">
                             <img
                                 alt="Rewards"
                                 src={config.url.BASE_URL+'/icons/reward-icon.png'}
@@ -63,10 +63,10 @@ export const CustomerSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Rewards
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/campaigns">
+                        <NavLink className="nav-link" to="/campaigns">
                             <img
                                 alt="Campaigns"
                                 src={config.url.BASE_URL+'/icons/campaign-icon.png'}
@@ -74,10 +74,10 @@ export const CustomerSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Campaigns
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/transactions">
+                        <NavLink className="nav-link" to="/transactions">
                             <img
                                 alt="Transactions"
                                 src={config.url.BASE_URL+'/icons/transaction-icon.png'}
@@ -85,10 +85,10 @@ export const CustomerSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Transactions
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/profile">
+                        <NavLink className="nav-link" to="/profile">
                             <img
                                 alt="Profile"
                                 src={config.url.BASE_URL+'/icons/profile-icon.png'}
@@ -96,10 +96,10 @@ export const CustomerSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Profile
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
-                        <Link className="nav-link" to="/settings">
+                        <NavLink className="nav-link" to="/settings">
                             <img
                                 alt="Dashboard"
                                 src={config.url.BASE_URL+'/icons/settings-icon.png'}
@@ -107,7 +107,7 @@ export const CustomerSidebar = (props) => {
                                 className="d-inline-block align-top"
                             />
                             Settings
-                        </Link>
+                        </NavLink>
                     </li>
                 </ul>
             </div>
